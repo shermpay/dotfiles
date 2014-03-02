@@ -1,0 +1,2 @@
+# -*- sh -*-			
+alias ec='emacsclient -nw -a vim'

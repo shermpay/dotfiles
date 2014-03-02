@@ -1,0 +1,159 @@
+;;; Sherman Pay Jing Hao
+;;; Tuesday, 05. November 2013
+;;; Contains all Major modes configuration
+
+;;; Global Undo tree mode
+(global-undo-tree-mode 1)
+
+;;; Control mode
+;; (control-mode-default-setup)
+
+;;; key chord modes
+(require 'key-chord)
+(key-chord-mode 1)
+;; (require 'space-chord)
+;; Yasnippet plugin
+(setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+(setq yas-prompt-functions '(yas-dropdown-prompt
+			     yas-completing-prompt))
+(require 'yasnippet)
+(yas-global-mode 1)
+
+;;; Auto-complete modes
+(require 'auto-complete)
+(add-to-list 'ac-dictionary-directories "/home/shermpay/.emacs.d/plugins/auto-complete/dict")
+
+(require 'auto-complete-config)
+(ac-config-default)
+(setq ac-auto-show-menu 1)
+(setq ac-trigger-commands nil)
+(global-auto-complete-mode t)
+
+;;; Jedi mode
+(autoload 'jedi:setup "jedi" nil t)
+(setq jedi:setup-keys t)                      ; optional
+(setq jedi:complete-on-dot t)
+
+;;; Paredit-mode
+(require 'paredit)
+(setq lisp-modes-hooks '(emacs-lisp-mode-hook
+			 eval-expression-minibuffer-setup-hook
+			 ielm-mode-hook
+			 lisp-mode-hook
+			 lisp-interaction-mode-hook
+			 scheme-mode-hook
+			 slime-mode-hook
+			 clojure-mode-hook
+			 cider-mode-hook))
+
+(dolist (hook lisp-modes-hooks nil)
+  (add-hook hook #'enable-paredit-mode))
+
+;;; Rainbow delimiters
+(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+(custom-set-faces
+ '(rainbow-delimiters-depth-1-face ((t (:foreground "ivory"))))
+ '(rainbow-delimiters-depth-2-face ((t (:foreground "snow1"))))
+ '(rainbow-delimiters-depth-3-face ((t (:foreground "orchid1"))))
+ '(rainbow-delimiters-depth-4-face ((t (:foreground "bisque1"))))
+ '(rainbow-delimiters-depth-5-face ((t (:foreground "LightSteelBlue1"))))
+ '(rainbow-delimiters-depth-6-face ((t (:foreground "dark gray"))))
+ '(rainbow-delimiters-depth-7-face ((t (:foreground "rosy brown"))))
+ '(rainbow-delimiters-depth-8-face ((t (:foreground "dark khaki"))))
+ '(rainbow-delimiters-depth-9-face ((t (:foreground "purple1"))))
+ '(rainbow-delimiters-unmatched-face ((t (:foreground "cadet blue")))))
+
+
+;; ^^^^^^^^^^^^^^^^^^^^ Lisp / SLIME ^^^^^^^^^^^^^^^^^^^^
+(setq slime-default-lisp 'clisp) ; Default lisp
+(setq slime-lisp-implementations
+      '((clisp ("/usr/local/bin/clisp" "-I"))
+	(sbcl ("/usr/bin/sbcl"))))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/slime-2013-04-05/"))
+(require 'slime-autoloads)
+;; (require 'slime-tramp)
+ ;;; slime with tramp
+(slime-setup '(slime-fancy))
+;; <<<<<<<<<<<<<<<<<<<< END LISP >>>>>>>>>>>>>>>>>>>>
+
+;; ^^^^^^^^^^^^^^^^^^^^ Clojure MODES ^^^^^^^^^^^^^^^^^^^^ 
+;;; Cider
+(add-hook 'clojure-mode-hook #'cider-mode)
+(add-hook 'cider-mode-hook 'ac-nrepl-setup)
+
+(setq cider-auto-select-error-buffer t)  ;Auto select error buffer
+(setq cider-repl-print-length 100)
+;; (add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
+;; (add-hook 'nrepl-interaction-mode-hook 'ac-nrepl-setup)
+;; (add-hook 'clojure-nrepl-mode-hook 'ac-nrepl-setup)
+
+;; <<<<<<<<<<<<<<<<<<<< END Clojure >>>>>>>>>>>>>>>>>>>>
+
+;; ^^^^^^^^^^^^^^^^^^^^ WEB MODES ^^^^^^^^^^^^^^^^^^^^ 
+;; Load php-mode
+(autoload 'php-mode "php-mode.el")
+(add-to-list 'auto-mode-alist
+	     '("\\.php[34]?\\'\\|\\.phtml\\'" . php-mode))
+
+;; Load nxhtml-mode
+;;   (load "~/.emacs.d/plugins/nxhtml/autostart.el")
+
+;; <<<<<<<<<<<<<<<<<<<< END WEB >>>>>>>>>>>>>>>>>>>>
+
+;; ^^^^^^^^^^^^^^^ Java MODE ^^^^^^^^^^^^^^^
+(add-hook 'java-mode-hook 'java-defer-loading)
+;; (add-to-list 'load-path "~/.emacs.d/plugins/auto-java-complete/")
+;;       (require 'ajc-java-complete-config)
+      ;; (add-hook 'java-mode-hook 'ajc-java-complete-mode)
+      ;; (add-hook 'find-file-hook 'auto-4-jsp-find-file-hook)
+;; <<<<<<<<<<<<<<< END JDE >>>>>>>>>>>>>>>
+
+;;; Python Mode
+(add-hook 'python-mode-hook 'jedi:setup)
+
+(setq python-shell-interpreter "ipython"
+       python-shell-interpreter-args ""
+       python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+       python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+       python-shell-completion-setup-code
+       "from IPython.core.completerlib import module_completion"
+       python-shell-completion-module-string-code
+       "';'.join(module_completion('''%s'''))\n"
+       python-shell-completion-string-code
+       "';'.join(get_ipython().Completer.all_completions('''%s'''))\n" )
+;; ^^^^^^^^^^^^^^^^^^^^ C MODE ^^^^^^^^^^^^^^^^^^^^
+(setq c-basic-offset 4)
+(c-set-offset 'case-label 4)
+;; <<<<<<<<<<<<<<<<<<<< END C >>>>>>>>>>>>>>>>>>>>
+
+;; ^^^^^^^^^^^^^^^^^^^^ OCTAVE MODE ^^^^^^^^^^^^^^^^^^^^
+(setq inferior-octave-program "/usr/bin/octave")
+(setq octave-block-offset 4)
+(setq octave-block-comment-start "%%")
+(setq octave-comment-char (string-to-char "%"))
+(setq auto-mode-alist
+      (cons '("\\.m\\'" . octave-mode) auto-mode-alist))
+(add-hook 'octave-mode-hook
+	  (lambda ()
+	    (define-key octave-mode-map (kbd "C-c C-z") 'octave-shell)))
+
+;;;  ^^^^^^^^^^^^^^^^^^^^ LATEX MODE ^^^^^^^^^^^^^^^^^^^^
+(load "auctex.el" nil t t)
+(load "preview-latex.el" nil t t)
+(setq TeX-auto-save t)
+(setq TeX-parse-self t)
+(setq-default TeX-master nil)
+(add-hook 'LaTeX-mode-hook 'visual-line-mode)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+(setq reftex-plug-into-AUCTeX t)
+(setq TeX-PDF-mode t)			;Always compile to PDF
+
+;; Org-mode
+;; The following lines are always needed.  Choose your own keys.
+(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode)) 
+(add-hook 'org-mode-hook 'flyspell-mode)
+;; (setq org-agenda-files (directory-files (concat *elisp-dir* "/org")))
+(provide 'modes-plugins)
+

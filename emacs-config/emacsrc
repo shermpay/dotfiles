@@ -1,0 +1,106 @@
+;; -*- emacs-lisp -*-
+;; -------------- STARTUP  --------------
+(require 'cl-lib); Allows use of Common-Lisp libraries
+;;; Useful default packages
+(require 'saveplace)
+(require 'uniquify)
+(require 'ansi-color)
+(require 'recentf)
+(defvar *elisp-dir* "~/.emacs.d")
+
+(global-linum-mode t);; Global Line Number mode on startup
+(column-number-mode t);; Column Number mode
+(server-start) ;; Start the emacs server
+(setq enable-recursive-minibuffers t)	; Useful
+(delete-selection-mode 1) 	      	; Deletes text in the region
+;; Abbrevations mode on startup
+(setq-default abbrev-mode t)
+;; (read-abbrev-file (concat *elisp-dir* "/abbrev_defs"))
+;; (setq save-abbrevs t)
+;; Load PATHS
+(let ((default-directory *elisp-dir*))
+  (normal-top-level-add-subdirs-to-load-path))
+(add-to-list 'load-path "~/dotfiles/emacs-config")
+;; Intelligent Do mode
+(ido-mode t)
+(setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
+;;; subword
+(global-subword-mode t)
+;;; Show matching parens
+(show-paren-mode 1)
+
+;;; Electric pair mode
+(electric-pair-mode 1)
+
+;; Uses echo area to display tooltips
+(tooltip-mode -1)
+(setq tooltip-use-echo-area t)
+
+;;; Minibuffer/Echo area/Mode line
+(setq echo-keystrokes 0.01)
+
+(setq inhibit-startup-message t)
+;; --------------- STARTUP END ---------------
+
+;;; Bookmarks
+
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ ;; --------------- MISC --------------- ;;
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Debugging
+(setq stack-trace-on-error t)
+;; Setting Auto-Save directory and Backup Directory
+(let ((tmp (concat *elisp-dir* "/tmp")))
+ (setq backup-directory-alist
+       `((".*" . ,tmp)))
+ (setq auto-save-file-name-transforms
+       `((".*" ,tmp t))))
+;; Emacs will not automatically add new lines
+(setq next-line-add-newlines nil)
+
+;; ;; Changes all yes/no questions to y/n type
+;; (fset 'yes-or-no-p 'y-or-n-p)
+
+;; TRAMP mode
+(setq tramp-default-method "ssh")
+(setq tramp-verbose 0)
+;; (add-to-list 'tramp-default-proxies-alist
+;; 	     '(nil "\\`root\\'" "/ssh:%h:"))
+;; (add-to-list 'tramp-default-proxies-alist
+;; 	     '((regexp-quote (system-name)) nil nil))
+
+;; Loading extra info directories
+(setq Info-directory-list
+      '("/usr/local/share/info/"
+	"/usr/share/info/emacs-24"
+	"/home/shermpay/.emacs.d/info"	
+	"/usr/share/info/"))
+
+;;; Package Manager
+(require 'package)
+(setq package-archives
+      '(("gnu"         . "http://elpa.gnu.org/packages/")
+        ("marmalade"   . "http://marmalade-repo.org/packages/")
+	("melpa"       . "http://melpa.milkbox.net/packages/")))
+(package-initialize)
+
+;; -------------------- MISC END --------------------
+
+;;; Load other customizations appropriately
+(require 'my-functions)
+(require 'modes-plugins)
+(require 'custom-faces)
+(require 'keybindings)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes (quote ("0c311fb22e6197daba9123f43da98f273d2bfaeeaeb653007ad1ee77f0003037" default))))
