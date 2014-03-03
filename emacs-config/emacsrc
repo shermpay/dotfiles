@@ -15,8 +15,8 @@
 (delete-selection-mode 1) 	      	; Deletes text in the region
 ;; Abbrevations mode on startup
 (setq-default abbrev-mode t)
-;; (read-abbrev-file (concat *elisp-dir* "/abbrev_defs"))
-;; (setq save-abbrevs t)
+(read-abbrev-file (concat *elisp-dir* "/abbrev_defs"))
+(setq save-abbrevs t)
 ;; Load PATHS
 (let ((default-directory *elisp-dir*))
   (normal-top-level-add-subdirs-to-load-path))

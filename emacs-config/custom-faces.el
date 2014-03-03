@@ -8,6 +8,7 @@
 (menu-bar-mode -1) 			
 (menu-bar-no-scroll-bar)
 (tool-bar-mode -1)
+(bar-cursor-mode 1)
 
 ;;; Set the default colors, allows all frame to have the same colors
 (setq default-frame-alist

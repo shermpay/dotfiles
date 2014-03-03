@@ -10,7 +10,7 @@
 (global-set-key (kbd "C-c d") 'insert-date) ;; Insert date command
 ;;; Overrides
 (global-set-key (kbd "M-6" ) 'delete-indentation)  ;Used to remove blank from one line to another(not between)
-(global-set-key (kbd "M-%") 'query-replace-regexp)  ;Query replace regexp
+(global-set-key (kbd "M-5") 'query-replace-regexp)  ;Query replace regexp
 (global-set-key (kbd "<f8>") 'tramp-cleanup-all-connections)
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
@@ -51,7 +51,7 @@
 (key-chord-define-global "vv" 'scroll-up-command)
 (key-chord-define-global "rj" 'bookmark-jump)
 (key-chord-define-global "qq" 'keyboard-quit)
-(key-chord-define-global "kk" 'ido-kill-this-buffer)
+(key-chord-define-global "kk" 'kill-this-buffer)
 (key-chord-define-global "xb" 'ido-switch-buffer)
 (key-chord-define-global "wb" 'ido-switch-buffer-other-window)
 (key-chord-define-global "jw" 'other-window)
