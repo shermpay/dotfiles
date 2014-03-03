@@ -9,6 +9,8 @@
 ;;; My functions
 (global-set-key (kbd "C-c d") 'insert-date) ;; Insert date command
 ;;; Overrides
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "M-o") 'other-window)
 (global-set-key (kbd "M-6" ) 'delete-indentation)  ;Used to remove blank from one line to another(not between)
 (global-set-key (kbd "M-5") 'query-replace-regexp)  ;Query replace regexp
 (global-set-key (kbd "<f8>") 'tramp-cleanup-all-connections)

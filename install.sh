@@ -30,7 +30,9 @@ install_bash() {
 install_lang() {
     echo "Installing programming languages and tools"
     # Install languages and its tools
-    echo sudo apt-get -y install clojure leiningen # Clojure
+    echo sudo apt-get -y install clojure # Clojure
+    echo wget https://raw.github.com/technomancy/leiningen/stable/bin/lein -O ${HOME}/bin
+    echo chmod a+x ${HOME}/bin
     echo sudo apt-get -y install python3 # Python
     echo sudo apt-get -y install ant maven # Java
     echo sudo apt-get -y install clang	  # Clang

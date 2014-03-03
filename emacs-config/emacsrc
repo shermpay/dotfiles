@@ -45,6 +45,11 @@
 
 ;;; Bookmarks
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; -------------- Editing ---------- ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq next-line-add-newlines t)
+
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  ;; --------------- MISC --------------- ;;
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -60,7 +65,7 @@
 (setq next-line-add-newlines nil)
 
 ;; ;; Changes all yes/no questions to y/n type
-;; (fset 'yes-or-no-p 'y-or-n-p)
+(fset 'yes-or-no-p 'y-or-n-p)
 
 ;; TRAMP mode
 (setq tramp-default-method "ssh")

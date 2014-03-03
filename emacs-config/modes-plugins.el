@@ -19,6 +19,10 @@
 (require 'yasnippet)
 (yas-global-mode 1)
 
+;;; Ido modes
+(flx-ido-mode 1)
+(ido-ubiquitous 1)
+
 ;;; Auto-complete modes
 (require 'auto-complete)
 (add-to-list 'ac-dictionary-directories "/home/shermpay/.emacs.d/plugins/auto-complete/dict")
