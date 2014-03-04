@@ -8,7 +8,7 @@
 (menu-bar-mode -1) 			
 (menu-bar-no-scroll-bar)
 (tool-bar-mode -1)
-(bar-cursor-mode 1)
+;; (bar-cursor-mode 1)
 
 ;;; Set the default colors, allows all frame to have the same colors
 (setq default-frame-alist
@@ -37,8 +37,6 @@
 ;; (set-face-foreground 'minibuffer-prompt "SteelBlue1")
 ;; (set-face-foreground 'linum "azure3")
 
-(require 'powerline)
-(powerline-vim-theme)
 (display-time-mode 1) 
  ;;(set-frame-parameter (selected-frame) 'alpha '(<active> [<inactive>]))
  (set-frame-parameter (selected-frame) 'alpha '(50 20))

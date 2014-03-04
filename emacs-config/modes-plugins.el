@@ -8,16 +8,20 @@
 ;;; Control mode
 ;; (control-mode-default-setup)
 
+;;; elscreen
+(elscreen-start)
+;;; evil-mode
+(evil-mode 1)
 ;;; key chord modes
-(require 'key-chord)
-(key-chord-mode 1)
+;; (require 'key-chord)
+;; (key-chord-mode 1)
 ;; (require 'space-chord)
 ;; Yasnippet plugin
-(setq yas-snippet-dirs '("~/.emacs.d/snippets"))
-(setq yas-prompt-functions '(yas-dropdown-prompt
-			     yas-completing-prompt))
-(require 'yasnippet)
-(yas-global-mode 1)
+;; (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+;; (setq yas-prompt-functions '(yas-dropdown-prompt
+;; 			     yas-completing-prompt))
+;; (require 'yasnippet)
+;; (yas-global-mode 1)
 
 ;;; Ido modes
 (flx-ido-mode 1)
@@ -39,7 +43,7 @@
 (setq jedi:complete-on-dot t)
 
 ;;; Paredit-mode
-(require 'paredit)
+(require 'paredit) 
 (setq lisp-modes-hooks '(emacs-lisp-mode-hook
 			 eval-expression-minibuffer-setup-hook
 			 ielm-mode-hook
@@ -60,8 +64,7 @@
  '(rainbow-delimiters-depth-2-face ((t (:foreground "snow1"))))
  '(rainbow-delimiters-depth-3-face ((t (:foreground "orchid1"))))
  '(rainbow-delimiters-depth-4-face ((t (:foreground "bisque1"))))
- '(rainbow-delimiters-depth-5-face ((t (:foreground "LightSteelBlue1"))))
- '(rainbow-delimiters-depth-6-face ((t (:foreground "dark gray"))))
+ '(rainbow-delimiters-depth-5-face ((t (:foreground "LightSteelBlue1")))) '(rainbow-delimiters-depth-6-face ((t (:foreground "dark gray"))))
  '(rainbow-delimiters-depth-7-face ((t (:foreground "rosy brown"))))
  '(rainbow-delimiters-depth-8-face ((t (:foreground "dark khaki"))))
  '(rainbow-delimiters-depth-9-face ((t (:foreground "purple1"))))
@@ -104,8 +107,7 @@
 
 ;; <<<<<<<<<<<<<<<<<<<< END WEB >>>>>>>>>>>>>>>>>>>>
 
-;; ^^^^^^^^^^^^^^^ Java MODE ^^^^^^^^^^^^^^^
-(add-hook 'java-mode-hook 'java-defer-loading)
+;; ^^^^^^^^^^^^^^^ Java MODE ^^^^^^^^^^^^^^^(add-hook 'java-mode-hook 'java-defer-loading)
 ;; (add-to-list 'load-path "~/.emacs.d/plugins/auto-java-complete/")
 ;;       (require 'ajc-java-complete-config)
       ;; (add-hook 'java-mode-hook 'ajc-java-complete-mode)

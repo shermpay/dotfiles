@@ -29,7 +29,7 @@
 (global-subword-mode t)
 ;;; Show matching parens
 (show-paren-mode 1)
-
+(setq show-paren-style 'expression)
 ;;; Electric pair mode
 (electric-pair-mode 1)
 

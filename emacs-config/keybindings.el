@@ -3,7 +3,10 @@
 ;;; My keybindings
 ;;; Overwrote certain default keybindings, and included keybindings for plugins
 
-;;; Global-mode
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ ;; - - - - - - - - - Global-mode - - - - - - - - - ;;
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;; magit
 (global-set-key (kbd "C-M-g") 'magit-status)
 ;;; My functions
@@ -32,9 +35,6 @@
 (global-set-key (kbd "M-SPC") 'ace-jump-mode) 
 (global-set-key (kbd "C-M-SPC") 'just-one-space)
 
-;;; Hide Show mode
-(global-set-key (kbd "M-RET") 'hs-toggle-hiding)
-
 ;;; Smex mode
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
@@ -47,23 +47,39 @@
 (global-set-key "\C-cb" 'org-iswitchb)
 
 ;;; Yas bindings
-(global-set-key [(control tab)] 'yas-expand)
+;; (global-set-key [(control tab)] 'yas-expand)
 
 ;;; Key chords
-(key-chord-define-global "vv" 'scroll-up-command)
-(key-chord-define-global "rj" 'bookmark-jump)
-(key-chord-define-global "qq" 'keyboard-quit)
-(key-chord-define-global "kk" 'kill-this-buffer)
-(key-chord-define-global "xb" 'ido-switch-buffer)
-(key-chord-define-global "wb" 'ido-switch-buffer-other-window)
-(key-chord-define-global "jw" 'other-window)
-(key-chord-define-global "xx" 'save-buffer)
-(key-chord-define-global "xv" 'eval-last-sexp)
-(key-chord-define-global "jf" 'ido-find-file)
-(key-chord-define-global "wf"  'ido-find-file-other-window)
-(key-chord-define-global "rw" 'bookmark-jump-other-window)
-;; (space-chord-define-global "j" 'ace-jump-char-mode)
+;;(key-chord-define-global "vv" 'scroll-up-command)
+;;(key-chord-define-global "rj" 'bookmark-jump)
+;;(key-chord-define-global "qq" 'keyboard-quit)
+;;(key-chord-define-global "kk" 'kill-this-buffer)
+;;(key-chord-define-global "xb" 'ido-switch-buffer)
+;;(key-chord-define-global "wb" 'ido-switch-buffer-other-window)
+;;(key-chord-define-global "jw" 'other-window)
+;;(key-chord-define-global "xx" 'save-buffer)
+;;(key-chord-define-global "xv" 'eval-last-sexp)
+;;(key-chord-define-global "jf" 'ido-find-file)
+;;(key-chord-define-global "wf"  'ido-find-file-other-window)
+;;(key-chord-define-global "rw" 'bookmark-jump-other-window)
+;;;; (space-chord-define-global "j" 'ace-jump-char-mode)
 
 ;; (key-chord-define clojure-mode-map "EE" 'cider-eval-last-sexp)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; - - - - - - - - - Evil-mode - - - - - - - - -  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define-key evil-normal-state-map (kbd "C-w t") 'elscreen-create) ;creat tab
+(define-key evil-normal-state-map (kbd "C-w x") 'elscreen-kill) ;kill tab
+(define-key evil-normal-state-map "gT" 'elscreen-previous) ;previous tab
+(define-key evil-normal-state-map "gt" 'elscreen-next) ;next tab
+;;; esc quits
+(define-key evil-normal-state-map [escape] 'keyboard-quit)
+(define-key evil-visual-state-map [escape] 'keyboard-quit)
+(define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 (provide 'keybindings)
+
