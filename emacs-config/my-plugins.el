@@ -10,12 +10,11 @@
 
 ;;; elscreen
 (elscreen-start)
-;;; evil-mode
-(evil-mode 1)
+
 ;;; key chord modes
 ;; (require 'key-chord)
 ;; (key-chord-mode 1)
-;; (require 'space-chord)
+;; ;; (require 'space-chord)
 ;; Yasnippet plugin
 ;; (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
 ;; (setq yas-prompt-functions '(yas-dropdown-prompt
@@ -27,10 +26,12 @@
 (flx-ido-mode 1)
 (ido-ubiquitous 1)
 
+;;; Projectile mode
+(projectile-global-mode 1)
+(setq projectile-mode-line (concat " Prj[" (projectile-project-name) "]"))
 ;;; Auto-complete modes
 (require 'auto-complete)
-(add-to-list 'ac-dictionary-directories "/home/shermpay/.emacs.d/plugins/auto-complete/dict")
-
+(add-to-list 'ac-dictionary-directories "/home/shermpay/.emacs.d/elpa/auto-complete-20140208.653/dict")
 (require 'auto-complete-config)
 (ac-config-default)
 (setq ac-auto-show-menu 1)
@@ -76,8 +77,7 @@
 (setq slime-lisp-implementations
       '((clisp ("/usr/local/bin/clisp" "-I"))
 	(sbcl ("/usr/bin/sbcl"))))
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/plugins/slime-2013-04-05/"))
-(require 'slime-autoloads)
+;; (require 'slime-autoloads)
 ;; (require 'slime-tramp)
  ;;; slime with tramp
 (slime-setup '(slime-fancy))
@@ -97,11 +97,6 @@
 ;; <<<<<<<<<<<<<<<<<<<< END Clojure >>>>>>>>>>>>>>>>>>>>
 
 ;; ^^^^^^^^^^^^^^^^^^^^ WEB MODES ^^^^^^^^^^^^^^^^^^^^ 
-;; Load php-mode
-(autoload 'php-mode "php-mode.el")
-(add-to-list 'auto-mode-alist
-	     '("\\.php[34]?\\'\\|\\.phtml\\'" . php-mode))
-
 ;; Load nxhtml-mode
 ;;   (load "~/.emacs.d/plugins/nxhtml/autostart.el")
 
@@ -161,5 +156,5 @@
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode)) 
 (add-hook 'org-mode-hook 'flyspell-mode)
 ;; (setq org-agenda-files (directory-files (concat *elisp-dir* "/org")))
-(provide 'modes-plugins)
+(provide 'my-plugins)
 

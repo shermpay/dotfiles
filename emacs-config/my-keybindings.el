@@ -3,9 +3,9 @@
 ;;; My keybindings
 ;;; Overwrote certain default keybindings, and included keybindings for plugins
 
- ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- ;; - - - - - - - - - Global-mode - - - - - - - - - ;;
- ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; - - - - - - - - - Global-mode - - - - - - - - - ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; magit
 (global-set-key (kbd "C-M-g") 'magit-status)
@@ -51,7 +51,7 @@
 
 ;;; Key chords
 ;;(key-chord-define-global "vv" 'scroll-up-command)
-;;(key-chord-define-global "rj" 'bookmark-jump)
+;; (key-chord-define-global "rj" 'bookmark-jump)
 ;;(key-chord-define-global "qq" 'keyboard-quit)
 ;;(key-chord-define-global "kk" 'kill-this-buffer)
 ;;(key-chord-define-global "xb" 'ido-switch-buffer)
@@ -66,20 +66,5 @@
 
 ;; (key-chord-define clojure-mode-map "EE" 'cider-eval-last-sexp)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; - - - - - - - - - Evil-mode - - - - - - - - -  ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define-key evil-normal-state-map (kbd "C-w t") 'elscreen-create) ;creat tab
-(define-key evil-normal-state-map (kbd "C-w x") 'elscreen-kill) ;kill tab
-(define-key evil-normal-state-map "gT" 'elscreen-previous) ;previous tab
-(define-key evil-normal-state-map "gt" 'elscreen-next) ;next tab
-;;; esc quits
-(define-key evil-normal-state-map [escape] 'keyboard-quit)
-(define-key evil-visual-state-map [escape] 'keyboard-quit)
-(define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
-(provide 'keybindings)
+(provide 'my-keybindings)
 

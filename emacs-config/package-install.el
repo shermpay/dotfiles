@@ -1,5 +1,6 @@
 ;;; Script to install packages
 
+(setq 'debug-on-error t)
 (require 'package)
 (setq package-archives
       '(("gnu"         . "http://elpa.gnu.org/packages/")
@@ -7,54 +8,48 @@
 	("melpa"       . "http://melpa.milkbox.net/packages/")))
 (package-initialize)
 
-(defvar my-packages '(
-		      ace-jump-mode
-		      ac-cider-compliment
-		      ac-nrepl
-		      ac-octave
-		      align-cljlet
-		      auto-complete
-                      clojure-mode
-                      clojure-test-mode
-                      cider
-		      clj-refactor
-		      clojure-cheatsheet
-		      clojure-mode
-		      clojure-snippets
-		      dash
-		      dropdown-list
-		      elscreen
-		      epc
-		      expand-region
-		      evil
-		      f
-		      flx
-		      flx-ido
-		      groovy-mode
-		      hackernews
-		      ido-ubiquitous
-		      jedi
-		      key-chord
-		      magit
-		      markdown-mode
-		      multiple-cursors
-		      mic-paren
-		      noctilux-theme
-		      paredit
-		      popup
-		      powerline
-		      projectile
-		      rainbow-delimiters
-		      s
-		      slime
-		      smex 
-		      sml-mode
-		      unbound
-		      undo-tree
-		      visual-regexp
-		      visual-regexp-steroids
-		      yasnippet))
+(defvar editing '(ace-jump-mode
+		  expand-region
+		  undo-tree
+		  multiple-cursors
+		  visual-regexp
+		  visual-regexp-steroids))
 
-(dolist (pkg my-packages)
+(defvar clojure '(ac-cider-compliment
+		  ac-nrepl
+		  align-cljlet
+		  clojure-mode
+		  clojure-test-mode
+		  cider
+		  clj-refactor
+		  clojure-cheatsheet
+		  clojure-mode))
+
+(defvar prog '(ac-octave
+	       markdown-mode
+	       groovy-mode
+	       auto-complete
+	       slime
+	       jedi
+	       magit
+	       rainbow-delimiters
+	       paredit
+	       sml-mode
+	       projectile))
+
+(defvar misc '(dropdown-list
+	       flx
+	       flx-ido
+	       elscreen
+	       ido-ubiquitous
+	       smex
+	       key-chord))
+
+
+(defvar evil '(evil))
+
+
+;;; Installing editing packages
+(dolist (pkg editing)
   (when (not (package-installed-p pkg))
-    (ignore-errors (package-install pkg))))
+    (with-demoted-errors (package-install pkg))))

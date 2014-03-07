@@ -3,7 +3,9 @@
 ;;; My Custom faces
 ;; *************** FACES ***************
 (require 'noctilux-theme)
-(setq theme-default 'noctilux-theme)
+(if (not (display-graphic-p))
+    (load-theme 'solarized-dark))
+
 ;;; Don't like all the fancy bars
 (menu-bar-mode -1) 			
 (menu-bar-no-scroll-bar)
@@ -37,10 +39,33 @@
 ;; (set-face-foreground 'minibuffer-prompt "SteelBlue1")
 ;; (set-face-foreground 'linum "azure3")
 
-(display-time-mode 1) 
- ;;(set-frame-parameter (selected-frame) 'alpha '(<active> [<inactive>]))
- (set-frame-parameter (selected-frame) 'alpha '(50 20))
- (add-to-list 'default-frame-alist '(alpha 50 20))
 
-(provide 'custom-faces)
-(set-frame-parameter (selected-frame) 'alpha '(40 50))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ---------- Mode-line ---------- ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(display-time-mode 1) 
+
+;;;--------- Smart Mode line---------  
+(setq sml/theme 'dark)
+(setq sml/name-width 40)
+(setq sml/mode-width 'full)
+(sml/setup)
+(dolist (mode '(" Undo-Tree" " Abbrev" " Paredit" " AC"))
+  (add-to-list 'sml/hidden-modes mode))
+(dolist (dir '(("^~/Programming/" ":P:")
+	       ("^~/Programming/Projects/" ":Prj:")
+	       ("^~/.emacs.d/org" ":Org:")
+	       ("^~/dotfiles/" ":dot:")))
+ (add-to-list 'sml/replacer-regexp-list dir))
+
+(setcdr (assq 'projectile-mode minor-mode-alist) (list (concat " Prj[" (projectile-project-name) "]")))
+
+;; (dolist (f mode-line-format)
+;;   (print f ))
+
+;;(set-frame-parameter (selected-frame) 'alpha '(<active> [<inactive>]))
+(set-frame-parameter (selected-frame) 'alpha '(50 20))
+(add-to-list 'default-frame-alist '(alpha 50 20))
+
+(provide 'my-faces)
+

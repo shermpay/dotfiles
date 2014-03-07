@@ -4,5 +4,9 @@ Local Linux configuration files
 ## Usage
 At your home directory, run `git clone git@github.com:shermpay/dotfiles.git`.
 
+Make sure *install.sh* is a **executable**. Run `chmod u+x install.sh` if it is not.
+Execute installation script with `./install.sh`
+
 ### TODO:
-Add bashscript for quick install.
+Configure Emacs for better integration with Evil.
+Finish up bash script.
