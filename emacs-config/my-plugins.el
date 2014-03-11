@@ -15,12 +15,6 @@
 ;; (require 'key-chord)
 ;; (key-chord-mode 1)
 ;; ;; (require 'space-chord)
-;; Yasnippet plugin
-;; (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
-;; (setq yas-prompt-functions '(yas-dropdown-prompt
-;; 			     yas-completing-prompt))
-;; (require 'yasnippet)
-;; (yas-global-mode 1)
 
 ;;; Ido modes
 (flx-ido-mode 1)
@@ -29,6 +23,11 @@
 ;;; Projectile mode
 (projectile-global-mode 1)
 (setq projectile-mode-line (concat " Prj[" (projectile-project-name) "]"))
+;;; Yassnippet
+(yas-global-mode 1)
+(setq yas-prompt-functions '(yas-dropdown-prompt
+			     yas-completing-prompt
+			     yas-ido-prompt))
 ;;; Auto-complete modes
 (require 'auto-complete)
 (add-to-list 'ac-dictionary-directories "/home/shermpay/.emacs.d/elpa/auto-complete-20140208.653/dict")
@@ -73,14 +72,14 @@
 
 
 ;; ^^^^^^^^^^^^^^^^^^^^ Lisp / SLIME ^^^^^^^^^^^^^^^^^^^^
-(setq slime-default-lisp 'clisp) ; Default lisp
-(setq slime-lisp-implementations
-      '((clisp ("/usr/local/bin/clisp" "-I"))
-	(sbcl ("/usr/bin/sbcl"))))
+;; (setq slime-default-lisp 'clisp) ; Default lisp
+;; (setq slime-lisp-implementations
+;;       '((clisp ("/usr/local/bin/clisp" "-I"))
+;; 	(sbcl ("/usr/bin/sbcl"))))
 ;; (require 'slime-autoloads)
 ;; (require 'slime-tramp)
  ;;; slime with tramp
-(slime-setup '(slime-fancy))
+;; (slime-setup '(slime-fancy))
 ;; <<<<<<<<<<<<<<<<<<<< END LISP >>>>>>>>>>>>>>>>>>>>
 
 ;; ^^^^^^^^^^^^^^^^^^^^ Clojure MODES ^^^^^^^^^^^^^^^^^^^^ 
@@ -112,7 +111,7 @@
 ;;; Python Mode
 (add-hook 'python-mode-hook 'jedi:setup)
 
-(setq python-shell-interpreter "ipython"
+(setq python-shell-interpreter "ipython3"
        python-shell-interpreter-args ""
        python-shell-prompt-regexp "In \\[[0-9]+\\]: "
        python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
@@ -127,6 +126,10 @@
 (c-set-offset 'case-label 4)
 ;; <<<<<<<<<<<<<<<<<<<< END C >>>>>>>>>>>>>>>>>>>>
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; --------- GO MODE ---------  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(remove-hook 'before-save-hook 'gofmt-before-save)
 ;; ^^^^^^^^^^^^^^^^^^^^ OCTAVE MODE ^^^^^^^^^^^^^^^^^^^^
 (setq inferior-octave-program "/usr/bin/octave")
 (setq octave-block-offset 4)

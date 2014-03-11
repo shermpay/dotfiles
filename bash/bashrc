@@ -108,3 +108,17 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 fi
 
 eval "$(fasd --init auto)"
+
+# Commonly used directories
+proj=~/Programming/Projects
+dev=~/Programming/Development
+soft=~/Software
+dl=~/Downloads
+db=~/Dropbox
+
+export GOROOT=~/Software/go
+export GOPATH=~/Programming/Go
+export PATH=$GOROOT/bin:$PATH
+
+export GRADLE_HOME=~/Software/gradle-1.10
+export PAHT=$GRADLE_HOME:$PATH

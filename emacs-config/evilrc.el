@@ -7,6 +7,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Start EVIL!
 (evil-mode 1)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; --------- Mode line ---------  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq evil-mode-line-format '(before . mode-line-position))
+
 ;;; Creating tabs the vim way. Requires elscreen
 (define-key evil-normal-state-map (kbd "C-w t") 'elscreen-create) ;creat tab
 (define-key evil-normal-state-map (kbd "C-w x") 'elscreen-kill) ;kill tab
@@ -15,12 +20,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; --------- Rebinding Keys --------- ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Other keys
+
 ;;; Mode switches
-(define-key evil-normal-state-map (kbd "M-RET") 'evil-emacs-state)
-(define-key evil-insert-state-map (kbd "M-RET") 'evil-emacs-state)
-(define-key evil-emacs-state-map (kbd "M-RET") 'evil-normal-state)
+(define-key evil-normal-state-map (kbd "C-M-z") 'evil-emacs-state)
+(define-key evil-insert-state-map (kbd "C-M-z") 'evil-emacs-state)
+(define-key evil-emacs-state-map (kbd "C-M-z") 'evil-normal-state)
+(define-key evil-normal-state-map (kbd "C-z") 'keyboard-quit)
 (define-key evil-insert-state-map (kbd "C-z") 'evil-normal-state)
-(define-key evil-normal-state-map (kbd "C-z") 'evil-normal-state)
+(define-key evil-emacs-state-map (kbd "C-z") 'evil-normal-state)
+(define-key evil-visual-state-map (kbd "C-z") 'evil-normal-state)
+
 ;;; esc quits
 (define-key evil-normal-state-map [escape] 'keyboard-quit)
 (define-key evil-visual-state-map [escape] 'keyboard-quit)
@@ -30,5 +40,6 @@
 (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 
+(define-key evil-normal-state-map [return] 'electrify-return-if-match)
 ;;; Provide the config 
 (provide 'evilrc)

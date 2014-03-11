@@ -13,10 +13,10 @@
 ;; (bar-cursor-mode 1)
 
 ;;; Set the default colors, allows all frame to have the same colors
-(setq default-frame-alist
-      '((background-color . "gray8")
-       ;; (foreground-color . "cyan2")
-       ))
+;; (setq default-frame-alist
+;;       '((background-color . "gray8")
+;;        ;; (foreground-color . "cyan2")
+;;        ))
 
 ;; ;;; Default font
 (set-face-attribute 'default nil
@@ -50,7 +50,7 @@
 (setq sml/name-width 40)
 (setq sml/mode-width 'full)
 (sml/setup)
-(dolist (mode '(" Undo-Tree" " Abbrev" " Paredit" " AC"))
+(dolist (mode '(" Undo-Tree" " Abbrev" " Paredit" " AC" " ARev" " yas"))
   (add-to-list 'sml/hidden-modes mode))
 (dolist (dir '(("^~/Programming/" ":P:")
 	       ("^~/Programming/Projects/" ":Prj:")
@@ -58,14 +58,7 @@
 	       ("^~/dotfiles/" ":dot:")))
  (add-to-list 'sml/replacer-regexp-list dir))
 
-(setcdr (assq 'projectile-mode minor-mode-alist) (list (concat " Prj[" (projectile-project-name) "]")))
-
-;; (dolist (f mode-line-format)
-;;   (print f ))
-
-;;(set-frame-parameter (selected-frame) 'alpha '(<active> [<inactive>]))
-(set-frame-parameter (selected-frame) 'alpha '(50 20))
-(add-to-list 'default-frame-alist '(alpha 50 20))
+(setcdr (assq 'projectile-mode minor-mode-alist)
+	(list (concat " Prj[" (projectile-project-name) "]")))
 
 (provide 'my-faces)
-

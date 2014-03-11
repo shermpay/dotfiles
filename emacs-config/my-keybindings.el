@@ -8,7 +8,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; magit
-(global-set-key (kbd "C-M-g") 'magit-status)
+(global-set-key [(f12)] 'magit-status)
 ;;; My functions
 (global-set-key (kbd "C-c d") 'insert-date) ;; Insert date command
 ;;; Overrides
@@ -47,7 +47,8 @@
 (global-set-key "\C-cb" 'org-iswitchb)
 
 ;;; Yas bindings
-;; (global-set-key [(control tab)] 'yas-expand)
+(define-key yas-minor-mode-map [(tab)] nil)
+(define-key yas-minor-mode-map [(control tab)] 'yas-expand)
 
 ;;; Key chords
 ;;(key-chord-define-global "vv" 'scroll-up-command)

@@ -21,10 +21,10 @@
 (let ((default-directory *elisp-dir*))
   (normal-top-level-add-subdirs-to-load-path))
 (add-to-list 'load-path "~/dotfiles/emacs-config")
+;;; Exec PATH
+
 ;; Intelligent Do mode
 (ido-mode t)
-(setq ido-enable-flex-matching t)
-(setq ido-everywhere t)
 ;;; subword
 (global-subword-mode t)
 ;;; Show matching parens
@@ -41,6 +41,8 @@
 (setq echo-keystrokes 0.01)
 
 (setq inhibit-startup-message t)
+;;; Uniquify
+(setq uniquify-buffer-name-style 'post-forward)
 ;; --------------- STARTUP END ---------------
 
 ;;; Bookmarks
@@ -54,7 +56,7 @@
  ;; --------------- MISC --------------- ;;
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Debugging
-(setq stack-trace-on-error t)
+;; (setq stack-trace-on-error t)
 ;; Setting Auto-Save directory and Backup Directory
 (let ((tmp (concat *elisp-dir* "/tmp")))
  (setq backup-directory-alist
@@ -94,9 +96,9 @@
 
 ;;; Load other customizations appropriately
 (require 'my-functions)
-(require 'modes-plugins)
-(require 'custom-faces)
-(require 'keybindings)
+(require 'my-plugins)
+(require 'my-faces)
+(require 'my-keybindings)
 (require 'evilrc)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
