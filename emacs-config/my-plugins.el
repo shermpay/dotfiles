@@ -109,6 +109,7 @@
 ;; <<<<<<<<<<<<<<< END JDE >>>>>>>>>>>>>>>
 
 ;;; Python Mode
+(setq python-indent-offset 4)
 (add-hook 'python-mode-hook 'jedi:setup)
 
 (setq python-shell-interpreter "ipython3"

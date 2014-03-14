@@ -7,6 +7,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Start EVIL!
 (evil-mode 1)
+;;; Relative linum
+(require 'linum-relative)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; --------- Mode line ---------  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -40,6 +42,7 @@
 (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 
-(define-key evil-normal-state-map [return] 'electrify-return-if-match)
+(define-key evil-normal-state-map [return] 'evil-ret-and-indent)
+(define-key evil-insert-state-map [return] 'evil-ret-and-indent)
 ;;; Provide the config 
 (provide 'evilrc)

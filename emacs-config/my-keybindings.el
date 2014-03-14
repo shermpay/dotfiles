@@ -23,6 +23,7 @@
 (global-set-key (kbd "C-M-r") 'isearch-backward)
 (global-set-key (kbd "M-g") 'goto-line)
 
+;;; Programming mode keys
 (add-hook 'prog-mode-hook  'prog-mode-keys)
 ;;; Multiple cursors
 (global-set-key (kbd "C-M-=") 'mc/edit-lines)

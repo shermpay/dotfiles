@@ -43,7 +43,8 @@
     (indent-according-to-mode)))
 
 (defun prog-mode-keys ()
-  (local-set-key (kbd "RET") 'electrify-return-if-match))
+  (local-set-key (kbd "RET") 'electrify-return-if-match)
+  (local-set-key [(f11)] 'compile))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ---------- EVIL MODE -----------  ;;
@@ -67,7 +68,7 @@
 	(async-shell-command (concat "java -cp .:* " (substring file 0 (- (length file) 5))))))
     (define-key java-mode-map (kbd "C-c C-r") 'java-run)
     (define-key java-mode-map (kbd "C-c C-v") 'java-compile)))
-
+(add-hook 'java-mode-hook 'java-defer-loading)
 ;;; ========================================
 ;;; ---------- LISP MODE
 ;;; ========================================
