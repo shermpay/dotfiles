@@ -5,3 +5,7 @@ Host shermanpay
 Host amgems
      HostName shermanpay.com
      User amgems
+
+Host attu
+     HostName attu.cs.washington.edu
+     User shermpay

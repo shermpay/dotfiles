@@ -116,9 +116,14 @@ soft=~/Software
 dl=~/Downloads
 db=~/Dropbox
 
+# Environment Variabls
+export EDITOR="emacsclient -n -a vim"
+export SUDO_EDITOR=$EDITOR
+export VISUAL=$EDITOR
+
 export GOROOT=~/Software/go
 export GOPATH=~/Programming/Go
 export PATH=$GOROOT/bin:$PATH
 
 export GRADLE_HOME=~/Software/gradle-1.10
-export PAHT=$GRADLE_HOME:$PATH
+export PATH=$GRADLE_HOME:$PATH

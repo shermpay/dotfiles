@@ -23,6 +23,7 @@
 ;;; Projectile mode
 (projectile-global-mode 1)
 (setq projectile-mode-line (concat " Prj[" (projectile-project-name) "]"))
+
 ;;; Yassnippet
 (yas-global-mode 1)
 (setq yas-prompt-functions '(yas-dropdown-prompt

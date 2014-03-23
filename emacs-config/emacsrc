@@ -31,7 +31,7 @@
 (show-paren-mode 1)
 (setq show-paren-style 'expression)
 ;;; Electric pair mode
-(electric-pair-mode 1)
+;; (electric-pair-mode 1)
 
 ;; Uses echo area to display tooltips
 (tooltip-mode -1)

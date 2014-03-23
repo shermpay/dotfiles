@@ -55,7 +55,7 @@
 ;;(key-chord-define-global "vv" 'scroll-up-command)
 ;; (key-chord-define-global "rj" 'bookmark-jump)
 ;;(key-chord-define-global "qq" 'keyboard-quit)
-;;(key-chord-define-global "kk" 'kill-this-buffer)
+;; (key-chord-define-global "kk" 'kill-this-buffer)
 ;;(key-chord-define-global "xb" 'ido-switch-buffer)
 ;;(key-chord-define-global "wb" 'ido-switch-buffer-other-window)
 ;;(key-chord-define-global "jw" 'other-window)

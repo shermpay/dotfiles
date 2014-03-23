@@ -59,7 +59,7 @@
       "Compiles the current buffer with javac"
       (interactive)
       (let ((file (buffer-name)))
-	(shell-command (concat "javac -g -Xlint -cp .:* " file))))
+	(shell-command (concat "javac -g -Xlint " file))))
 
     (defun java-run (&rest args)
       "Runs the current buffer with java"
