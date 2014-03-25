@@ -10,7 +10,11 @@
 
 (global-linum-mode t);; Global Line Number mode on startup
 (column-number-mode t);; Column Number mode
-(server-start) ;; Start the emacs server
+;;; Emacs server
+;; (setq server-port 1337)
+;; (setq server-use-tcp t)
+;; (setq server-host (system-name))
+(server-start) ; Start the emacs server
 (setq enable-recursive-minibuffers t)	; Useful
 (delete-selection-mode 1) 	      	; Deletes text in the region
 ;; Abbrevations mode on startup
@@ -120,4 +124,5 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes (quote ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "0c311fb22e6197daba9123f43da98f273d2bfaeeaeb653007ad1ee77f0003037" default))))
+ '(custom-safe-themes (quote ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "0c311fb22e6197daba9123f43da98f273d2bfaeeaeb653007ad1ee77f0003037" default)))
+ '(scroll-bar-mode nil))

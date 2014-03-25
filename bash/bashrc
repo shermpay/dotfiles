@@ -127,3 +127,4 @@ export PATH=$GOROOT/bin:$PATH
 
 export GRADLE_HOME=~/Software/gradle-1.10
 export PATH=$GRADLE_HOME:$PATH
+export nginxdir=/home/shermpay/Software/nginx/nginx-clojure-0.1.2/nginx-1.4.4
