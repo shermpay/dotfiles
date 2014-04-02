@@ -48,7 +48,10 @@
 (defvar evil '(evil))
 
 
+(defvar all-pkgs (list editing clojure prog misc evil))
 ;;; Installing editing packages
-(dolist (pkg editing)
-  (when (not (package-installed-p pkg))
-    (with-demoted-errors (package-install pkg))))
+
+(dolist (all-pkgs pkgs)
+ (dolist (pkg pkgs)
+   (when (not (package-installed-p pkg))
+     (with-demoted-errors (package-install pkg)))))
