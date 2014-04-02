@@ -45,10 +45,12 @@
 	       key-chord))
 
 
+(defvar faces '(noctilux-theme solarized-theme sml-modeline))
+
 (defvar evil '(evil))
 
 
-(defvar all-pkgs (list editing clojure prog misc evil))
+(defvar all-pkgs (list editing clojure prog misc evil faces))
 ;;; Installing editing packages
 
 (dolist (pkgs all-pkgs)
