@@ -45,9 +45,9 @@
 	       key-chord))
 
 
-(defvar faces '(noctilux-theme solarized-theme sml-modeline))
+(defvar faces '(noctilux-theme solarized-theme smart-mode-line))
 
-(defvar evil '(evil))
+(defvar evil '(evil evil-leader linum-relative))
 
 
 (defvar all-pkgs (list editing clojure prog misc evil faces))
