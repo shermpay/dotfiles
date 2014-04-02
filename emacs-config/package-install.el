@@ -1,6 +1,6 @@
 ;;; Script to install packages
 
-(setq 'debug-on-error t)
+(setq debug-on-error t)
 (require 'package)
 (setq package-archives
       '(("gnu"         . "http://elpa.gnu.org/packages/")

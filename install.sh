@@ -14,7 +14,7 @@ dir_check() {
     if [ $(pwd) == ${HOME}/dotfiles ]; then
 	echo 'You are currently in ~/dotfiles. Installation will commence.'
     else
-	echo You are in $(pwd). This script requires you to clone the reop into ~/dotfiles
+	echo You are in $(pwd). This script requires you to clone the repo into ~/dotfiles
 	exit 1
     fi
 }
@@ -22,27 +22,27 @@ dir_check() {
 install_bash() {
     echo "Installing bash tools"
     # Install essential xubuntu packages
-    echo sudo apt-get update
-    echo sudo apt-get -y install git curl xclip tmux dropbox
+    sudo apt-get update
+    sudo apt-get -y install git curl xclip tmux dropbox
 
 }
 
 install_lang() {
     echo "Installing programming languages and tools"
     # Install languages and its tools
-    echo sudo apt-get -y install clojure # Clojure
-    echo wget https://raw.github.com/technomancy/leiningen/stable/bin/lein -O ${HOME}/bin
-    echo chmod a+x ${HOME}/bin
-    echo sudo apt-get -y install python3 # Python
-    echo sudo apt-get -y install ant maven # Java
-    echo sudo apt-get -y install clang	  # Clang
+    sudo apt-get -y install clojure # Clojure
+    wget https://raw.github.com/technomancy/leiningen/stable/bin/lein -O ${HOME}/bin
+    chmod a+x ${HOME}/bin
+    sudo apt-get -y install python3 # Python
+    sudo apt-get -y install ant maven # Java
+    sudo apt-get -y install clang	  # Clang
 
 }
 
 install_emacs() {
     echo "Installing emacs and emacs packages"
     # Install emacs and its packages
-    echo sudo apt-get -y install emacs
+    sudo apt-get -y install emacs
     if hash emacs; then
 	EMACS_CONFS=emacs-config
 	echo emacs --script ${EMACS_CONFS}/package-install.el
