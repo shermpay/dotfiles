@@ -109,12 +109,19 @@ fi
 
 eval "$(fasd --init auto)"
 
+# PS1 config
+userps1="\e[44m\[\e[1;36m\]\\u\[\e[m\]"
+dirps1="\e[40m\[\e[2;37m\][\\w]\[\e[m\]"
+cmd='{$(ls --color=always -t -w 80 | head -n 10 | xargs echo)}'
+prompt="\\nλ *> "
+export PS1="${debian_chroot:+($debian_chroot)}"$userps1$dirps1$cmd$prompt
+
 # Commonly used directories
-proj=~/Programming/Projects
-dev=~/Programming/Development
-soft=~/Software
-dl=~/Downloads
-db=~/Dropbox
+export proj=~/Programming/Projects
+export dev=~/Programming/Development
+export soft=~/Software
+export dl=~/Downloads
+export db=~/Dropbox
 
 # Environment Variabls
 export EDITOR="emacsclient -n -a vim"
@@ -127,4 +134,12 @@ export PATH=$GOROOT/bin:$PATH
 
 export GRADLE_HOME=~/Software/gradle-1.10
 export PATH=$GRADLE_HOME:$PATH
+
+export GROOVY_HOME=/home/shermpay/.gvm/groovy/current/bin/
 export nginxdir=/home/shermpay/Software/nginx/nginx-clojure-0.1.2/nginx-1.4.4
+
+export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"
+ 
+export LESS=' -R '
+#THIS MUST BE AT THE END OF THE FILE FOR GVM TO WORK!!!
+[[ -s "/home/shermpay/.gvm/bin/gvm-init.sh" ]] && source "/home/shermpay/.gvm/bin/gvm-init.sh"

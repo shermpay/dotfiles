@@ -2,6 +2,8 @@
 ;;; Tuesday, 05. November 2013
 ;;; Contains all Major modes configuration
 
+;;; exec path
+;; (exec-path-from-shell-copy-env "PATH")
 ;;; Global Undo tree mode
 (global-undo-tree-mode 1)
 
@@ -10,7 +12,7 @@
 
 ;;; elscreen
 (elscreen-start)
-
+(require 'elscreen-server)
 ;;; key chord modes
 ;; (require 'key-chord)
 ;; (key-chord-mode 1)
@@ -36,6 +38,15 @@
 (ac-config-default)
 (setq ac-auto-show-menu 1)
 (setq ac-trigger-commands nil)
+;;; Adding ac-math (latex)
+(require 'ac-math)
+(defun ac-LaTeX-mode-setup () ; add ac-sources to default ac-sources
+  (setq ac-sources
+	(append '(ac-source-math-unicode ac-source-math-latex ac-source-latex-commands)
+		ac-sources)))
+(add-hook 'LaTeX-mode-hook 'ac-LaTeX-mode-setup)
+(add-to-list 'ac-modes 'latex-mode)
+
 (global-auto-complete-mode t)
 
 ;;; Jedi mode
@@ -90,12 +101,21 @@
 
 (setq cider-auto-select-error-buffer t)  ;Auto select error buffer
 (setq cider-repl-print-length 100)
-;; (add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
-;; (add-hook 'nrepl-interaction-mode-hook 'ac-nrepl-setup)
-;; (add-hook 'clojure-nrepl-mode-hook 'ac-nrepl-setup)
+(setq cider-stacktrace-fill-column 80)
+(add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
+(add-hook 'nrepl-interaction-mode-hook 'ac-nrepl-setup)
+(add-hook 'clojure-nrepl-mode-hook 'ac-nrepl-setup)
 
 ;; <<<<<<<<<<<<<<<<<<<< END Clojure >>>>>>>>>>>>>>>>>>>>
 
+;;; Scheme modes
+;;; Racket
+(add-hook 'racket-mode-hook (lambda () (geiser-mode 1)))
+(require 'ac-geiser)
+(add-hook 'geiser-mode-hook 'ac-geiser-setup)
+(add-hook 'geiser-repl-mode-hook 'ac-geiser-setup)
+(eval-after-load "auto-complete"
+  '(add-to-list 'ac-modes 'geiser-repl-mode))
 ;; ^^^^^^^^^^^^^^^^^^^^ WEB MODES ^^^^^^^^^^^^^^^^^^^^ 
 ;; Load nxhtml-mode
 ;;   (load "~/.emacs.d/plugins/nxhtml/autostart.el")
@@ -109,9 +129,19 @@
       ;; (add-hook 'find-file-hook 'auto-4-jsp-find-file-hook)
 ;; <<<<<<<<<<<<<<< END JDE >>>>>>>>>>>>>>>
 
-;;; Python Mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;           Groovy-mode           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Set path to groovy binary
+(setq groovy-home "/home/shermpay/.gvm/groovy/current")
+(setq groovy-program-name "groovysh")
+(add-to-list 'auto-mode-alist (cons "\\.gradle\\'" 'groovy-mode))
+;;;;;;;;;;;;;;;;;;;;;
+;;     Python Mode ;;
+;;;;;;;;;;;;;;;;;;;;;
 (setq python-indent-offset 4)
 (add-hook 'python-mode-hook 'jedi:setup)
+(add-hook 'python-mode-hook (lambda () (electric-indent-mode 0)))
 
 (setq python-shell-interpreter "ipython3"
        python-shell-interpreter-args ""
@@ -124,10 +154,8 @@
        python-shell-completion-string-code
        "';'.join(get_ipython().Completer.all_completions('''%s'''))\n" )
 ;; ^^^^^^^^^^^^^^^^^^^^ C MODE ^^^^^^^^^^^^^^^^^^^^
-(setq c-basic-offset 4)
-(c-set-offset 'case-label 4)
 ;; <<<<<<<<<<<<<<<<<<<< END C >>>>>>>>>>>>>>>>>>>>
-
+(setq-default c-basic-offset 4)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; --------- GO MODE ---------  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -153,13 +181,22 @@
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
 (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+(add-hook 'LaTeX-mode-hook (lambda () (progn
+					(auto-fill-mode 1)
+					(set-fill-column 80))))
 (setq reftex-plug-into-AUCTeX t)
 (setq TeX-PDF-mode t)			;Always compile to PDF
+(add-hook 'org-mode-hook
+	  (lambda () (set-face-foreground 'font-latex-math-face "chocolate")))
 
 ;; Org-mode
 ;; The following lines are always needed.  Choose your own keys.
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode)) 
 (add-hook 'org-mode-hook 'flyspell-mode)
 ;; (setq org-agenda-files (directory-files (concat *elisp-dir* "/org")))
-(provide 'my-plugins)
 
+;;;;;;;;;;;;;;
+;; SML mode ;;
+;;;;;;;;;;;;;;
+(add-hook 'sml-mode-hook  (lambda () (clear-abbrev-table sml-mode-abbrev-table)))
+(provide 'my-plugins)

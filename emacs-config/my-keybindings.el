@@ -51,6 +51,10 @@
 (define-key yas-minor-mode-map [(tab)] nil)
 (define-key yas-minor-mode-map [(control tab)] 'yas-expand)
 
+;;; Latex-math-mode
+;; (define-key LaTeX-math-mode-map (kbd "` !") 'LaTeX-math-neg)
+;; (define-key LaTeX-math-mode-map (kbd "` =") 'LaTeX-math-equiv)
+
 ;;; Key chords
 ;;(key-chord-define-global "vv" 'scroll-up-command)
 ;; (key-chord-define-global "rj" 'bookmark-jump)
@@ -69,4 +73,3 @@
 ;; (key-chord-define clojure-mode-map "EE" 'cider-eval-last-sexp)
 
 (provide 'my-keybindings)
-

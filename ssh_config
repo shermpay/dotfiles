@@ -9,3 +9,7 @@ Host amgems
 Host attu
      HostName attu.cs.washington.edu
      User shermpay
+
+Host compilers
+     HostName 192.168.56.101
+     User compilers

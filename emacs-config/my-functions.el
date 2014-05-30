@@ -6,6 +6,12 @@
 ;;; ========================================
 ;;; ---------- JUMPING Functions
 ;;; ========================================
+(defun kill-this-buffer-tab ()
+  (interactive)
+  (progn
+    (kill-this-buffer)
+    (elscreen-kill)))
+(define-key evil-normal-state-map (kbd "C-w d") 'kill-this-buffer-tab) 
 
 ;;; ========================================
 ;;; ---------- EDITING Functions
@@ -27,7 +33,7 @@
 
 ;;; Paredit with Electric Return
  (defvar electrify-return-match
-    "[\]}\)\"]"
+    "}"
     "If this regexp matches the text after the cursor, do an \"electric\"
   return.")
 
@@ -43,7 +49,6 @@
     (indent-according-to-mode)))
 
 (defun prog-mode-keys ()
-  (local-set-key (kbd "RET") 'electrify-return-if-match)
   (local-set-key [(f11)] 'compile))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -53,6 +58,43 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; --------- C MODE --------- ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun my-c-mode-font-lock-if0 (limit)
+  "For when using if macro for comments"
+  (save-restriction
+    (widen)
+    (save-excursion
+      (goto-char (point-min))
+      (let ((depth 0) str start start-depth)
+        (while (re-search-forward "^\\s-*#\\s-*\\(if\\|else\\|endif\\)" limit 'move)
+          (setq str (match-string 1))
+          (if (string= str "if")
+              (progn
+                (setq depth (1+ depth))
+                (when (and (null start) (looking-at "\\s-+0"))
+                  (setq start (match-end 0)
+                        start-depth depth)))
+            (when (and start (= depth start-depth))
+              (c-put-font-lock-face start (match-beginning 0) 'font-lock-comment-face)
+              (setq start nil))
+            (when (string= str "endif")
+              (setq depth (1- depth)))))
+        (when (and start (> depth 0))
+          (c-put-font-lock-face start (point) 'font-lock-comment-face)))))
+  nil)
+
+(defun my-c-mode-hook ()
+  (font-lock-add-keywords
+    nil
+    '((my-c-mode-font-lock-if0 (0 font-lock-comment-face prepend))) 'add-to-end))
+
+(defun my-c-mode-common-hook ()
+  (progn
+    (local-set-key (kbd "RET") 'electrify-return-if-match)
+    (lambda () (electric-pair-mode 1))
+    (c-set-offset 'case-label '+)))
+
+(add-hook 'c-mode-hook 'my-c-mode-hook)
+(add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 ;;; ========================================
 ;;; ---------- JAVA MODE
 ;;; ========================================
@@ -106,10 +148,43 @@
      (define-key octave-mode-map (kbd "C-c C-z") 'octave-shell)))
 
 
+;;;;;;;;;;;;;;;;;;;
+;; GRAPHVIZ MODE ;;
+;;;;;;;;;;;;;;;;;;;
+(defun dot-to-png ()
+  (interactive)
+  (let* ((file (buffer-name))
+	(out-file (substring file 0 (- (length file) 4))))
+    (shell-command (concat "dot -Tpng " file " -o " out-file ".png"))))
 ;;; ========================================
+
 ;;; ---------- MISC
 ;;; ========================================
 
+;;; reverse pairs in a list
+(defun reverse-pairs (lst)
+  "Reverse pairs in a list"
+  (labels ((aux (lst result)
+		(if (null lst)
+		    result
+		  (aux (rest (cdr lst)) (cons (-take 2 lst) result)))))
+    (reduce (lambda (x acc) (append x acc)) (aux lst (list)))))
+
+;;; Reverse char-pairs in a list
+(defun reverse-char-pairs (beg end)
+  "Reverse pairs of characters in a string"
+  (interactive (if (use-region-p)
+		   (list (region-beginning) (region-end))
+		 (list (point-min) (point-min))))
+  (progn
+    (insert (concat (reverse-pairs
+		     (string-to-list (buffer-substring-no-properties beg end)))))
+    (delete-region beg end)))
+(defun test (beg end)
+  (interactive (if (use-region-p)
+		   (list (region-beginning) (region-end))
+		 (list (point-min) (point-min))))
+  (message "%s" (buffer-substring-no-properties beg end)))
 ;;; generates a list of characters from START to END
 ;;; Prepends/Appends a string if given
 (defun* generate-characters (start end &key (prepend "") (append ""))

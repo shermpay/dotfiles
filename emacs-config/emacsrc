@@ -25,8 +25,6 @@
 (let ((default-directory *elisp-dir*))
   (normal-top-level-add-subdirs-to-load-path))
 (add-to-list 'load-path "~/dotfiles/emacs-config")
-;;; Exec PATH
-
 ;; Intelligent Do mode
 (ido-mode t)
 ;;; subword
@@ -34,6 +32,8 @@
 ;;; Show matching parens
 (show-paren-mode 1)
 (setq show-paren-style 'expression)
+;;; electric indent-mode
+(add-hook 'prog-mode-hook (lambda () (electric-indent-mode 1)))
 ;;; Electric pair mode
 ;; (electric-pair-mode 1)
 
@@ -54,7 +54,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; -------------- Editing ---------- ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq next-line-add-newlines t)
+(setq next-line-add-newlines nil)
 
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  ;; --------------- MISC --------------- ;;
@@ -67,8 +67,6 @@
        `((".*" . ,tmp)))
  (setq auto-save-file-name-transforms
        `((".*" ,tmp t))))
-;; Emacs will not automatically add new lines
-(setq next-line-add-newlines nil)
 
 ;; ;; Changes all yes/no questions to y/n type
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -99,11 +97,11 @@
 ;; -------------------- MISC END --------------------
 
 ;;; Load other customizations appropriately
+(require 'evilrc)
 (require 'my-functions)
 (require 'my-plugins)
 (require 'my-faces)
 (require 'my-keybindings)
-(require 'evilrc)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
