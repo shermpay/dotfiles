@@ -173,6 +173,7 @@
 	    (define-key octave-mode-map (kbd "C-c C-z") 'octave-shell)))
 
 ;;;  ^^^^^^^^^^^^^^^^^^^^ LATEX MODE ^^^^^^^^^^^^^^^^^^^^
+<<<<<<< Updated upstream
 (load "auctex.el" nil t t)
 (load "preview-latex.el" nil t t)
 (setq TeX-auto-save t)
@@ -189,6 +190,19 @@
 (setq TeX-PDF-mode t)			;Always compile to PDF
 (add-hook 'org-mode-hook
 	  (lambda () (set-face-foreground 'font-latex-math-face "chocolate")))
+=======
+;; (load "auctex.el" nil t t)
+;; (load "preview-latex.el" nil t t)
+;; (setq TeX-auto-save t)
+;; (setq TeX-parse-self t)
+;; (setq-default TeX-master nil)
+;; (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+;; (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+;; (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+;; (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+;; (setq reftex-plug-into-AUCTeX t)
+;; (setq TeX-PDF-mode t)			;Always compile to PDF
+>>>>>>> Stashed changes
 
 ;; Org-mode
 ;; The following lines are always needed.  Choose your own keys.
