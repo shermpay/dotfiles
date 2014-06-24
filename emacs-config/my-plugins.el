@@ -39,11 +39,13 @@
 (setq ac-auto-show-menu 1)
 (setq ac-trigger-commands nil)
 ;;; Adding ac-math (latex)
-(require 'ac-math)
+
 (defun ac-LaTeX-mode-setup () ; add ac-sources to default ac-sources
-  (setq ac-sources
-	(append '(ac-source-math-unicode ac-source-math-latex ac-source-latex-commands)
-		ac-sources)))
+  (progn
+    (require 'ac-math)
+    (setq ac-sources
+	 (append '(ac-source-math-unicode ac-source-math-latex ac-source-latex-commands)
+		 ac-sources))))
 (add-hook 'LaTeX-mode-hook 'ac-LaTeX-mode-setup)
 (add-to-list 'ac-modes 'latex-mode)
 
@@ -117,8 +119,6 @@
 (eval-after-load "auto-complete"
   '(add-to-list 'ac-modes 'geiser-repl-mode))
 ;; ^^^^^^^^^^^^^^^^^^^^ WEB MODES ^^^^^^^^^^^^^^^^^^^^ 
-;; Load nxhtml-mode
-;;   (load "~/.emacs.d/plugins/nxhtml/autostart.el")
 
 ;; <<<<<<<<<<<<<<<<<<<< END WEB >>>>>>>>>>>>>>>>>>>>
 
@@ -133,6 +133,7 @@
 ;;           Groovy-mode           ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Set path to groovy binary
+(require 'groovy-mode)
 (setq groovy-home "/home/shermpay/.gvm/groovy/current")
 (setq groovy-program-name "groovysh")
 (add-to-list 'auto-mode-alist (cons "\\.gradle\\'" 'groovy-mode))
@@ -199,4 +200,11 @@
 ;; SML mode ;;
 ;;;;;;;;;;;;;;
 (add-hook 'sml-mode-hook  (lambda () (clear-abbrev-table sml-mode-abbrev-table)))
+
+;;;;;;;;;;;;;;;;;;;;
+;; Compiler tools ;;
+;;;;;;;;;;;;;;;;;;;;
+(require 'flex-mode)
+(require 'make-regexp)
+(require 'bison-mode)
 (provide 'my-plugins)
