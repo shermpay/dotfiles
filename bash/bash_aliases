@@ -9,4 +9,5 @@ alias sf='fasd -sif'     # interactive file selection
 alias z='fasd_cd -d'     # cd, same functionality as j in autojump
 alias zz='fasd_cd -d -i'
 
-alias gcc351='gcc -g -Wall -std=gnu99' 
+alias open='xdg-open'
+alias less='less -N'

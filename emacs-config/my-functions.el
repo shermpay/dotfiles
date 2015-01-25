@@ -4,7 +4,7 @@
 
 (require 'cl)
 ;;; ========================================
-;;; ---------- JUMPING Functions
+;;; ---------- Window/Buffer Functions
 ;;; ========================================
 (defun kill-this-buffer-tab ()
   (interactive)
@@ -160,6 +160,14 @@
 
 ;;; ---------- MISC
 ;;; ========================================
+
+(defun caesar-cipher (s n)
+  (apply #'string
+         (mapcar (lambda (x) (+ (mod (+ n (- x ?a)) 26) ?a)) (downcase s))))
+
+(defun all-caesar-ciphers (s)
+  (dotimes (n 26)
+    (print (caesar-cipher s n))))
 
 ;;; reverse pairs in a list
 (defun reverse-pairs (lst)

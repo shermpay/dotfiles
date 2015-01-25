@@ -47,10 +47,6 @@
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
 
-;;; Yas bindings
-(define-key yas-minor-mode-map [(tab)] nil)
-(define-key yas-minor-mode-map [(control tab)] 'yas-expand)
-
 ;;; Latex-math-mode
 ;; (define-key LaTeX-math-mode-map (kbd "` !") 'LaTeX-math-neg)
 ;; (define-key LaTeX-math-mode-map (kbd "` =") 'LaTeX-math-equiv)

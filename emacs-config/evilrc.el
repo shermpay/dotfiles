@@ -9,8 +9,8 @@
 (global-evil-leader-mode)
 (evil-mode 1)
 
-(require 'surround)
-(global-surround-mode 1)
+;; (require 'surround)
+;; (global-surround-mode 1)
 (setq evil-move-cursor-back nil)	;Don't want to move cursor back when exit insert
 ;;; Relative linum
 (require 'linum-relative)

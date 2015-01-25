@@ -2,13 +2,19 @@
 ;;; Tuesday, 17. December 2013
 ;;; My Custom faces
 ;; *************** FACES ***************
-;; (require 'noctilux-theme)
 (require 'color-theme)
 (color-theme-initialize)
-(color-theme-robin-hood)
 (if (not (display-graphic-p))
     (load-theme 'solarized-dark))
+;; (destructuring-bind (sec min hr day month yr . _) (decode-time)
+;;   (if (or (> hr 17 ) (< hr 7))
+;;       (progn
+;;         (load-file "~/.emacs.d/plugins/Amelie-theme.el")
+;;         (load-theme 'Amelie t))
+;;     (color-theme-classic)))
 
+(load-file "~/.emacs.d/plugins/Amelie-theme.el")
+(load-theme 'Amelie t)
 ;;; Don't like all the fancy bars
 (menu-bar-mode -1) 			
 (menu-bar-no-scroll-bar)
@@ -33,8 +39,8 @@
 ;; (set-face-foreground 'font-lock-variable-name-face "GoldenRod1")
 ;; (set-face-foreground 'font-lock-builtin-face "orchid1")
 ;; (set-face-foreground 'font-lock-constant-face "green")
-;; (set-face-foreground 'font-lock-comment-face "tan")
-;; (set-face-foreground 'font-lock-comment-delimiter-face "tan")
+(set-face-foreground 'font-lock-comment-face "tan")
+(set-face-foreground 'font-lock-comment-delimiter-face "tan")
 ;; (set-face-foreground 'font-lock-doc-face "wheat")
 ;; (set-face-foreground 'font-lock-string-face "LightPink")
 ;; (set-face-foreground 'font-lock-regexp-grouping-construct "DodgerBlue")
@@ -49,7 +55,8 @@
 (display-time-mode 1) 
 
 ;;;--------- Smart Mode line---------  
-(setq sml/theme 'light)
+(setq sml/no-confirm-load-theme t)
+(setq sml/theme 'automatic)
 (setq sml/name-width 40)
 (setq sml/mode-width 'full)
 (sml/setup)

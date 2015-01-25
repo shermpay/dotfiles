@@ -34,6 +34,7 @@
 (setq show-paren-style 'expression)
 ;;; electric indent-mode
 (add-hook 'prog-mode-hook (lambda () (electric-indent-mode 1)))
+(setq-default indent-tabs-mode nil)
 ;;; Electric pair mode
 ;; (electric-pair-mode 1)
 
@@ -49,12 +50,11 @@
 (setq uniquify-buffer-name-style 'post-forward)
 ;; --------------- STARTUP END ---------------
 
-;;; Bookmarks
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; -------------- Editing ---------- ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq next-line-add-newlines nil)
+(setq tab-width 4)
 
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  ;; --------------- MISC --------------- ;;
@@ -97,11 +97,25 @@
 ;; -------------------- MISC END --------------------
 
 ;;; Load other customizations appropriately
-(require 'evilrc)
-(require 'my-functions)
-(require 'my-plugins)
-(require 'my-faces)
-(require 'my-keybindings)
+(defun timed-require (mode)
+  (let ((st (float-time)))
+    (require mode)
+    (message "%s: %f seconds" mode (- (float-time) st))))
+(timed-require 'evilrc)
+(timed-require 'my-functions)
+(timed-require 'my-plugins)
+(timed-require 'my-faces)
+(timed-require 'my-keybindings)
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes (quote ("a81bc918eceaee124247648fc9682caddd713897d7fd1398856a5b61a592cb62" "3632cf223c62cb7da121be0ed641a2243f7ec0130178722554e613c9ab3131de" "0c311fb22e6197daba9123f43da98f273d2bfaeeaeb653007ad1ee77f0003037" default)))
+ '(ecb-options-version "2.40")
+ '(scroll-bar-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -117,10 +131,3 @@
  '(rainbow-delimiters-depth-8-face ((t (:foreground "dark khaki"))))
  '(rainbow-delimiters-depth-9-face ((t (:foreground "purple1"))))
  '(rainbow-delimiters-unmatched-face ((t (:foreground "cadet blue")))))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes (quote ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "0c311fb22e6197daba9123f43da98f273d2bfaeeaeb653007ad1ee77f0003037" default)))
- '(scroll-bar-mode nil))

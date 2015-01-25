@@ -107,8 +107,6 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
-eval "$(fasd --init auto)"
-
 # PS1 config
 userps1="\e[44m\[\e[1;36m\]\\u\[\e[m\]"
 dirps1="\e[40m\[\e[2;37m\][\\w]\[\e[m\]"
@@ -117,29 +115,19 @@ prompt="\\nλ *> "
 export PS1="${debian_chroot:+($debian_chroot)}"$userps1$dirps1$cmd$prompt
 
 # Commonly used directories
-export proj=~/Programming/Projects
-export dev=~/Programming/Development
-export soft=~/Software
-export dl=~/Downloads
-export db=~/Dropbox
+export PJ=~/Dropbox/Projects
+export SW=~/Software
+export DL=~/Downloads
+export DB=~/Dropbox
+export HW=~/Dropbox/uw
 
-# Environment Variabls
+# Env Variables
+export LEIN_FAST_TRAMPOLINE=y
+export LEIN_JAVA_CMD=~/bin/drip
 export EDITOR="emacsclient -n -a vim"
 export SUDO_EDITOR=$EDITOR
 export VISUAL=$EDITOR
 
-export GOROOT=~/Software/go
-export GOPATH=~/Programming/Go
-export PATH=$GOROOT/bin:$PATH
 
-export GRADLE_HOME=~/Software/gradle-1.10
-export PATH=$GRADLE_HOME:$PATH
-
-export GROOVY_HOME=/home/shermpay/.gvm/groovy/current/bin/
-export nginxdir=/home/shermpay/Software/nginx/nginx-clojure-0.1.2/nginx-1.4.4
-
-export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"
- 
-export LESS=' -R '
 #THIS MUST BE AT THE END OF THE FILE FOR GVM TO WORK!!!
 [[ -s "/home/shermpay/.gvm/bin/gvm-init.sh" ]] && source "/home/shermpay/.gvm/bin/gvm-init.sh"

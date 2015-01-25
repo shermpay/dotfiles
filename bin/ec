@@ -1,0 +1,41 @@
+#!/usr/bin/python
+# Script to invoke emacsclient with more flavor
+# invoke emacsclient the same way with a file argument to open
+# file in current frame
+# Use the -T/--new-tab flag to open in new tab
+# Use the -f flag to invoke with emacsclient flags
+
+import argparse
+import subprocess
+
+# Arguments that will always be invoked
+default_args = ["--alternate-editor=vim", "--no-wait"]
+# Final command to be invoked
+cmd = ["emacsclient"] + default_args
+
+# Parse args
+parser = argparse.ArgumentParser()
+# Get filename
+parser.add_argument("filename", nargs='?')
+# -T, --new-tab for opening in new tab
+parser.add_argument("-T", "--new-tab", help="Open file in new tab",
+                    action='store_true')
+# -f, --flags for builtin emacsclient options
+parser.add_argument("-f", "--flags", help="Invoke with builtin emacsclient flags.")
+
+args = parser.parse_args()
+
+if args.flags:              # Using builtin emacsclient flags
+    flags = args.flags.replace(":", "-").split()
+    cmd += flags
+
+if args.new_tab:
+    cmd += ["-e", "(elscreen-find-file \"{}\")".format(args.filename)]
+else:
+    cmd.append(args.filename)       # Append filename to the end
+
+# Remove Nones
+while None in cmd:
+    cmd.remove(None)
+# Invoke the cmd
+subprocess.call(cmd)
