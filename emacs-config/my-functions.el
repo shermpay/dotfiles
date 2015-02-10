@@ -36,7 +36,8 @@
     (indent-according-to-mode)))
 
 (defun prog-mode-keys ()
-  (local-set-key [(f11)] 'compile))
+  (local-set-key [(f11)] 'compile)
+  (local-set-key [tab] 'company-complete))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ---------- EVIL MODE -----------  ;;

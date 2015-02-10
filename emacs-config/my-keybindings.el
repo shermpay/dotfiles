@@ -31,11 +31,8 @@
 
 (global-set-key (kbd "M-`") 'er/expand-region) ;Expand Region
 
-;;; Smex mode
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-X") 'smex-major-mode-commands)
-;; This is your old M-x.
-(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+;;; Helm
+(global-set-key (kbd "M-x") 'helm-M-x)
 
 ;;; Term Mode
 (global-set-key (kbd "<f10>") #'term-other-window)

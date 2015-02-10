@@ -17,37 +17,20 @@
 ;; (key-chord-mode 1)
 ;; ;; (require 'space-chord)
 
-;;; Ido modes
-(flx-ido-mode 1)
-(ido-ubiquitous 1)
-
 ;;; Helm modes
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
+(global-unset-key (kbd "C-x c"))
 (require 'helm-config)
+(setq helm-M-x-fuzzy-match t
+      helm-split-window-in-side-p)
+(helm-mode 1)
 
 ;;; Projectile mode
 (projectile-global-mode 1)
 (setq projectile-mode-line (concat " Prj[" (projectile-project-name) "]"))
 
-;;; Auto-complete modes
-(require 'auto-complete)
-(add-to-list 'ac-dictionary-directories "/home/shermpay/.emacs.d/elpa/auto-complete-20140208.653/dict")
-(require 'auto-complete-config)
-(ac-config-default)
-(ac-set-trigger-key "C-i")
-(setq ac-auto-show-menu 1)
-(setq ac-trigger-commands nil)
-;;; Adding ac-math (latex)
-
-(defun ac-LaTeX-mode-setup () ; add ac-sources to default ac-sources
-  (progn
-    (require 'ac-math)
-    (setq ac-sources
-	 (append '(ac-source-math-unicode ac-source-math-latex ac-source-latex-commands)
-		 ac-sources))))
-(add-hook 'LaTeX-mode-hook 'ac-LaTeX-mode-setup)
-(add-to-list 'ac-modes 'latex-mode)
-
-(global-auto-complete-mode t)
+;;; Company modes
+(add-hook 'after-init-hook 'global-company-mode)
 
 ;;;;;;;;;;;;;;;;;;
 ;; Paredit-mode ;;
