@@ -25,6 +25,7 @@
 ;; --------- Cursor --------- ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq evil-normal-state-cursor '("white" box))
+(setq evil-insert-state-cursor '("white" bar))
 (setq evil-emacs-state-cursor '("green" bar))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; --------- Mode line ---------  ;;
@@ -48,12 +49,33 @@
 (evil-leader/set-key
   "f" 'ido-find-file
   "k" 'kill-this-buffer
-  "g" 'elscreen-goto
-  )
+  "g" 'elscreen-goto)
 
 ;;; Other keys
 
 ;;; Mode switches
+(define-key evil-normal-state-map (kbd "C-\\") 'evil-emacs-state)
+(define-key evil-insert-state-map (kbd "C-\\") 'evil-emacs-state)
+(define-key evil-emacs-state-map (kbd "C-\\") 'evil-exit-emacs-state)
+
+;;; Key Translations
+(define-key key-translation-map (kbd ",,") (kbd "C-x"))
+(define-key key-translation-map (kbd ",q") (kbd "C-g"))
+(define-key key-translation-map (kbd ",h") (kbd "C-h"))
+(define-key key-translation-map (kbd ",p") (kbd "C-c p"))
+
+;;; Ace jump
+(define-key evil-motion-state-map (kbd "SPC") #'evil-ace-jump-char-mode)
+(define-key evil-motion-state-map (kbd "C-SPC") #'evil-ace-jump-word-mode)
+;; different jumps for different visual modes
+(defadvice evil-visual-line (before spc-for-line-jump activate)
+  (define-key evil-motion-state-map (kbd "SPC") #'evil-ace-jump-line-mode))
+ 
+(defadvice evil-visual-char (before spc-for-char-jump activate)
+  (define-key evil-motion-state-map (kbd "SPC") #'evil-ace-jump-char-mode))
+ 
+(defadvice evil-visual-block (before spc-for-char-jump activate)
+  (define-key evil-motion-state-map (kbd "SPC") #'evil-ace-jump-char-mode))
 ;;; esc quits
 (define-key evil-normal-state-map [escape] 'keyboard-quit)
 (define-key evil-visual-state-map [escape] 'keyboard-quit)

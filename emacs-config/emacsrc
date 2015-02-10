@@ -56,6 +56,22 @@
 (setq next-line-add-newlines nil)
 (setq tab-width 4)
 
+;;;;;;;;;;;;;;
+;; Terminal ;;
+;;;;;;;;;;;;;;
+(defun term-key-bindings ()
+  (define-key term-raw-map (kbd "M-&") #'async-shell-command)
+  (define-key term-raw-map (kbd "M-:") #'eval-expression)
+  (define-key term-raw-map (kbd "C-w") nil)
+  (define-key term-raw-map (kbd "C-p") 'term-send-raw)
+  (define-key term-raw-map (kbd "M-o") #'other-window))
+
+(defun term-local-settings ()
+  (setq term-buffer-maximum-size 1024))
+
+(add-hook 'term-mode-hook #'term-key-bindings)
+(add-hook 'term-mode-hook #'term-local-settings)
+
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  ;; --------------- MISC --------------- ;;
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -106,28 +122,3 @@
 (timed-require 'my-plugins)
 (timed-require 'my-faces)
 (timed-require 'my-keybindings)
-
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes (quote ("a81bc918eceaee124247648fc9682caddd713897d7fd1398856a5b61a592cb62" "3632cf223c62cb7da121be0ed641a2243f7ec0130178722554e613c9ab3131de" "0c311fb22e6197daba9123f43da98f273d2bfaeeaeb653007ad1ee77f0003037" default)))
- '(ecb-options-version "2.40")
- '(scroll-bar-mode nil))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(rainbow-delimiters-depth-1-face ((t (:foreground "ivory"))))
- '(rainbow-delimiters-depth-2-face ((t (:foreground "snow1"))))
- '(rainbow-delimiters-depth-3-face ((t (:foreground "orchid1"))))
- '(rainbow-delimiters-depth-4-face ((t (:foreground "bisque1"))))
- '(rainbow-delimiters-depth-5-face ((t (:foreground "LightSteelBlue1"))))
- '(rainbow-delimiters-depth-6-face ((t (:foreground "dark gray"))))
- '(rainbow-delimiters-depth-7-face ((t (:foreground "rosy brown"))))
- '(rainbow-delimiters-depth-8-face ((t (:foreground "dark khaki"))))
- '(rainbow-delimiters-depth-9-face ((t (:foreground "purple1"))))
- '(rainbow-delimiters-unmatched-face ((t (:foreground "cadet blue")))))

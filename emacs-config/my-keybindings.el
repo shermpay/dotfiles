@@ -14,14 +14,12 @@
 ;;; Overrides
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "M-o") 'other-window)
-(global-set-key (kbd "M-6" ) 'delete-indentation)  ;Used to remove blank from one line to another(not between)
 (global-set-key (kbd "M-5") 'query-replace-regexp)  ;Query replace regexp
 (global-set-key (kbd "<f8>") 'tramp-cleanup-all-connections)
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 (global-set-key (kbd "C-M-s") 'isearch-forward)
 (global-set-key (kbd "C-M-r") 'isearch-backward)
-(global-set-key (kbd "M-g") 'goto-line)
 
 ;;; Programming mode keys
 (add-hook 'prog-mode-hook  'prog-mode-keys)
@@ -31,16 +29,31 @@
 (global-set-key (kbd "M-]") 'mc/mark-next-like-this)
 (global-set-key (kbd "M-+") 'mc/mark-all-like-this)
 
-(global-set-key (kbd "M-2") 'er/expand-region) ;Expand Region
-;;; Ace jump mode
-(global-set-key (kbd "M-SPC") 'ace-jump-mode) 
-(global-set-key (kbd "C-M-SPC") 'just-one-space)
+(global-set-key (kbd "M-`") 'er/expand-region) ;Expand Region
 
 ;;; Smex mode
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 ;; This is your old M-x.
 (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+
+;;; Term Mode
+(global-set-key (kbd "<f10>") #'term-other-window)
+
+;;; Elscreen
+(global-set-key (kbd "M-1") (lambda () (interactive) (elscreen-goto 1)))
+(global-set-key (kbd "M-2") (lambda () (interactive) (elscreen-goto 2)))
+(global-set-key (kbd "M-3") (lambda () (interactive) (elscreen-goto 3)))
+(global-set-key (kbd "M-4") (lambda () (interactive) (elscreen-goto 4)))
+(global-set-key (kbd "M-5") (lambda () (interactive) (elscreen-goto 5)))
+(global-set-key (kbd "M-6") (lambda () (interactive) (elscreen-goto 6)))
+(global-set-key (kbd "M-7") (lambda () (interactive) (elscreen-goto 7)))
+(global-set-key (kbd "M-8") (lambda () (interactive) (elscreen-goto 8)))
+(global-set-key (kbd "M-9") (lambda () (interactive) (elscreen-goto 9)))
+(global-set-key (kbd "M-0") (lambda () (interactive) (elscreen-goto 0)))
+(global-set-key (kbd "M-g w") #'elscreen-goto)
+(global-set-key (kbd "M-g M-w") #'elscreen-goto)
+
 
 ;;; Org Mode
 (global-set-key "\C-cl" 'org-store-link)

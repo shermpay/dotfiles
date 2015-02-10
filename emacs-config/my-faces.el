@@ -4,22 +4,12 @@
 ;; *************** FACES ***************
 (require 'color-theme)
 (color-theme-initialize)
-(if (not (display-graphic-p))
-    (load-theme 'solarized-dark))
-;; (destructuring-bind (sec min hr day month yr . _) (decode-time)
-;;   (if (or (> hr 17 ) (< hr 7))
-;;       (progn
-;;         (load-file "~/.emacs.d/plugins/Amelie-theme.el")
-;;         (load-theme 'Amelie t))
-;;     (color-theme-classic)))
+(load-theme 'solarized-dark t)
 
-(load-file "~/.emacs.d/plugins/Amelie-theme.el")
-(load-theme 'Amelie t)
 ;;; Don't like all the fancy bars
 (menu-bar-mode -1) 			
 (menu-bar-no-scroll-bar)
 (tool-bar-mode -1)
-;; (bar-cursor-mode 1)
 
 ;;; Set the default colors, allows all frame to have the same colors
 ;; (setq default-frame-alist
@@ -32,23 +22,6 @@
 		    :family "Source Code Pro"
 		    :height 90)
 
-;; ;;; Color Scheme
-;; (set-face-foreground 'font-lock-function-name-face "red")
-;; (set-face-foreground 'font-lock-keyword-face "yellow")
-;; (set-face-foreground 'font-lock-type-face "RoyalBlue1")
-;; (set-face-foreground 'font-lock-variable-name-face "GoldenRod1")
-;; (set-face-foreground 'font-lock-builtin-face "orchid1")
-;; (set-face-foreground 'font-lock-constant-face "green")
-(set-face-foreground 'font-lock-comment-face "tan")
-(set-face-foreground 'font-lock-comment-delimiter-face "tan")
-;; (set-face-foreground 'font-lock-doc-face "wheat")
-;; (set-face-foreground 'font-lock-string-face "LightPink")
-;; (set-face-foreground 'font-lock-regexp-grouping-construct "DodgerBlue")
-;; (set-face-foreground 'font-lock-regexp-grouping-backslash "DodgerBlue")
-;; (set-face-foreground 'font-lock-negation-char-face "GoldenRod1")
-;; (set-face-foreground 'minibuffer-prompt "SteelBlue1")
-;; (set-face-foreground 'linum "azure3")
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ---------- Mode-line ---------- ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -56,19 +29,19 @@
 
 ;;;--------- Smart Mode line---------  
 (setq sml/no-confirm-load-theme t)
-(setq sml/theme 'automatic)
+(setq sml/theme 'respectful)
 (setq sml/name-width 40)
 (setq sml/mode-width 'full)
 (sml/setup)
 (dolist (mode '(" Undo-Tree" " Abbrev" " Paredit" " AC" " ARev" " yas"))
   (add-to-list 'sml/hidden-modes mode))
 (dolist (dir '(("^~/Programming/" ":P:")
-	       ("^~/Programming/Projects/" ":Prj:")
-	       ("^~/.emacs.d/org" ":Org:")
-	       ("^~/dotfiles/" ":dot:")))
- (add-to-list 'sml/replacer-regexp-list dir))
+	       ("^:DB:Projects/" ":Prj:")
+	       ("^~/.emacs.d/org/" ":Org:")
+	       ("^~/dotfiles/" ":Dot:")))
+ (add-to-list 'sml/replacer-regexp-list dir t))
 
 (setcdr (assq 'projectile-mode minor-mode-alist)
-	(list (concat " Prj[" (projectile-project-name) "]")))
+	(list (concat " {" (projectile-project-name) "}")))
 
 (provide 'my-faces)

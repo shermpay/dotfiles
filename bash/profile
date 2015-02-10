@@ -23,8 +23,8 @@ if [ -d "$HOME/bin" ] ; then
 fi
 
 # Environment Variabls
-export JAVA_HOME='/usr/java/jdk1.8.0_25'
-export JRE_HOME='/usr/lib/jdk1.8.0_25'
+# export JAVA_HOME='/usr/java/jdk1.8.0_25'
+# export JRE_HOME='/usr/lib/jdk1.8.0_25'
 
 export GOROOT=~/Software/go
 export GOPATH=~/Programming/Go
@@ -45,7 +45,7 @@ export CLOJURESCRIPT_HOME=/home/shermpay/Programming/OpenSource/Clojure/clojures
 PATH=$CLOJURESCRIPT_HOME/bin:$PATH
 
 # defects4j
-export PATH=$PATH:/home/shermpay/Dropbox/uw/research/defects4j/framework/bin
+export PATH=$PATH:/home/shermpay/Dropbox/uw/research/defects4j-refactoring/framework/bin
 
 #THIS MUST BE AT THE END OF THE FILE FOR GVM TO WORK!!!
 [[ -s "/home/shermpay/.gvm/bin/gvm-init.sh" ]] && source "/home/shermpay/.gvm/bin/gvm-init.sh"

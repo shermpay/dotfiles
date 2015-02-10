@@ -10,6 +10,8 @@
 (global-undo-tree-mode 1)
 ;;; elscreen
 (elscreen-start)
+(setq elscreen-prefix-key (kbd "C-w"))
+
 ;;; key chord modes
 ;; (require 'key-chord)
 ;; (key-chord-mode 1)
@@ -31,7 +33,7 @@
 (add-to-list 'ac-dictionary-directories "/home/shermpay/.emacs.d/elpa/auto-complete-20140208.653/dict")
 (require 'auto-complete-config)
 (ac-config-default)
-(ac-set-trigger-key (kbd "C-i"))
+(ac-set-trigger-key "C-i")
 (setq ac-auto-show-menu 1)
 (setq ac-trigger-commands nil)
 ;;; Adding ac-math (latex)

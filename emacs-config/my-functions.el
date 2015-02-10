@@ -11,25 +11,12 @@
   (progn
     (kill-this-buffer)
     (elscreen-kill)))
+
 (define-key evil-normal-state-map (kbd "C-w d") 'kill-this-buffer-tab) 
 
 ;;; ========================================
 ;;; ---------- EDITING Functions
 ;;; ========================================
-
-(defun copy-whole-line ()
-  "Kills a whole line without remove it"
-  (interactive)
-  (let ((cur (point-marker))
-	(start (progn
-		 (move-beginning-of-line 1)
-		 (point)))
-	(end (progn
-	       (move-end-of-line 1)
-	       (point))))
-    (kill-ring-save start end)
-    (goto-char cur)
-    (message "Saved %s in kill ring" (downcase (what-line)))))
 
 ;;; Paredit with Electric Return
  (defvar electrify-return-match
@@ -128,11 +115,6 @@
 	(lambda (f)
 	  (substring f (length *current-tramp-path*))))
   (slime-connect "localhost" 4005))
-(defvar *vergil-tramp-path*
-  "/ssh:shermpay@vergil.u.washington.edu:")
- (defun slime-vergil ()
-  (interactive)
-  (connect-to-host *vergil-tramp-path*))
 
 ;;; ========================================
 ;;; ---------- OCTAVE MODE
@@ -147,7 +129,6 @@
   '(progn
      (define-key octave-mode-map (kbd "C-c C-z") 'octave-shell)))
 
-
 ;;;;;;;;;;;;;;;;;;;
 ;; GRAPHVIZ MODE ;;
 ;;;;;;;;;;;;;;;;;;;
@@ -156,11 +137,31 @@
   (let* ((file (buffer-name))
 	(out-file (substring file 0 (- (length file) 4))))
     (shell-command (concat "dot -Tpng " file " -o " out-file ".png"))))
-;;; ========================================
 
+;;; ========================================
+;;; ---------- Term
+;;; ========================================
+(defun term-other-window ()
+  (interactive)
+  (if (not (get-buffer "*ansi-term*"))
+      (progn (split-window-sensibly (selected-window))
+             (other-window 1)
+             (ansi-term (getenv "SHELL")))
+    (switch-to-buffer-other-window "*ansi-term*")))
+
+(defun new-term-other-window ()
+  (interactive)
+  (split-window-sensibly (selected-window))
+  (other-window 1)
+  (ansi-term (getenv "SHELL")))
+
+(add-hook 'term-mode-hook
+          (lambda () (define-key term-mode-map (kbd "C-S-c") #'term-interrupt-subjob)))
+
+
+;;; ========================================
 ;;; ---------- MISC
 ;;; ========================================
-
 (defun caesar-cipher (s n)
   (apply #'string
          (mapcar (lambda (x) (+ (mod (+ n (- x ?a)) 26) ?a)) (downcase s))))
@@ -188,11 +189,7 @@
     (insert (concat (reverse-pairs
 		     (string-to-list (buffer-substring-no-properties beg end)))))
     (delete-region beg end)))
-(defun test (beg end)
-  (interactive (if (use-region-p)
-		   (list (region-beginning) (region-end))
-		 (list (point-min) (point-min))))
-  (message "%s" (buffer-substring-no-properties beg end)))
+
 ;;; generates a list of characters from START to END
 ;;; Prepends/Appends a string if given
 (defun* generate-characters (start end &key (prepend "") (append ""))
@@ -208,7 +205,7 @@
 
 ;; Add date capabilites
 (defun insert-date (prefix)
-  "Insert the current date. With prefix-argument, use ISO format. With two
+  "Insert the current date. With p
 prefix arguments, write out the day and month name."
   (interactive "P")
   (let ((format (cond
@@ -217,14 +214,6 @@ prefix arguments, write out the day and month name."
 		 ((equal prefix '(16)) "%A, %d. %B %Y")))
 	(system-time-locale "de_DE"))
     (insert (format-time-string format))))
-
-(defun toggle-transparency ()
-   (interactive)
-   (if (/=
-        (cadr (frame-parameter nil 'alpha))
-        100)
-       (set-frame-parameter nil 'alpha '(100 100))
-     (set-frame-parameter nil 'alpha '(85 50))))
 
 (provide 'my-functions)
 
