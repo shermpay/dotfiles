@@ -33,7 +33,7 @@
 (setq sml/name-width 40)
 (setq sml/mode-width 'full)
 (sml/setup)
-(dolist (mode '(" Undo-Tree" " Abbrev" " Paredit" " AC" " ARev" " yas"))
+(dolist (mode '(" Undo-Tree" " Abbrev" " Paredit" " AC" " ARev" " yas" " company" " Helm"))
   (add-to-list 'sml/hidden-modes mode))
 (dolist (dir '(("^~/Programming/" ":P:")
 	       ("^:DB:Projects/" ":Prj:")

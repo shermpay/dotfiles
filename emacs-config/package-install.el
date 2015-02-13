@@ -1,59 +1,30 @@
-;;; Script to install packages
+;;; Script to generate package installer
+(defun generate-package-initializers ()
+  (print '(require 'package))
+  (print '(setq package-archives
+                '(("gnu"         . "http://elpa.gnu.org/packages/")
+                  ("marmalade"   . "http://marmalade-repo.org/packages/")
+                  ("melpa"       . "http://melpa.milkbox.net/packages/"))))
+  (print '(package-initialize)))
 
-(require 'package)
-(setq package-archives
-      '(("gnu"         . "http://elpa.gnu.org/packages/")
-        ("marmalade"   . "http://marmalade-repo.org/packages/")
-	("melpa"       . "http://melpa.milkbox.net/packages/")))
-(package-initialize)
+(defun generate-my-packages-list ()
+  (princ "(defvar -my-packages (")
+  (dolist (pkg package-alist)
+    (destructuring-bind (pkg-name . pkg-info) pkg
+      (princ (format "%S\n" pkg-name))))
+  (princ "))\n")
+  t)
 
-(defvar editing '(ace-jump-mode
-		  expand-region
-		  undo-tree
-		  multiple-cursors
-		  visual-regexp
-		  visual-regexp-steroids))
+(defun generate-package-installation-script ()
+  (with-temp-file "-package-install.el"
+   (with-output-to-temp-buffer (current-buffer)
+     (princ ";;; This is a generated script to install elisp packages")
+     (generate-package-initializers)
+     (print '(make-local-variable -my-packages))
+     (generate-my-packages-list)
+     (print
+      '(dolist (pkg -my-packages)
+         (when (not (package-installed-p pkg))
+           (with-demoted-errors (package-install pkg))))))))
 
-(defvar clojure '(ac-cider-compliment
-		  ac-nrepl
-		  align-cljlet
-		  clojure-mode
-		  clojure-test-mode
-		  cider
-		  clj-refactor
-		  clojure-cheatsheet
-		  clojure-mode))
-
-(defvar prog '(ac-octave
-	       markdown-mode
-	       groovy-mode
-	       auto-complete
-	       slime
-	       jedi
-	       magit
-	       rainbow-delimiters
-	       paredit
-	       sml-mode
-	       projectile))
-
-(defvar misc '(dropdown-list
-	       flx
-	       flx-ido
-	       elscreen
-	       ido-ubiquitous
-	       smex
-	       key-chord))
-
-
-(defvar faces '(noctilux-theme solarized-theme smart-mode-line))
-
-(defvar evil '(evil evil-leader linum-relative))
-
-
-(defvar all-pkgs (list editing clojure prog misc evil faces))
-;;; Installing editing packages
-
-(dolist (pkgs all-pkgs)
- (dolist (pkg pkgs)
-   (when (not (package-installed-p pkg))
-     (with-demoted-errors (package-install pkg)))))
+(generate-package-installation-script)

@@ -1,4 +1,6 @@
 ;; -*- emacs-lisp -*-
+;;; Benchmark Init
+(defvar *elisp-dir* "~/.emacs.d")
 ;; -------------- STARTUP  --------------
 (require 'cl-lib); Allows use of Common-Lisp libraries
 ;;; Useful default packages
@@ -6,7 +8,6 @@
 (require 'uniquify)
 (require 'ansi-color)
 (require 'recentf)
-(defvar *elisp-dir* "~/.emacs.d")
 
 (global-linum-mode t);; Global Line Number mode on startup
 (column-number-mode t);; Column Number mode
