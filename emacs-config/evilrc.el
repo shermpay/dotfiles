@@ -36,14 +36,21 @@
 ;; --------- TABS --------- ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Creating tabs the vim way. Requires elscreen
-(define-key evil-normal-state-map (kbd "C-w t") 'elscreen-create) ;create tab
-(define-key evil-normal-state-map (kbd "C-w x") 'elscreen-kill) ;kill tab
-(define-key evil-normal-state-map (kbd "C-w f") 'elscreen-find-file)  ;Create tab with new file
-(define-key evil-normal-state-map "gT" 'elscreen-previous) ;previous tab
-(define-key evil-normal-state-map "gt" 'elscreen-next) ;next tab
+(global-evil-tabs-mode)
+;; (define-key evil-normal-state-map (kbd "C-w t") 'elscreen-create) ;create tab
+;; (define-key evil-normal-state-map (kbd "C-w x") 'elscreen-kill) ;kill tab
+;; (define-key evil-normal-state-map (kbd "C-w f") 'elscreen-find-file)  ;Create tab with new file
+;; (define-key evil-normal-state-map "gT" 'elscreen-previous) ;previous tab
+;; (define-key evil-normal-state-map "gt" 'elscreen-next) ;next tab
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; --------- Rebinding Keys --------- ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Useful defaults
+(define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+(define-key evil-normal-state-map (kbd "g j") 'evil-next-line)
+(define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
+(define-key evil-normal-state-map (kbd "g k") 'evil-previous-line)
+
 ;;; Leader
 (setq evil-leader/leader ",")
 (evil-leader/set-key
@@ -84,6 +91,7 @@
 (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
 (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+(global-set-key [escape] 'evil-exit-emacs-state)
 
 ;; (define-key evil-normal-state-map [return] 'evil-ret-and-indent)
 ;; (define-key evil-insert-state-map [return] 'evil-ret-and-indent)

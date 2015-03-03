@@ -1,0 +1,98 @@
+#!/usr/bin/python3
+# JAVA7_HOME=/usr/lib/jvm/jdk1.7.0_60
+# JAVA8_HOME=/usr/lib/jvm/jdk1.8.0_25
+
+# if [ $# -eq 1 ]; then
+# 	if [ $1 -eq 7 ]; then
+# 		export JAVA_HOME=$JAVA7_HOME
+# 	elif [ $1 -eq 8 ]; then
+# 		export JAVA_HOME=$JAVA8_HOME
+# 	fi
+# 	echo "Updated JAVA_HOME: "$JAVA_HOME
+
+# 	sudo update-alternatives --config java
+# 	sudo update-alternatives --config javac
+# else
+# 	echo 'usage javas [version]'
+# fi
+
+import argparse
+import os
+import subprocess
+import sys
+
+# user
+user = os.environ['USER']
+
+# configurations
+java_versions = {
+    7: {'home': '/usr/lib/jvm/jdk1.7.0_60',
+        'java': '/usr/lib/jvm/jdk1.7.0_60/bin/java',
+        'javac': '/usr/lib/jvm/jdk1.7.0_60/bin/javac'},
+    8: {'home':'/usr/lib/jvm/jdk1.8.0_25',
+        'java': '/usr/lib/jvm/jdk1.8.0_25/bin/java',
+        'javac': '/usr/lib/jvm/jdk1.8.0_25/bin/javac'}
+}
+
+def curr_status():
+    """ get the current status of the Java configuration"""
+    curr_home = os.environ['JAVA_HOME']
+    for k, conf in java_versions.items():
+        if conf['home'] == curr_home:
+            curr_version = k
+    return (curr_home, curr_version)
+
+def print_status():
+    """ print the current configuration to stdout """
+    print("Current Java Config")
+    print("-------------------")
+    print("JAVA_HOME=", curr_home, sep='')
+    print("Version:", curr_version)
+
+def write_update_java_home():
+    path = '/home/' + user + '/bin/update_java_home'
+    with open(path, 'w') as f:
+        f.write("#!/bin/bash\n")
+        f.write("JAVA_HOME=" + curr_home + "\n")
+
+def update_java_version(new_version):
+    config = java_versions[new_version]
+    os.environ['JAVA_HOME'] = config['home']
+    subprocess.call(["sudo", "update-alternatives", "--set", "java", config['java']])
+    subprocess.call(["sudo", "update-alternatives", "--set", "javac", config['javac']])
+    global curr_home, curr_version
+    curr_home, curr_version = curr_status()
+    write_update_java_home()
+
+# Initialize Global Status
+# These variables have to be updated whenver Java configuration changes are made
+curr_home, curr_version = curr_status()
+
+# Parse arguments
+parser = argparse.ArgumentParser();
+parser.add_argument("-c", "--config", type=int,
+                    help="configure java version")
+args = parser.parse_args()
+
+print_status()
+
+if args.config:
+    new_version = args.config
+
+    if new_version not in java_versions.keys():
+        print("Version", new_version, "does not exist", file=sys.stderr)
+        print("Please pick from the following:", java_versions.keys(), file=sys.stderr)
+        sys.exit(1)
+
+    if new_version == curr_version:
+        print("Current version", curr_version, "equals argument version", new_version)
+        print("Exiting.")
+        sys.exit(0)
+    else:
+        print()
+        print("Updated Java version")
+        print()
+        update_java_version(new_version)
+        print_status()
+        sys.exit(1)
+

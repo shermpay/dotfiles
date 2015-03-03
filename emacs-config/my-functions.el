@@ -7,12 +7,13 @@
 ;;; ---------- Window/Buffer Functions
 ;;; ========================================
 (defun kill-this-buffer-tab ()
+  "Kills this buffer and deletes this tab"
   (interactive)
   (progn
     (kill-this-buffer)
     (elscreen-kill)))
 
-(define-key evil-normal-state-map (kbd "C-w d") 'kill-this-buffer-tab) 
+;; (define-key evil-normal-state-map (kbd "C-w d") 'kill-this-buffer-tab) 
 
 ;;; ========================================
 ;;; ---------- EDITING Functions
@@ -37,7 +38,7 @@
 
 (defun prog-mode-keys ()
   (local-set-key [(f11)] 'compile)
-  (local-set-key [tab] 'company-complete))
+  (local-set-key [M-tab] 'company-complete))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ---------- EVIL MODE -----------  ;;

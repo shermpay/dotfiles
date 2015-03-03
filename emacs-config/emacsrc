@@ -71,9 +71,11 @@
 (add-hook 'term-mode-hook #'term-key-bindings)
 (add-hook 'term-mode-hook #'term-local-settings)
 
- ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- ;; --------------- MISC --------------- ;;
- ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; --------------- MISC --------------- ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Python3 shebang
+(add-to-list 'interpreter-mode-alist '("python3" . python-mode))
 ;;; Debugging
 ;; (setq stack-trace-on-error t)
 ;; Setting Auto-Save directory and Backup Directory

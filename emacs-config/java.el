@@ -1,17 +1,29 @@
 ;; ^^^^^^^^^^^^^^^ Java MODE ^^^^^^^^^^^^^^^
 (add-hook 'java-mode-hook 'java-defer-loading)
-(add-to-list 'load-path "~/.emacs.d/plugins/auto-java-complete/")
-;; (require 'ajc-java-complete-config)
-;; (add-hook 'java-mode-hook 'ajc-java-complete-mode)
-;; (add-hook 'find-file-hook 'auto-4-jsp-find-file-hook)
 (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
                                   global-semanticdb-minor-mode
                                   global-semantic-idle-summary-mode
                                   global-semantic-mru-bookmark-mode))
 (semantic-mode 1)
-;; (require 'malabar-mode)
-;; (setq malabar-groovy-lib-dir "/path/to/malabar/lib")
-;; (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
+
+(defun initialize-eclim ()
+  (require 'eclim)
+  (global-eclim-mode)
+  (setq eclim-eclipse-dirs '("~/Software/eclipse"))
+  (setq eclim-executable "~/Software/eclipse/eclim")
+  (setq help-at-pt-display-when-idle t)
+  (setq help-at-pt-timer-delay 0.1)
+  (help-at-pt-set-timer)
+  (require 'eclimd)
+  (setq eclimd-default-workspace "~/Software/eclim")
+  (start-eclimd eclimd-default-workspace)
+  (setq company-eclim-auto-save t)
+  (require 'company-emacs-eclim)
+  (company-emacs-eclim-setup)
+  (company-eclim))
+
+(add-hook 'java-mode-hook 'initialize-eclim)
+
 (add-hook 'java-mode-hook
       '(lambda ()
          "Treat Java 1.5 @-style annotations as comments."

@@ -9,25 +9,39 @@
 ;;; Global Undo tree mode
 (global-undo-tree-mode 1)
 ;;; elscreen
-(elscreen-start)
 (setq elscreen-prefix-key (kbd "C-w"))
+(elscreen-start)
 
 ;;; key chord modes
 ;; (require 'key-chord)
 ;; (key-chord-mode 1)
 ;; ;; (require 'space-chord)
 
+;;; Projectile mode
+(projectile-global-mode 1)
+(setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
+
 ;;; Helm modes
+(require 'helm)
+(require 'helm-config)
 (global-set-key (kbd "C-c h") 'helm-command-prefix)
 (global-unset-key (kbd "C-x c"))
-(require 'helm-config)
+; rebind tab to run persistent action
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) 
+ ; make TAB works in terminal
+(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
+ ; list actions using C-z
+(define-key helm-map (kbd "C-z")  'helm-select-action)
+
+(when (executable-find "curl")
+  (setq helm-google-suggest-use-curl-p t))
+
 (setq helm-M-x-fuzzy-match t
+      helm-quick-update t
       helm-split-window-in-side-p)
 (helm-mode 1)
 
-;;; Projectile mode
-(projectile-global-mode 1)
-(setq projectile-mode-line (concat " Prj[" (projectile-project-name) "]"))
+(require 'helm-projectile)
 
 ;;; Company modes
 (add-hook 'after-init-hook 'global-company-mode)
@@ -48,7 +62,6 @@
 
 (dolist (hook lisp-modes-hooks nil)
   (add-hook hook #'enable-paredit-mode))
-
 
 ;;;;;;;;;;;;
 ;; Octave ;;
@@ -98,7 +111,6 @@
 ;;;;;;;;;;;;;;;;;;
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Compiler tools ;;
