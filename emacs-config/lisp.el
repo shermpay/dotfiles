@@ -19,6 +19,7 @@
 (defun clojure-indentation ()
   (put-clojure-indent 'match 'defun))
 (add-hook 'clojure-mode-hook #'clojure-indentation)
+(add-hook 'clojure-mode-hook #'flycheck-clojure-setup)
 (setq cider-auto-select-error-buffer t)  ;Auto select error buffer
 (setq cider-repl-print-length 100)
 (setq cider-stacktrace-fill-column 80)

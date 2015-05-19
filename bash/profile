@@ -22,6 +22,8 @@ if [ -d "$HOME/bin" ] ; then
     PATH="$HOME/bin:$PATH"
 fi
 
+export UW_HOME="/home/shermpay/Dropbox/uw"
+
 # Environment Variabls
 # export JAVA_HOME='/usr/java/jdk1.8.0_25'
 # export JRE_HOME='/usr/lib/jdk1.8.0_25'
@@ -43,6 +45,9 @@ export LESS=' -R '
 # CLJS
 export CLOJURESCRIPT_HOME=/home/shermpay/Programming/OpenSource/Clojure/clojurescript
 PATH=$CLOJURESCRIPT_HOME/bin:$PATH
+
+# Haskel Cabal
+PATH=~/.cabal/bin:$PATH
 
 # defects4j
 export PATH=$PATH:/home/shermpay/Dropbox/uw/research/defects4j-refactoring/framework/bin

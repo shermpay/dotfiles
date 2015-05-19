@@ -1,6 +1,7 @@
 ;; -*- emacs-lisp -*-
 ;;; Benchmark Init
 (defvar *elisp-dir* "~/.emacs.d")
+(defvar *org-dir* (concat *elisp-dir* "/org"))
 ;; -------------- STARTUP  --------------
 (require 'cl-lib); Allows use of Common-Lisp libraries
 ;;; Useful default packages
@@ -8,6 +9,10 @@
 (require 'uniquify)
 (require 'ansi-color)
 (require 'recentf)
+(add-hook 'emacs-startup-hook
+          (lambda () (find-file (concat *org-dir* "/todo.org"))))
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
 
 (global-linum-mode t);; Global Line Number mode on startup
 (column-number-mode t);; Column Number mode
@@ -91,6 +96,7 @@
 ;; TRAMP mode
 (setq tramp-default-method "ssh")
 (setq tramp-verbose 0)
+(setq password-cache-expiry 3600)
 ;; (add-to-list 'tramp-default-proxies-alist
 ;; 	     '(nil "\\`root\\'" "/ssh:%h:"))
 ;; (add-to-list 'tramp-default-proxies-alist
@@ -123,3 +129,16 @@
 (timed-require 'my-plugins)
 (timed-require 'my-faces)
 (timed-require 'my-keybindings)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ecb-options-version "2.40")
+ '(scroll-bar-mode nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

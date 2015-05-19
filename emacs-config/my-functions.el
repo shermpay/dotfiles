@@ -38,7 +38,7 @@
 
 (defun prog-mode-keys ()
   (local-set-key [(f11)] 'compile)
-  (local-set-key [M-tab] 'company-complete))
+  (local-set-key (kbd "M-SPC") 'company-complete))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ---------- EVIL MODE -----------  ;;

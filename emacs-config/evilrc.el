@@ -24,9 +24,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; --------- Cursor --------- ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq evil-normal-state-cursor '("white" box))
-(setq evil-insert-state-cursor '("white" bar))
-(setq evil-emacs-state-cursor '("green" bar))
+;;; Dark Themed
+;; (setq evil-normal-state-cursor '("white" box)
+;;       evil-insert-state-cursor '("white" bar)
+;;       evil-emacs-state-cursor '("green" bar))
+
+(setq evil-normal-state-cursor '("dim gray" box)
+      evil-insert-state-cursor '("dim gray" bar)
+      evil-emacs-state-cursor '("blue" bar))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; --------- Mode line ---------  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

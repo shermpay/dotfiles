@@ -43,8 +43,19 @@
 
 (require 'helm-projectile)
 
+;;; ECB
+;; (require 'ecb)
+;; (require 'ecb-autoloads)
+(setq ecb-help-info-path "./ecb.info")
+(setq ecb-windows-width 0.15)
+
 ;;; Company modes
 (add-hook 'after-init-hook 'global-company-mode)
+
+;;; Flycheck
+(add-hook 'after-init-hook #'global-flycheck-mode)
+(setq flycheck-display-errors-delay 0.5)
+(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
 
 ;;;;;;;;;;;;;;;;;;
 ;; Paredit-mode ;;
@@ -106,17 +117,12 @@
 ;;;;;;;;;;;;;;
 (add-hook 'sml-mode-hook  (lambda () (clear-abbrev-table sml-mode-abbrev-table)))
 
-;;;;;;;;;;;;;;;;;;
-;; Haskell Mode ;;
-;;;;;;;;;;;;;;;;;;
-(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-
 ;;;;;;;;;;;;;;;;;;;;
 ;; Compiler tools ;;
 ;;;;;;;;;;;;;;;;;;;;
 ;; (require 'flex-mode)
 ;; (require 'make-regexp)
 ;; (require 'bison-mode)
+(setq magit-last-seen-setup-instructions "1.4.0")
 (provide 'my-plugins)
  

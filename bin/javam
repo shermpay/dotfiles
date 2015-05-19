@@ -54,6 +54,7 @@ def write_update_java_home():
     with open(path, 'w') as f:
         f.write("#!/bin/bash\n")
         f.write("JAVA_HOME=" + curr_home + "\n")
+    print("Wrote to bash script", path)
 
 def update_java_version(new_version):
     config = java_versions[new_version]

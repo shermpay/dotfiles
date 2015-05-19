@@ -4,7 +4,7 @@
 ;; *************** FACES ***************
 (require 'color-theme)
 (color-theme-initialize)
-(load-theme 'solarized-dark t)
+(load-theme 'solarized-light t)
 
 ;;; Don't like all the fancy bars
 (menu-bar-mode -1) 			
