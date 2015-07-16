@@ -52,10 +52,16 @@
 ;;; Company modes
 (add-hook 'after-init-hook 'global-company-mode)
 
+;;; YCMD mode
+(add-hook 'after-init-hook 'global-ycmd-mode)
+(set-variable 'ycmd-server-command '("python" "/home/shermpay/Programming/OpenSource/ycmd/ycmd"))
+
 ;;; Flycheck
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (setq flycheck-display-errors-delay 0.5)
 (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
+(setq flycheck-clang-include-path '("/usr/include"
+                                    "/usr/include/SDL2"))
 
 ;;;;;;;;;;;;;;;;;;
 ;; Paredit-mode ;;
@@ -111,6 +117,9 @@
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode)) 
 (add-hook 'org-mode-hook 'flyspell-mode)
 (setq org-agenda-files (directory-files (concat *elisp-dir* "/org")))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((dot . t)))
 
 ;;;;;;;;;;;;;;
 ;; SML mode ;;
