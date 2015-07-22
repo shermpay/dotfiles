@@ -4,7 +4,7 @@
 (setq package-archives (quote (("gnu" . "http://elpa.gnu.org/packages/") ("marmalade" . "http://marmalade-repo.org/packages/") ("melpa" . "http://melpa.milkbox.net/packages/"))))
 
 (package-initialize)
-(defvar -my-packages (zonokai-theme
+(defvar -my-packages '(zonokai-theme
 yaml-mode
 w3m
 visual-regexp-steroids
@@ -112,5 +112,4 @@ ant
 align-cljlet
 ace-jump-mode
 ))
-
 (dolist (pkg -my-packages) (when (not (package-installed-p pkg)) (with-demoted-errors (package-install pkg))))

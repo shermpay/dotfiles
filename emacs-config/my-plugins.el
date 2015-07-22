@@ -116,7 +116,7 @@
 ;; The following lines are always needed.  Choose your own keys.
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode)) 
 (add-hook 'org-mode-hook 'flyspell-mode)
-(setq org-agenda-files (directory-files (concat *elisp-dir* "/org")))
+(setq org-agenda-files (directory-files (concat +elisp-dir+ "/org")))
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((dot . t)))

@@ -131,14 +131,7 @@ export DB=~/Dropbox
 export HW=~/Dropbox/uw
 
 # Env Variables
-export LEIN_FAST_TRAMPOLINE=y
-# export LEIN_JAVA_CMD=~/bin/drip
 export EDITOR="emacsclient -n -a vim"
 export SUDO_EDITOR=$EDITOR
 export VISUAL=$EDITOR
-export CLJ="/home/shermpay/.m2/repository/org/clojure/clojure/1.6.0/clojure-1.6.0.jar"
 
-
-#THIS MUST BE AT THE END OF THE FILE FOR GVM TO WORK!!!
-[[ -s "/home/shermpay/.gvm/bin/gvm-init.sh" ]] && source "/home/shermpay/.gvm/bin/gvm-init.sh"
-export PATH=$PATH:/home/shermpay/cse451/tools/bin

@@ -1,7 +1,6 @@
 ;; -*- emacs-lisp -*-
-;;; Benchmark Init
-(defvar *elisp-dir* "~/.emacs.d")
-(defvar *org-dir* (concat *elisp-dir* "/org"))
+(defvar +elisp-dir+ "~/.emacs.d")
+(defvar +org-dir+ (concat +elisp-dir+ "/org"))
 ;; -------------- STARTUP  --------------
 (require 'cl-lib); Allows use of Common-Lisp libraries
 ;;; Useful default packages
@@ -10,7 +9,7 @@
 (require 'ansi-color)
 (require 'recentf)
 (add-hook 'emacs-startup-hook
-          (lambda () (find-file (concat *org-dir* "/todo.org"))))
+          (lambda () (find-file (concat +org-dir+ "/todo.org"))))
 (recentf-mode 1)
 (setq recentf-max-menu-items 25)
 
@@ -25,12 +24,12 @@
 (delete-selection-mode 1) 	      	; Deletes text in the region
 ;; Abbrevations mode on startup
 (setq-default abbrev-mode t)
-(read-abbrev-file (concat *elisp-dir* "/abbrev_defs"))
+(read-abbrev-file (concat +elisp-dir+ "/abbrev_defs"))
 (setq save-abbrevs t)
 ;; Load PATHS
-(let ((default-directory *elisp-dir*))
+(let ((default-directory +elisp-dir+))
   (normal-top-level-add-subdirs-to-load-path))
-(add-to-list 'load-path "~/dotfiles/emacs-config")
+
 ;;; subword
 (global-subword-mode t)
 ;;; Show matching parens
@@ -84,7 +83,7 @@
 ;;; Debugging
 ;; (setq stack-trace-on-error t)
 ;; Setting Auto-Save directory and Backup Directory
-(let ((tmp (concat *elisp-dir* "/tmp")))
+(let ((tmp (concat +elisp-dir+ "/tmp")))
  (setq backup-directory-alist
        `((".*" . ,tmp)))
  (setq auto-save-file-name-transforms

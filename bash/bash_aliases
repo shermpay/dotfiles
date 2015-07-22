@@ -1,13 +1,5 @@
 # -*- sh -*-			
-alias a='fasd -a'        # any
-alias s='fasd -si'       # show / search / select
-alias d='fasd -d'        # directory
-alias f='fasd -f'        # file
-alias sd='fasd -sid'     # interactive directory selection
-alias sf='fasd -sif'     # interactive file selection
-alias z='fasd_cd -d'     # cd, same functionality as j in autojump
-alias zz='fasd_cd -d -i'
 
-alias op='xdg-open'
 alias less='less -N'
-alias audacity='LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/ audacity'
+alias vi='vim'
+
