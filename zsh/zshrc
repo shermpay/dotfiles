@@ -1,0 +1,84 @@
+# The following lines were added by compinstall
+
+zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]} l:|=* r:|=*' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
+zstyle :compinstall filename '/home/shermpay/.zshrc'
+
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
+# Lines configured by zsh-newuser-install
+HISTFILE=~/.histfile
+HISTSIZE=10000
+SAVEHIST=10000
+# End of lines configured by zsh-newuser-install
+
+# Dirstack
+DIRSTACKFILE="$HOME/.cache/zsh/dirs"
+if [[ -f $DIRSTACKFILE ]] && [[ $#dirstack -eq 0 ]]; then
+  dirstack=( ${(f)"$(< $DIRSTACKFILE)"} )
+  [[ -d $dirstack[1] ]] && cd $dirstack[1]
+fi
+chpwd() {
+  print -l $PWD ${(u)dirstack} >$DIRSTACKFILE
+}
+
+DIRSTACKSIZE=20
+
+setopt autopushd pushdsilent pushdtohome
+
+## Remove duplicate entries
+setopt pushdignoredups
+
+## This reverts the +/- operators.
+setopt pushdminus
+
+# enable color support
+autoload -U colors && colors
+
+# add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    alias ls='ls --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Read from an alias file other aliases
+if [[ -f ~/.zsh_aliases ]] ; then
+    source ~/.zsh_aliases
+fi
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+function cd_ls() {
+    emulate -L zsh
+    ls --color=auto | head -n 8 | xargs echo
+}
+
+chpwd_functions=''
+chpwd_functions=(${chpwd_functions[@]} "cd_ls")
+
+# PS1 Prompt
+# userps1="\e[44m\[\e[1;36m\]\\u\[\e[m\]"
+# dirps1="\e[40m\[\e[2;37m\][\\w]\[\e[m\]"
+# cmd='{$(ls --color=always -t -w 80 | head -n 10 | xargs echo)}'
+# prompt="\\nλ *> "
+# export PS1="${debian_chroot:+($debian_chroot)}"$userps1$dirps1$cmd$prompt
+# zsh Prompt
+user="%n"
+host=" %m "
+userps1="$user: %{$fg[black]%}%K{blue}${host}%k%{$reset_color%}"
+wd_prompt="[%3~]"
+dirps1="%{$fg[cyan]%}${wd_prompt}"
+main_prompt="$ "
+PROMPT="${userps1} ${dirps1} ${main_prompt}"
+RPROMPT=''
+

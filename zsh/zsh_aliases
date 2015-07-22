@@ -1,0 +1,5 @@
+# -*- sh -*-			
+
+alias less='less -N'
+alias vi='vim'
+
