@@ -28,8 +28,7 @@ export UW_HOME="/home/shermpay/Dropbox/uw"
 # export JAVA_HOME='/usr/java/jdk1.8.0_25'
 # export JRE_HOME='/usr/lib/jdk1.8.0_25'
 
-export GOROOT=~/Software/go
-export GOPATH=~/Programming/Go
+export GOPATH=~/Code/Go
 export PATH=$GOROOT/bin:$PATH
 export PATH=$GOPATH/bin:$PATH
 

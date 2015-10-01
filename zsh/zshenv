@@ -1,0 +1,23 @@
+# -*-sh-mode-*-
+typeset -U path
+
+if [ -d ~/.dotfiles/bin ]; then
+    path=(~/.dotfiles/bin "$path[@]")
+fi
+
+if [ -d ~/.local/bin ]; then
+    path=(~/.local/bin "$path[@]")
+fi
+
+if [ -d ~/.local/share/man ]; then
+	manpath=(~/.local/share/man "$manpath[@]")
+fi
+
+export PATH MANPATH
+
+export EDITOR=vim
+export VISUAL="emacsclient -a vim"
+# export PYTHONSTARTUP=~/.pythonrc
+export PAGER=less
+export LESS=R
+export CFLAGS="-Wall -pipe"

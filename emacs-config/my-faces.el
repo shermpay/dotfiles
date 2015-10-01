@@ -11,6 +11,9 @@
 (menu-bar-no-scroll-bar)
 (tool-bar-mode -1)
 
+;;; Show which function I am in
+(which-function-mode)
+
 ;;; Set the default colors, allows all frame to have the same colors
 ;; (setq default-frame-alist
 ;;       '((background-color . "gray8")
@@ -33,8 +36,8 @@
 (setq sml/name-width 40)
 (setq sml/mode-width 'full)
 (sml/setup)
-(dolist (mode '(" Undo-Tree" " Abbrev" " Paredit" " AC" " ARev" " yas" " company" " Helm"))
-  (add-to-list 'sml/hidden-modes mode))
+(dolist (mode '("overwrite-mode"))
+  (add-to-list 'rm-whitelist mode))
 (dolist (dir '(("^~/Programming/" ":P:")
 	       ("^:DB:Projects/" ":Prj:")
 	       ("^~/.emacs.d/org/" ":Org:")

@@ -13,9 +13,11 @@
 (defun haskell-config ()
   "Configure haskell."
   (progn
-    (set (make-local-variable 'electric-indent-mode) nil)
+    (setq electric-indent-local-mode nil)
     (turn-on-haskell-doc-mode)
     (turn-on-haskell-indent)
+    (interactive-haskell-mode)
+    (flycheck-haskell-setup)
     (dolist (key-bindings haskell-key-bindings)
       (destructuring-bind (key . f) key-bindings
         (define-key haskell-mode-map key f)))))

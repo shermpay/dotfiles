@@ -4,8 +4,10 @@
 (setq package-archives (quote (("gnu" . "http://elpa.gnu.org/packages/") ("marmalade" . "http://marmalade-repo.org/packages/") ("melpa" . "http://melpa.milkbox.net/packages/"))))
 
 (package-initialize)
-(defvar -my-packages '(zonokai-theme
+(defvar -my-packages (zonokai-theme
+ycmd
 yaml-mode
+with-editor
 w3m
 visual-regexp-steroids
 visual-regexp
@@ -14,8 +16,10 @@ undo-tree
 unbound
 typed-clojure-mode
 tablist
+stumpwm-mode
 sr-speedbar
 sql-indent
+spinner
 solarized-theme
 smyx-theme
 sml-mode
@@ -36,6 +40,8 @@ projectile
 powerline
 popup
 pkg-info
+perspective
+persp-projectile
 pdf-tools
 paredit
 noctilux-theme
@@ -44,6 +50,7 @@ multiple-cursors
 mode-compile
 math-symbol-lists
 markdown-mode
+magit-popup
 magit
 linum-relative
 let-alist
@@ -52,6 +59,8 @@ key-chord
 javadoc-lookup
 inf-groovy
 helm-projectile
+helm-gtags
+helm-core
 helm
 haskell-mode
 hackernews
@@ -66,11 +75,13 @@ go-eldoc
 gnuplot-mode
 gnuplot
 git-timemachine
-git-rebase-mode
-git-commit-mode
+git-commit
+ggtags
 geiser
 fringe-helper
+flycheck-ycmd
 flycheck-pos-tip
+flycheck-haskell
 flycheck-clojure
 flycheck
 faceup
@@ -96,6 +107,7 @@ dash
 dart-mode
 ctable
 concurrent
+company-ycmd
 company-go
 company
 color-theme
@@ -112,4 +124,5 @@ ant
 align-cljlet
 ace-jump-mode
 ))
+
 (dolist (pkg -my-packages) (when (not (package-installed-p pkg)) (with-demoted-errors (package-install pkg))))

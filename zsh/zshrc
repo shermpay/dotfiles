@@ -36,6 +36,9 @@ setopt pushdminus
 # enable color support
 autoload -U colors && colors
 
+# use Emacs mode
+bindkey -e
+
 # add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto'
@@ -60,7 +63,7 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 
 function cd_ls() {
     emulate -L zsh
-    ls --color=auto | head -n 8 | xargs echo
+    echo $(ls --color=auto | head -n 8)
 }
 
 chpwd_functions=''
@@ -75,10 +78,10 @@ chpwd_functions=(${chpwd_functions[@]} "cd_ls")
 # zsh Prompt
 user="%n"
 host=" %m "
-userps1="$user: %{$fg[black]%}%K{blue}${host}%k%{$reset_color%}"
+userps1="($user @ %{$fg[black]%}%K{blue}${host}%k%{$reset_color%})"
 wd_prompt="[%3~]"
-dirps1="%{$fg[cyan]%}${wd_prompt}"
+dirps1="%{$fg[cyan]%}${wd_prompt}%{$reset_color%}"
 main_prompt="$ "
-PROMPT="${userps1} ${dirps1} ${main_prompt}"
+PROMPT="${userps1}:${dirps1} ${main_prompt}"
 RPROMPT=''
 

@@ -54,7 +54,7 @@
 
 ;;; YCMD mode
 (add-hook 'after-init-hook 'global-ycmd-mode)
-(set-variable 'ycmd-server-command '("python" "/home/shermpay/Programming/OpenSource/ycmd/ycmd"))
+(set-variable 'ycmd-server-command '("python2" "/home/shermpay/Code/OpenSource/ycmd/ycmd"))
 
 ;;; Flycheck
 (add-hook 'after-init-hook #'global-flycheck-mode)

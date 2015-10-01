@@ -35,8 +35,7 @@
 ;;; Show matching parens
 (show-paren-mode 1)
 (setq show-paren-style 'expression)
-;;; electric indent-mode
-(add-hook 'prog-mode-hook (lambda () (electric-indent-mode 1)))
+;;; Indentation
 (setq-default indent-tabs-mode nil)
 ;;; Electric pair mode
 ;; (electric-pair-mode 1)
@@ -116,6 +115,9 @@
 	("melpa"       . "http://melpa.milkbox.net/packages/")))
 (package-initialize)
 
+;;; Browser
+(setq browse-url-generic-program "/usr/bin/google-chrome-stable"
+      browse-url-browser-function 'browse-url-generic)
 ;; -------------------- MISC END --------------------
 
 ;;; Load other customizations appropriately
