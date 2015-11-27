@@ -14,6 +14,7 @@
 (setq evil-move-cursor-back nil)	;Don't want to move cursor back when exit insert
 ;;; Relative linum
 (require 'linum-relative)
+(linum-relative-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; --------- HOOKS --------- ;;
@@ -88,6 +89,7 @@
  
 (defadvice evil-visual-block (before spc-for-char-jump activate)
   (define-key evil-motion-state-map (kbd "SPC") #'evil-ace-jump-char-mode))
+
 ;;; esc quits
 (define-key evil-normal-state-map [escape] 'keyboard-quit)
 (define-key evil-visual-state-map [escape] 'keyboard-quit)

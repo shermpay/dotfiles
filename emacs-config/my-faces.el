@@ -4,7 +4,6 @@
 ;; *************** FACES ***************
 (require 'color-theme)
 (color-theme-initialize)
-(load-theme 'solarized-light t)
 
 ;;; Don't like all the fancy bars
 (menu-bar-mode -1) 			
@@ -32,7 +31,7 @@
 
 ;;;--------- Smart Mode line---------  
 (setq sml/no-confirm-load-theme t)
-(setq sml/theme 'respectful)
+(setq sml/theme 'light)
 (setq sml/name-width 40)
 (setq sml/mode-width 'full)
 (sml/setup)

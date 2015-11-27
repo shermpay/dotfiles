@@ -1,7 +1,7 @@
 Host shermanpay
      HostName shermanpay.com
      User shermpay
-		 IdentityFile /home/shermpay/.ssh/foobar.pem
+     IdentityFile /home/shermpay/.ssh/foobar.pem
 
 Host amgems
      HostName shermanpay.com
@@ -16,6 +16,10 @@ Host compilers
      User compilers
 
 Host old
-		 HostName 54.148.195.16
-		 User shermpay
+     HostName 54.148.195.16
+     User shermpay
 
+Host shrimp
+     HostName codered.cs.washington.edu
+     User shrimp
+     IdentityFile /home/shermpay/.ssh/id_shrimp_rsa

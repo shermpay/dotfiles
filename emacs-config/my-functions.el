@@ -1,13 +1,18 @@
+;;; package  --- Summary
+;;; Commentary:
 ;;; Sherman Pay Jing Hao
 ;;; Tuesday, 17. December 2013
 ;;; Functions that I defined and find really useful
 
+;;; Code:
 (require 'cl)
+(require 's)
+(require 'dash)
 ;;; ========================================
 ;;; ---------- Window/Buffer Functions
 ;;; ========================================
 (defun kill-this-buffer-tab ()
-  "Kills this buffer and deletes this tab"
+  "Kill this buffer and deletes this tab."
   (interactive)
   (progn
     (kill-this-buffer)
@@ -37,6 +42,7 @@
     (indent-according-to-mode)))
 
 (defun prog-mode-keys ()
+  "Setup keybindings for 'prog-mode'."
   (local-set-key [(f11)] 'compile)
   (local-set-key (kbd "M-SPC") 'company-complete))
 
@@ -216,6 +222,40 @@ prefix arguments, write out the day and month name."
 		 ((equal prefix '(16)) "%A, %d. %B %Y")))
 	(system-time-locale "de_DE"))
     (insert (format-time-string format))))
+
+(defun my-apply-function-to-region (from to function)
+  "Apply an elisp function to region in FROM TO."
+  (interactive "r\naFunction to apply: ")
+  (princ (s-upper-camel-case (buffer-substring from to)) (current-buffer))
+  (delete-region from to))
+
+(defun my-upper-camel-case-word ()
+  "Convert to upper camel-case from point to end of word."
+  (interactive)
+  (princ (s-upper-camel-case (thing-at-point 'symbol)) (current-buffer))
+  (mark-sexp)
+  (delete-region (point) (mark)))
+
+(defun my-lower-camel-case-word ()
+  "Convert to upper camel-case from point to end of word."
+  (interactive)
+  (princ (s-lower-camel-case (thing-at-point 'symbol)) (current-buffer))
+  (mark-sexp)
+  (delete-region (point) (mark)))
+
+(defun my-clang-format-current-buffer ()
+  "Run clang-format on the current buffer."
+  (if (eq major-mode 'c++-mode)
+      (let ((clang-fmt
+             (apply #'concat
+                    (-interpose " " (list *my-clang-format* *my-clang-format-args*))))
+            (old-point (point)))
+        (progn
+          (shell-command-on-region (point-min) (point-max) clang-fmt
+                                   :current-buffer :replace)
+          (goto-char old-point)
+          t))
+    nil))
 
 (provide 'my-functions)
 

@@ -41,6 +41,18 @@
       helm-split-window-in-side-p)
 (helm-mode 1)
 
+;;; helm gtags
+(setq
+ helm-gtags-ignore-case t
+ helm-gtags-auto-update t
+ helm-gtags-use-input-at-cursor t
+ helm-gtags-pulse-at-cursor t
+ helm-gtags-direct-helm-completing t
+ helm-gtags-prefix-key "\C-cg"
+ helm-gtags-suggested-key-mapping t)
+;;; Variables have to set before loading of helm-gtags
+(require 'helm-gtags)
+
 (require 'helm-projectile)
 
 ;;; ECB
@@ -116,7 +128,8 @@
 ;; The following lines are always needed.  Choose your own keys.
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode)) 
 (add-hook 'org-mode-hook 'flyspell-mode)
-(setq org-agenda-files (directory-files (concat +elisp-dir+ "/org")))
+(add-hook 'org-mode-hook 'turn-on-auto-fill)
+(setq org-agenda-files (directory-files (concat user-emacs-directory "/org")))
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((dot . t)))
@@ -133,5 +146,13 @@
 ;; (require 'make-regexp)
 ;; (require 'bison-mode)
 (setq magit-last-seen-setup-instructions "1.4.0")
+
+;;;;;;;;;;
+;; MU4E ;;
+;;;;;;;;;;
+(setq site-lisp-directory "/usr/local/share/emacs/site-lisp/")
+(add-to-list 'load-path (concat site-lisp-directory "mu4e"))
+
+
 (provide 'my-plugins)
  

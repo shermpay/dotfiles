@@ -1,0 +1,17 @@
+#!/bin/sh
+
+PYTHON_BIN='/bin/python'
+
+if [[ $# -ne 1 ]] ; then
+    echo "switch_python: requires [version] argument" 
+else
+    if [[ -L $PYTHON_BIN ]] ; then
+        sudo rm $PYTHON_BIN
+    elif [[ -e $PYTHON_BIN ]] ; then
+        echo "There exists a non-symbolic python executable at "$PYTHON_BIN
+        exit 1
+    fi
+    sudo ln -s $PYTHON_BIN"$1" $PYTHON_BIN
+fi
+
+

@@ -21,3 +21,12 @@ export VISUAL="emacsclient -a vim"
 export PAGER=less
 export LESS=R
 export CFLAGS="-Wall -pipe"
+
+export DEPOT_TOOLS_PATH='/home/shermpay/Code/OpenSource/depot_tools'
+
+export PATH="$DEPOT_TOOLS_PATH":"$PATH"
+
+export MAILDIR=$HOME"/.mail"
+
+# gtags
+export GTAGSFORCECPP=1

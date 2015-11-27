@@ -37,8 +37,6 @@ export PATH=$soft/go_appengine:$PATH
 
 export GROOVY_HOME=/home/shermpay/.gvm/groovy/current/bin/
 
-export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"
- 
 export LESS=' -R '
 
 # CLJS

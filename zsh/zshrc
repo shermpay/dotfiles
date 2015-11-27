@@ -85,3 +85,4 @@ main_prompt="$ "
 PROMPT="${userps1}:${dirps1} ${main_prompt}"
 RPROMPT=''
 
+
