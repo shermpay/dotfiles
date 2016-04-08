@@ -1,0 +1,5 @@
+#!/bin/bash
+
+xmodmap $HOME/.Xmodmap
+xset r rate 150 50 -b
+

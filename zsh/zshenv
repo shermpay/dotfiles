@@ -1,8 +1,9 @@
-# -*-sh-mode-*-
+#!/bin/zsh
+# -*- sh -*-
 typeset -U path
 
-if [ -d ~/.dotfiles/bin ]; then
-    path=(~/.dotfiles/bin "$path[@]")
+if [ -d ~/bin ]; then
+    path=(~/bin "$path[@]")
 fi
 
 if [ -d ~/.local/bin ]; then
@@ -22,11 +23,13 @@ export PAGER=less
 export LESS=R
 export CFLAGS="-Wall -pipe"
 
-export DEPOT_TOOLS_PATH='/home/shermpay/Code/OpenSource/depot_tools'
-
-export PATH="$DEPOT_TOOLS_PATH":"$PATH"
+# export DEPOT_TOOLS_PATH='/home/shermpay/Code/OpenSource/depot_tools'
+# export PATH="$DEPOT_TOOLS_PATH":"$PATH"
 
 export MAILDIR=$HOME"/.mail"
 
 # gtags
 export GTAGSFORCECPP=1
+
+# For CSE457
+export PLAT=ARCH

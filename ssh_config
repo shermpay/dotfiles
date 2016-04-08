@@ -23,3 +23,8 @@ Host shrimp
      HostName codered.cs.washington.edu
      User shrimp
      IdentityFile /home/shermpay/.ssh/id_shrimp_rsa
+
+Host gitlab.cs.washington.edu
+     HostName gitlab.cs.washington.edu
+     User git
+     IdentityFile /home/shermpay/.ssh/id_rsa_gitlab

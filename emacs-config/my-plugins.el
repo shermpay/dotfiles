@@ -3,14 +3,13 @@
 ;;; Contains all Major modes configuration
 
 ;;; Copy Environment Variables
-;; (exec-path-from-shell-copy-env "PATH")
 ;; (exec-path-from-shell-copy-env "GOROOT")
 ;; (exec-path-from-shell-copy-env "GOPATH")
 ;;; Global Undo tree mode
 (global-undo-tree-mode 1)
 ;;; elscreen
-(setq elscreen-prefix-key (kbd "C-w"))
-(elscreen-start)
+;; (setq elscreen-prefix-key (kbd "C-w"))
+;; (elscreen-start)
 
 ;;; key chord modes
 ;; (require 'key-chord)
@@ -51,9 +50,8 @@
  helm-gtags-prefix-key "\C-cg"
  helm-gtags-suggested-key-mapping t)
 ;;; Variables have to set before loading of helm-gtags
-(require 'helm-gtags)
-
-(require 'helm-projectile)
+;; (require 'helm-gtags)
+;; (require 'helm-projectile)
 
 ;;; ECB
 ;; (require 'ecb)
@@ -71,7 +69,13 @@
 ;;; Flycheck
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (setq flycheck-display-errors-delay 0.5)
-(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
+
+(defun my-flycheck-toggle-display-errors-function ()
+  (interactive)
+  (if (eq flycheck-display-errors-function #'flycheck-display-error-messages)
+      (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
+    (setq flycheck-display-errors-function #'flycheck-display-error-messages)))
+
 (setq flycheck-clang-include-path '("/usr/include"
                                     "/usr/include/SDL2"))
 
@@ -150,9 +154,27 @@
 ;;;;;;;;;;
 ;; MU4E ;;
 ;;;;;;;;;;
+(exec-path-from-shell-copy-env "MAILDIR")
 (setq site-lisp-directory "/usr/local/share/emacs/site-lisp/")
 (add-to-list 'load-path (concat site-lisp-directory "mu4e"))
+(require 'mu4e)
+(setq mu4e-maildir (getenv "MAILDIR")
+      mu4e-get-mail-command "offlineimap"
+      mu4e-update-interval (* 5 60) ; In seconds
+      ;; Setup Gmail folders
+      mu4e-drafts-folder "/[Gmail].Drafts"
+      mu4e-sent-folder "/[Gmail].Sent Mail"
+      mu4e-trash-folder "/[Gmail].Trash"
+      ;; Don't need to keep an extra copy
+      mu4e-sent-messages-behavior 'delete)    
 
+(if (null mu4e-maildir) (message "Error reading MAILDIR environment variable"))
+(setq mail-user-agent 'mu4e-user-agent) ; Setting default mail program
+
+;;;;;;;;;;;;;;;;;
+;; Major Modes ;;
+;;;;;;;;;;;;;;;;;
+(require 'c)
 
 (provide 'my-plugins)
  

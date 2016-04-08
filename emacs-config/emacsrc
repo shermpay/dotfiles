@@ -156,7 +156,10 @@
  '(indent-tabs-mode nil)
  '(safe-local-variable-values
    (quote
-    ((eval setq flycheck-clang-args nil)
+    ((eval setenv "PLAT" "ARCH")
+     (eval message "Using .dir-locals.el for C++")
+     (eval turn-on-auto-fill)
+     (eval setq flycheck-clang-args nil)
      (eval setq company-clang-arguments
            (list my-project-include-path))
      (eval google-set-c-style)

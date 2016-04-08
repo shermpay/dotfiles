@@ -85,4 +85,11 @@ main_prompt="$ "
 PROMPT="${userps1}:${dirps1} ${main_prompt}"
 RPROMPT=''
 
+# For completion
+fpath[1,0]=~/.zsh/completion/
+
+# This way the completion script does not have to parse Bazel's options
+# repeatedly.  The directory in cache-path must be created manually.
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh/cache
 

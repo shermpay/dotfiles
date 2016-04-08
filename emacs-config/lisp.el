@@ -1,14 +1,15 @@
 ;;;;;;;;;;
 ;; Lisp ;;
 ;;;;;;;;;;
-;; (setq slime-default-lisp 'clisp) ; Default lisp
-;; (setq slime-lisp-implementations
-;;       '((clisp ("/usr/local/bin/clisp" "-I"))
-;; 	(sbcl ("/usr/bin/sbcl"))))
+(setq slime-default-lisp 'sbcl) ; Default lisp
+(setq slime-lisp-implementations
+      '((clisp ("/bin/clisp" "-I"))
+	(sbcl ("/bin/sbcl"))))
 ;; (require 'slime-autoloads)
 ;; (require 'slime-tramp)
- ;;; slime with tramp
-;; (slime-setup '(slime-fancy))
+
+;; slime with tramp
+(slime-setup '(slime-fancy))
 
 ;;;;;;;;;;;;;
 ;; Clojure ;;

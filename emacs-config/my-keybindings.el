@@ -14,7 +14,8 @@
 ;;; Overrides
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "M-o") 'other-window)
-(global-set-key (kbd "M-5") 'query-replace-regexp)  ;Query replace regexp
+(global-set-key (kbd "M-%") 'query-replace-regexp)  ;Query replace regexp
+(global-set-key (kbd "C-M-%") 'query-replace)  ;Query replace
 (global-set-key (kbd "<f8>") 'tramp-cleanup-all-connections)
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)

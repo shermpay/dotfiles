@@ -4,8 +4,62 @@
 
 (in-package :stumpwm)
 
+;;; Programs
+(setf *terminal* "xfce4-terminal")
+(setf *browser* "google-chrome-stable")
+(setf *browser-props* '(:class "google-chrome"))
+
+(setf *chat-client* "messengerfordesktop")
+(setf *chat-client-props* '(:title "Messenger"))
+
+;;; Open terminal
+(defcommand terminal ()
+  ()
+  "Start terminal set by the *terminal* global variable."
+  (run-or-raise *terminal* '(:instance "terminal")))
+
+;;; Open web browser
+(defcommand web-browser ()
+  ()
+  "Start web browser set by the *browser* global variable."
+  (run-or-raise *browser* *browser-props*))
+
+;; Open chat-client
+(defcommand chat-client ()
+  ()
+  "Start web browser set by the *browser* global variable."
+  (run-or-raise *chat-client* *chat-client-props*))
+
+(defcommand xmodmap ()
+  ()
+  (run-shell-command "xmodmap ~/.Xmodmap"))
+
+;; Web jump (works for Google and Imdb)
+(defmacro make-web-search (name prefix)
+  `(defcommand ,(intern name) (search) ((:rest ,(concatenate 'string name " search: ")))
+               (run-shell-command
+                (concatenate 'string
+                             ,prefix (substitute #\+ #\Space search)))))
+
+(make-web-search "google" "google-chrome-stable http://www.google.com/search?q=")
+;; (make-web-jump "imdb" "firefox http://www.imdb.com/find?q=")
+
+
+;;;;;;;;;;;;;;;;;;
+;; Key bindings ;;
+;;;;;;;;;;;;;;;;;;
 ;; change the prefix key to something else
-(set-prefix-key (kbd "S-a""))
+(set-prefix-key (kbd "s-a"))
+
+(define-key *top-map* (kbd "s-e") "emacs")
+(define-key *top-map* (kbd "s-q") "terminal")
+(define-key *top-map* (kbd "s-w") "web-browser")
+(define-key *top-map* (kbd "s-c") "chat-client")
+
+;;;;;;;;;;;;;;;;;;;;;;;
+;; Debugging Stumpwm ;;
+;;;;;;;;;;;;;;;;;;;;;;;
+(setf *debug-level* 1)
 
 ;; prompt the user for an interactive command. The first arg is an
 ;; optional initial contents.
@@ -22,15 +76,6 @@
 ;; (define-key *root-map* (kbd "C-s") "colon1 exec xterm -e ssh ")
 ;; Lock screen
 ;; (define-key *root-map* (kbd "C-l") "exec xlock")
-
-;; Web jump (works for Google and Imdb)
-;; (defmacro make-web-jump (name prefix)
-;;   `(defcommand ,(intern name) (search) ((:rest ,(concatenate 'string name " search: ")))
-;;     (substitute #\+ #\Space search)
-;;     (run-shell-command (concatenate 'string ,prefix search))))
-;; 
-;; (make-web-jump "google" "firefox http://www.google.fr/search?q=")
-;; (make-web-jump "imdb" "firefox http://www.imdb.com/find?q=")
 
 ;; C-t M-s is a terrble binding, but you get the idea.
 ;; (define-key *root-map* (kbd "M-s") "google")
