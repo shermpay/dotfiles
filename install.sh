@@ -2,19 +2,24 @@
 # Sherman Pay Jing Hao
 # Sunday, 02. March 2014
 # Installation scripts
-# TODO: 1) mkdir for appropriate directory. 2) wget packages not in repo.
+# TODO: 1) mkdir for appropriate directory.
+# TODO: 2) Modularize with config files.
+# TODO: 3) Error handling
 
 # Checks and cds into right directory
 # Has to be in ~/dotfiles
+
+DOTFILES="${HOME}/dotfiles"
+
 dir_check() {
     # try to cd into right dir
-    cd ${HOME}/dotfiles
+    cd "$DOTFILES"
 
     # Make sure in right dir
-    if [ $(pwd) == ${HOME}/dotfiles ]; then
+    if [ $(pwd) == "$DOTFILES" ]; then
 	echo 'You are currently in ~/dotfiles. Installation will commence.'
     else
-	echo You are in $(pwd). This script requires you to clone the repo into ~/dotfiles
+	echo "You are in $(pwd). This script requires you to clone the repo into $DOTFILES"
 	exit 1
     fi
 }
@@ -23,8 +28,10 @@ install_bash() {
     echo "Installing bash tools"
     # Install essential xubuntu packages
     sudo apt-get update
-    sudo apt-get -y install git curl xclip tmux dropbox
+    sudo apt-get -y install git curl xclip tmux zsh
 
+    chmod +x bash/links.sh
+    bash/links.sh
 }
 
 install_lang() {
@@ -47,9 +54,9 @@ install_emacs() {
 	EMACS_CONFS=emacs-config
 	echo emacs --script ${EMACS_CONFS}/package-install.el
     else
-	'Emacs did not install successfully'    
-    fi	    
-    
+	'Emacs did not install successfully'
+    fi
+
 }
 
 exit_script() {
@@ -87,7 +94,7 @@ for i in $@; do
 	    else
 		exit_script 1
 	    fi
-	    ;;	
+	    ;;
 	-a|--all)
 	    printf "Install all tools? Please enter [y/n] "
 	    read user_input
@@ -107,7 +114,7 @@ for i in $@; do
 	    install_lang
 	    ;;
 	-e|--emacs)
-	    instal_emacs
+	    install_emacs
 	    ;;
     esac
     exit 0
