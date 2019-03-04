@@ -1,0 +1,195 @@
+#+TITLE: Sherman Pay's Emacs Configuration
+#+AUTHOR: Jing Hao Sherman Pay
+#+EMAIL: shermanpay1991@gmail.com
+#+PROPERTY: header-args :emacs-lisp    :tangle yes
+#+OPTIONS: toc:3 num:nil
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://thomasf.github.io/solarized-css/solarized-light.min.css" />
+
+
+* Configuration
+
+** Require Common Lisp library
+Require builtin libraries here.
+
+#+BEGIN_SRC emacs-lisp
+  (require 'cl-lib)
+#+END_SRC
+
+** Environment
+
+*** My variables
+My user defined variables. I prefix all my variables with "my" to ensure there
+are no name collisions with other other modes variables.
+#+BEGIN_SRC emacs-lisp
+(defvar my-org-dir (concat user-emacs-directory "org"))
+#+END_SRC 
+
+*** Load Paths
+Add "~/.emacs.d" to load-path
+#+BEGIN_SRC emacs-lisp
+(let ((default-directory user-emacs-directory))
+  (normal-top-level-add-subdirs-to-load-path))
+#+END_SRC
+
+*** User Info
+Explicitly set these.
+#+BEGIN_SRC emacs-lisp
+(setq user-full-name "Jing Hao Sherman Pay"
+      user-mail-address "shermanpay1991@gmail.com")
+#+END_SRC
+
+** Startup
+Right now I open a basic "todo.org" file at startup. Consider creating a
+personalized org file for startup.
+#+BEGIN_SRC emacs-lisp
+(add-hook 'emacs-startup-hook
+          (lambda () (find-file (concat my-org-dir "/todo.org"))))
+(setq inhibit-startup-message t)
+#+END_SRC
+
+** Basic stuff
+
+*** Yes/No prompts
+Change yes or no prompts to y or n prompts
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+*** Uniquify
+Uniquify buffer names with "post-forward" style:
+   /foo/bar/name will become name|/foo/bar
+#+BEGIN_SRC emacs-lisp
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'post-forward)
+#+END_SRC
+
+** Editing text
+subword-mode: Allows navigation and editing of "subwords"
+
+show-paren-mode: Show matching parentheses
+
+next-line-add-newlines: If non-nil 'next-line' inserts a newline
+
+save-place-mode: Save previous editing location and always go back to it
+#+BEGIN_SRC emacs-lisp
+(global-subword-mode t)
+
+(show-paren-mode 1)
+(setq show-paren-style 'expression)
+
+(setq next-line-add-newlines nil)
+
+(save-place-mode 1)
+#+END_SRC
+
+*** Ansi Color codes
+Enable Ansi color codes for compilation buffers
+#+BEGIN_SRC emacs-lisp
+(require 'ansi-color)
+#+END_SRC
+
+*** Debugging Emacs
+#+BEGIN_SRC emacs-lisp
+(setq debug-on-error t)
+#+END_SRC
+
+*** Backups
+Setting Auto-Save directory and Backup Directory
+#+BEGIN_SRC emacs-lisp
+(let ((tmp (concat user-emacs-directory "tmp")))
+ (setq backup-directory-alist
+       `((".*" . ,tmp)))
+ (setq auto-save-file-name-transforms
+       `((".*" ,tmp t))))
+#+END_SRC
+
+** User Interface
+
+*** Line and Column numbers
+I will like to see line and column numbers for all files.
+#+BEGIN_SRC emacs-lisp
+(global-linum-mode t)
+(column-number-mode t)
+#+END_SRC
+
+*** Bars
+Don't like all the fancy bars
+#+BEGIN_SRC emacs-lisp
+(menu-bar-mode -1) 			
+(menu-bar-no-scroll-bar)
+(tool-bar-mode -1)
+#+END_SRC
+
+*** Echo Area
+Uses echo area to display tooltips and echo keystrokes
+#+BEGIN_SRC emacs-lisp
+(tooltip-mode -1)
+(setq echo-keystrokes 0.01)
+#+END_SRC
+
+** Emacs Server
+
+Start emacs server on port 1337.
+#+BEGIN_SRC emacs-lisp
+(setq server-port 1337)
+(setq server-use-tcp t)
+(setq server-host (system-name))
+(server-start) ; Start the emacs server
+#+END_SRC
+
+** Package Management
+Package management is important!
+Add melpa-stable repository, which has stable community packages.
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(add-to-list 'package-archives
+      '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(package-initialize)
+#+END_SRC
+
+*** use-package
+Bootstrap and customize it.
+always-ensure: Ensure the package exists by downloading it if it does not exist.
+#+BEGIN_SRC emacs-lisp
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+(eval-when-compile (require 'use-package))
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
+#+END_SRC
+
+*** evil-mode
+I use evil-mode for Vim emulation
+#+BEGIN_SRC emacs-lisp
+(use-package evil)
+(evil-mode 1)
+#+END_SRC
+
+** Flyspell
+
+Enable flyspell mode for strings and comments
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode-hook (lambda () (flyspell-prog-mode)))
+#+END_SRC
+
+** TRAMP mode
+
+This is for remote editing files using SSH
+#+BEGIN_SRC emacs-lisp
+(setq tramp-default-method "ssh")
+(setq tramp-verbose 0)
+(setq password-cache-expiry 3600)
+;; I don't remember what the following is for...
+;; (add-to-list 'tramp-default-proxies-alist
+;; 	     '(nil "\\`root\\'" "/ssh:%h:"))
+;; (add-to-list 'tramp-default-proxies-alist
+;; 	     '((regexp-quote (system-name)) nil nil))
+#+END_SRC
+
+** Browser settings
+
+Use chrome as the default browser. This assumes chrome is installed.
+#+BEGIN_SRC emacs-lisp
+(setq browse-url-generic-program "/usr/bin/google-chrome"
+      browse-url-browser-function 'browse-url-generic)
+#+END_SRC
