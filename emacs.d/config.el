@@ -57,12 +57,14 @@
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
+  (package-refresh-contents)
   (package-install 'use-package))
 (eval-when-compile (require 'use-package))
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
 
-(use-package evil-mode)
+(use-package evil)
+(evil-mode 1)
 
 (add-hook 'prog-mode-hook (lambda () (flyspell-prog-mode)))
 

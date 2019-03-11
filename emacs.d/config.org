@@ -145,6 +145,7 @@ Add melpa-stable repository, which has stable community packages.
 (add-to-list 'package-archives
       '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
+
 #+END_SRC
 
 *** use-package
@@ -152,6 +153,7 @@ Bootstrap and customize it.
 always-ensure: Ensure the package exists by downloading it if it does not exist.
 #+BEGIN_SRC emacs-lisp
 (unless (package-installed-p 'use-package)
+  (package-refresh-contents)
   (package-install 'use-package))
 (eval-when-compile (require 'use-package))
 (require 'use-package-ensure)
