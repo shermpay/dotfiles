@@ -5,10 +5,6 @@
 (require 'color-theme)
 (color-theme-initialize)
 
-;;; Don't like all the fancy bars
-(menu-bar-mode -1) 			
-(menu-bar-no-scroll-bar)
-(tool-bar-mode -1)
 
 ;;; Show which function I am in
 (which-function-mode)
