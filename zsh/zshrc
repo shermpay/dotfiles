@@ -93,3 +93,7 @@ fpath[1,0]=~/.zsh/completion/
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
 
+# Source configuration required for shell tools(such as pyenv)
+if [[ -f "$HOME/.shtools" ]]; then
+    source "$HOME/.shtools"
+fi
