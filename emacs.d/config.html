@@ -3,12 +3,12 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-03-02 Sat 00:16 -->
+<!-- 2019-03-17 Sun 10:14 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Sherman Pay's Emacs Configuration</title>
 <meta name="generator" content="Org mode" />
-<meta name="author" content="Sherman Pay" />
+<meta name="author" content="Jing Hao Sherman Pay" />
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
   .title  { text-align: center;
@@ -180,7 +180,7 @@
   .org-svg { width: 90%; }
   /*]]>*/-->
 </style>
-<link rel="stylesheet" type="text/css" href="http://thomasf.github.io/solarized-css/solarized-light.min.css" />
+<link rel="stylesheet" type="text/css" href="http://thomasf.github.io/solarized-css/solarized-dark.min.css" />
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -235,55 +235,69 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orga51756f">Configuration</a>
+<li><a href="#org85649f5">Configuration</a>
 <ul>
-<li><a href="#orgef64675">Require Common Lisp library</a></li>
-<li><a href="#org4a65ddc">Environment</a>
+<li><a href="#orgd861ee8">Require Common Lisp library</a></li>
+<li><a href="#orge017e4d">Environment</a>
 <ul>
-<li><a href="#org123a3de">My variables</a></li>
-<li><a href="#org5487c37">Load Paths</a></li>
-<li><a href="#org3a826cd">User Info</a></li>
+<li><a href="#org27e7030">My variables</a></li>
+<li><a href="#org99768b3">Load Paths</a></li>
+<li><a href="#org31e1ba1">User Info</a></li>
 </ul>
 </li>
-<li><a href="#orgf1b63bb">Startup</a></li>
-<li><a href="#org39dfa9a">Basic stuff</a>
+<li><a href="#orgfb7c4bc">Startup</a></li>
+<li><a href="#orga27e126">Basic stuff</a>
 <ul>
-<li><a href="#org5cc225d">Yes/No prompts</a></li>
-<li><a href="#org45a70a7">Uniquify</a></li>
+<li><a href="#orgcfe5d0a">Yes/No prompts</a></li>
+<li><a href="#org49bb605">Uniquify</a></li>
 </ul>
 </li>
-<li><a href="#orge42788d">Editing text</a>
+<li><a href="#org6d2c0da">Editing text</a>
 <ul>
-<li><a href="#org0a7685b">Ansi Color codes</a></li>
-<li><a href="#org1a6264a">Debugging Emacs</a></li>
-<li><a href="#org6569f5b">Backups</a></li>
+<li><a href="#org93f0a2f">Ansi Color codes</a></li>
+<li><a href="#orgefd1f3b">Debugging Emacs</a></li>
+<li><a href="#org4e5a3be">Backups</a></li>
 </ul>
 </li>
-<li><a href="#org6a040fc">User Interface</a>
+<li><a href="#org2d6456d">User Interface</a>
 <ul>
-<li><a href="#org5579b3c">Line and Column numbers</a></li>
-<li><a href="#org0d0d9fa">Bars</a></li>
-<li><a href="#org5661563">Echo Area</a></li>
+<li><a href="#orgd6aae1c">Line and Column numbers</a></li>
+<li><a href="#org2262cf5">Bars</a></li>
+<li><a href="#org18b70af">Echo Area</a></li>
 </ul>
 </li>
-<li><a href="#orgcde24d6">Emacs Server</a></li>
-<li><a href="#org1a958ce">Package Manager</a></li>
-<li><a href="#org88eb6c7">Flyspell</a></li>
-<li><a href="#orgd15f1b4">TRAMP mode</a></li>
-<li><a href="#orgbeb3a1b">Browser settings</a></li>
+<li><a href="#org9428aaf">Emacs Server</a></li>
+<li><a href="#orgdd759ae">Package Management</a>
+<ul>
+<li><a href="#org1bdfb8b">use-package</a></li>
+<li><a href="#orgb856f35">evil-mode</a></li>
+</ul>
+</li>
+<li><a href="#orgf69405f">Flyspell</a></li>
+<li><a href="#org669c6a9">TRAMP mode</a></li>
+<li><a href="#orgf81128b">Browser settings</a></li>
+<li><a href="#org841ff8f">Other Packages/Plugins</a>
+<ul>
+<li><a href="#orgd709877">Helm</a></li>
+<li><a href="#org66c222f">Projectile</a></li>
+<li><a href="#org8166a6e">Undo tree mode</a></li>
+</ul>
+</li>
+<li><a href="#org2c2c2ef">Font</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orga51756f" class="outline-2">
-<h2 id="orga51756f">Configuration</h2>
-<div class="outline-text-2" id="text-orga51756f">
+
+<div id="outline-container-org85649f5" class="outline-2">
+<h2 id="org85649f5">Configuration</h2>
+<div class="outline-text-2" id="text-org85649f5">
 </div>
-<div id="outline-container-orgef64675" class="outline-3">
-<h3 id="orgef64675">Require Common Lisp library</h3>
-<div class="outline-text-3" id="text-orgef64675">
+<div id="outline-container-orgd861ee8" class="outline-3">
+<h3 id="orgd861ee8">Require Common Lisp library</h3>
+<div class="outline-text-3" id="text-orgd861ee8">
 <p>
 Require builtin libraries here.
 </p>
@@ -295,13 +309,13 @@ Require builtin libraries here.
 </div>
 </div>
 
-<div id="outline-container-org4a65ddc" class="outline-3">
-<h3 id="org4a65ddc">Environment</h3>
-<div class="outline-text-3" id="text-org4a65ddc">
+<div id="outline-container-orge017e4d" class="outline-3">
+<h3 id="orge017e4d">Environment</h3>
+<div class="outline-text-3" id="text-orge017e4d">
 </div>
-<div id="outline-container-org123a3de" class="outline-4">
-<h4 id="org123a3de">My variables</h4>
-<div class="outline-text-4" id="text-org123a3de">
+<div id="outline-container-org27e7030" class="outline-4">
+<h4 id="org27e7030">My variables</h4>
+<div class="outline-text-4" id="text-org27e7030">
 <p>
 My user defined variables. I prefix all my variables with "my" to ensure there
 are no name collisions with other other modes variables.
@@ -313,9 +327,9 @@ are no name collisions with other other modes variables.
 </div>
 </div>
 
-<div id="outline-container-org5487c37" class="outline-4">
-<h4 id="org5487c37">Load Paths</h4>
-<div class="outline-text-4" id="text-org5487c37">
+<div id="outline-container-org99768b3" class="outline-4">
+<h4 id="org99768b3">Load Paths</h4>
+<div class="outline-text-4" id="text-org99768b3">
 <p>
 Add "~/.emacs.d" to load-path
 </p>
@@ -327,9 +341,9 @@ Add "~/.emacs.d" to load-path
 </div>
 </div>
 
-<div id="outline-container-org3a826cd" class="outline-4">
-<h4 id="org3a826cd">User Info</h4>
-<div class="outline-text-4" id="text-org3a826cd">
+<div id="outline-container-org31e1ba1" class="outline-4">
+<h4 id="org31e1ba1">User Info</h4>
+<div class="outline-text-4" id="text-org31e1ba1">
 <p>
 Explicitly set these.
 </p>
@@ -342,9 +356,9 @@ Explicitly set these.
 </div>
 </div>
 
-<div id="outline-container-orgf1b63bb" class="outline-3">
-<h3 id="orgf1b63bb">Startup</h3>
-<div class="outline-text-3" id="text-orgf1b63bb">
+<div id="outline-container-orgfb7c4bc" class="outline-3">
+<h3 id="orgfb7c4bc">Startup</h3>
+<div class="outline-text-3" id="text-orgfb7c4bc">
 <p>
 Right now I open a basic "todo.org" file at startup. Consider creating a
 personalized org file for startup.
@@ -358,13 +372,13 @@ personalized org file for startup.
 </div>
 </div>
 
-<div id="outline-container-org39dfa9a" class="outline-3">
-<h3 id="org39dfa9a">Basic stuff</h3>
-<div class="outline-text-3" id="text-org39dfa9a">
+<div id="outline-container-orga27e126" class="outline-3">
+<h3 id="orga27e126">Basic stuff</h3>
+<div class="outline-text-3" id="text-orga27e126">
 </div>
-<div id="outline-container-org5cc225d" class="outline-4">
-<h4 id="org5cc225d">Yes/No prompts</h4>
-<div class="outline-text-4" id="text-org5cc225d">
+<div id="outline-container-orgcfe5d0a" class="outline-4">
+<h4 id="orgcfe5d0a">Yes/No prompts</h4>
+<div class="outline-text-4" id="text-orgcfe5d0a">
 <p>
 Change yes or no prompts to y or n prompts
 </p>
@@ -375,9 +389,9 @@ Change yes or no prompts to y or n prompts
 </div>
 </div>
 
-<div id="outline-container-org45a70a7" class="outline-4">
-<h4 id="org45a70a7">Uniquify</h4>
-<div class="outline-text-4" id="text-org45a70a7">
+<div id="outline-container-org49bb605" class="outline-4">
+<h4 id="org49bb605">Uniquify</h4>
+<div class="outline-text-4" id="text-org49bb605">
 <p>
 Uniquify buffer names with "post-forward" style:
    /foo/bar/name will become name|/foo/bar
@@ -391,9 +405,9 @@ Uniquify buffer names with "post-forward" style:
 </div>
 </div>
 
-<div id="outline-container-orge42788d" class="outline-3">
-<h3 id="orge42788d">Editing text</h3>
-<div class="outline-text-3" id="text-orge42788d">
+<div id="outline-container-org6d2c0da" class="outline-3">
+<h3 id="org6d2c0da">Editing text</h3>
+<div class="outline-text-3" id="text-org6d2c0da">
 <p>
 subword-mode: Allows navigation and editing of "subwords"
 </p>
@@ -422,9 +436,9 @@ save-place-mode: Save previous editing location and always go back to it
 </div>
 </div>
 
-<div id="outline-container-org0a7685b" class="outline-4">
-<h4 id="org0a7685b">Ansi Color codes</h4>
-<div class="outline-text-4" id="text-org0a7685b">
+<div id="outline-container-org93f0a2f" class="outline-4">
+<h4 id="org93f0a2f">Ansi Color codes</h4>
+<div class="outline-text-4" id="text-org93f0a2f">
 <p>
 Enable Ansi color codes for compilation buffers
 </p>
@@ -435,9 +449,9 @@ Enable Ansi color codes for compilation buffers
 </div>
 </div>
 
-<div id="outline-container-org1a6264a" class="outline-4">
-<h4 id="org1a6264a">Debugging Emacs</h4>
-<div class="outline-text-4" id="text-org1a6264a">
+<div id="outline-container-orgefd1f3b" class="outline-4">
+<h4 id="orgefd1f3b">Debugging Emacs</h4>
+<div class="outline-text-4" id="text-orgefd1f3b">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">(<span style="color: #a020f0;">setq</span> debug-on-error t)
 </pre>
@@ -445,9 +459,9 @@ Enable Ansi color codes for compilation buffers
 </div>
 </div>
 
-<div id="outline-container-org6569f5b" class="outline-4">
-<h4 id="org6569f5b">Backups</h4>
-<div class="outline-text-4" id="text-org6569f5b">
+<div id="outline-container-org4e5a3be" class="outline-4">
+<h4 id="org4e5a3be">Backups</h4>
+<div class="outline-text-4" id="text-org4e5a3be">
 <p>
 Setting Auto-Save directory and Backup Directory
 </p>
@@ -463,13 +477,13 @@ Setting Auto-Save directory and Backup Directory
 </div>
 </div>
 
-<div id="outline-container-org6a040fc" class="outline-3">
-<h3 id="org6a040fc">User Interface</h3>
-<div class="outline-text-3" id="text-org6a040fc">
+<div id="outline-container-org2d6456d" class="outline-3">
+<h3 id="org2d6456d">User Interface</h3>
+<div class="outline-text-3" id="text-org2d6456d">
 </div>
-<div id="outline-container-org5579b3c" class="outline-4">
-<h4 id="org5579b3c">Line and Column numbers</h4>
-<div class="outline-text-4" id="text-org5579b3c">
+<div id="outline-container-orgd6aae1c" class="outline-4">
+<h4 id="orgd6aae1c">Line and Column numbers</h4>
+<div class="outline-text-4" id="text-orgd6aae1c">
 <p>
 I will like to see line and column numbers for all files.
 </p>
@@ -481,9 +495,9 @@ I will like to see line and column numbers for all files.
 </div>
 </div>
 
-<div id="outline-container-org0d0d9fa" class="outline-4">
-<h4 id="org0d0d9fa">Bars</h4>
-<div class="outline-text-4" id="text-org0d0d9fa">
+<div id="outline-container-org2262cf5" class="outline-4">
+<h4 id="org2262cf5">Bars</h4>
+<div class="outline-text-4" id="text-org2262cf5">
 <p>
 Don't like all the fancy bars
 </p>
@@ -496,9 +510,9 @@ Don't like all the fancy bars
 </div>
 </div>
 
-<div id="outline-container-org5661563" class="outline-4">
-<h4 id="org5661563">Echo Area</h4>
-<div class="outline-text-4" id="text-org5661563">
+<div id="outline-container-org18b70af" class="outline-4">
+<h4 id="org18b70af">Echo Area</h4>
+<div class="outline-text-4" id="text-org18b70af">
 <p>
 Uses echo area to display tooltips and echo keystrokes
 </p>
@@ -511,9 +525,9 @@ Uses echo area to display tooltips and echo keystrokes
 </div>
 </div>
 
-<div id="outline-container-orgcde24d6" class="outline-3">
-<h3 id="orgcde24d6">Emacs Server</h3>
-<div class="outline-text-3" id="text-orgcde24d6">
+<div id="outline-container-org9428aaf" class="outline-3">
+<h3 id="org9428aaf">Emacs Server</h3>
+<div class="outline-text-3" id="text-org9428aaf">
 <p>
 Start emacs server on port 1337.
 </p>
@@ -527,27 +541,69 @@ Start emacs server on port 1337.
 </div>
 </div>
 
-<div id="outline-container-org1a958ce" class="outline-3">
-<h3 id="org1a958ce">Package Manager</h3>
-<div class="outline-text-3" id="text-org1a958ce">
+<div id="outline-container-orgdd759ae" class="outline-3">
+<h3 id="orgdd759ae">Package Management</h3>
+<div class="outline-text-3" id="text-orgdd759ae">
 <p>
 Package management is important!
-Add marmalade repository, which has stable community packages.
+Add melpa-stable repository, which has stable community packages.
 </p>
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">(<span style="color: #a020f0;">require</span> '<span style="color: #008b8b;">package</span>)
 (add-to-list 'package-archives
-      '(<span style="color: #8b2252;">"marmalade"</span>   . <span style="color: #8b2252;">"http://marmalade-repo.org/packages/"</span>))
-(<span style="color: #a020f0;">setq</span> package-enable-at-startup nil)
+      '(<span style="color: #8b2252;">"melpa-stable"</span> . <span style="color: #8b2252;">"https://stable.melpa.org/packages/"</span>) t)
 (package-initialize)
+
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org1bdfb8b" class="outline-4">
+<h4 id="org1bdfb8b">use-package</h4>
+<div class="outline-text-4" id="text-org1bdfb8b">
+<p>
+Bootstrap and customize it.
+always-ensure: Ensure the package exists by downloading it if it does not exist.
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="color: #a020f0;">unless</span> (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(<span style="color: #a020f0;">eval-when-compile</span> (<span style="color: #a020f0;">require</span> '<span style="color: #008b8b;">use-package</span>))
+(<span style="color: #a020f0;">require</span> '<span style="color: #008b8b;">use-package-ensure</span>)
+(<span style="color: #a020f0;">setq</span> use-package-always-ensure t)
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org88eb6c7" class="outline-3">
-<h3 id="org88eb6c7">Flyspell</h3>
-<div class="outline-text-3" id="text-org88eb6c7">
+<div id="outline-container-orgb856f35" class="outline-4">
+<h4 id="orgb856f35">evil-mode</h4>
+<div class="outline-text-4" id="text-orgb856f35">
+<p>
+I use evil-mode for Vim emulation
+</p>
+
+<p>
+evil-move-cursor-back: don't want to move cursor back after exiting insert 
+Add more distinguishable colors for evil states
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="color: #a020f0;">use-package</span> <span style="color: #008b8b;">evil</span>
+  <span style="color: #483d8b;">:config</span> (evil-mode 1)
+  (<span style="color: #a020f0;">setq</span> evil-move-cursor-back nil)
+  (<span style="color: #a020f0;">setq</span> evil-normal-state-cursor '(<span style="color: #8b2252;">"dim gray"</span> box)
+        evil-insert-state-cursor '(<span style="color: #8b2252;">"dim gray"</span> bar)
+        evil-emacs-state-cursor '(<span style="color: #8b2252;">"blue"</span> bar)))
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf69405f" class="outline-3">
+<h3 id="orgf69405f">Flyspell</h3>
+<div class="outline-text-3" id="text-orgf69405f">
 <p>
 Enable flyspell mode for strings and comments
 </p>
@@ -558,9 +614,9 @@ Enable flyspell mode for strings and comments
 </div>
 </div>
 
-<div id="outline-container-orgd15f1b4" class="outline-3">
-<h3 id="orgd15f1b4">TRAMP mode</h3>
-<div class="outline-text-3" id="text-orgd15f1b4">
+<div id="outline-container-org669c6a9" class="outline-3">
+<h3 id="org669c6a9">TRAMP mode</h3>
+<div class="outline-text-3" id="text-org669c6a9">
 <p>
 This is for remote editing files using SSH
 </p>
@@ -578,9 +634,9 @@ This is for remote editing files using SSH
 </div>
 </div>
 
-<div id="outline-container-orgbeb3a1b" class="outline-3">
-<h3 id="orgbeb3a1b">Browser settings</h3>
-<div class="outline-text-3" id="text-orgbeb3a1b">
+<div id="outline-container-orgf81128b" class="outline-3">
+<h3 id="orgf81128b">Browser settings</h3>
+<div class="outline-text-3" id="text-orgf81128b">
 <p>
 Use chrome as the default browser. This assumes chrome is installed.
 </p>
@@ -591,11 +647,80 @@ Use chrome as the default browser. This assumes chrome is installed.
 </div>
 </div>
 </div>
+<div id="outline-container-org841ff8f" class="outline-3">
+<h3 id="org841ff8f">Other Packages/Plugins</h3>
+<div class="outline-text-3" id="text-org841ff8f">
+<p>
+The packages here are not <b>required</b>, but they each have their use case or
+provide a whole new experience.
+</p>
+</div>
+
+<div id="outline-container-orgd709877" class="outline-4">
+<h4 id="orgd709877">Helm</h4>
+<div class="outline-text-4" id="text-orgd709877">
+<p>
+Amazing package that provides a whole new UX
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="color: #a020f0;">use-package</span> <span style="color: #008b8b;">helm</span>
+  <span style="color: #483d8b;">:config</span> (helm-mode 1)
+  (<span style="color: #a020f0;">setq</span> helm-M-x-fuzzy-match t
+        helm-split-window-inside-p t)
+  <span style="color: #483d8b;">:bind</span> (<span style="color: #8b2252;">"M-x"</span> . helm-M-x))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org66c222f" class="outline-4">
+<h4 id="org66c222f">Projectile</h4>
+<div class="outline-text-4" id="text-org66c222f">
+<p>
+Package for working with "projects"
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="color: #a020f0;">use-package</span> <span style="color: #008b8b;">projectile</span>
+  <span style="color: #483d8b;">:config</span> (projectile-global-mode 1))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8166a6e" class="outline-4">
+<h4 id="org8166a6e">Undo tree mode</h4>
+<div class="outline-text-4" id="text-org8166a6e">
+<p>
+This makes undo/redo in emacs behave like a tree!
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="color: #a020f0;">use-package</span> <span style="color: #008b8b;">undo-tree</span>
+  <span style="color: #483d8b;">:config</span> (global-undo-tree-mode 1))
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2c2c2ef" class="outline-3">
+<h3 id="org2c2c2ef">Font</h3>
+<div class="outline-text-3" id="text-org2c2c2ef">
+<p>
+I am experimenting with the <a href="https://sourcefoundry.org/hack/">Hack</a> font at the moment. The following will try to
+set the font if it exists. Installation of the font is a manual step at the moment.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(set-frame-font (find-font (font-spec <span style="color: #483d8b;">:name</span> <span style="color: #8b2252;">"Hack"</span> <span style="color: #483d8b;">:weight</span> 'normal <span style="color: #483d8b;">:slant</span> 'normal)))
+</pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Author: Sherman Pay</p>
-<p class="date">Created: 2019-03-02 Sat 00:16</p>
+<p class="author">Author: Jing Hao Sherman Pay</p>
+<p class="date">Created: 2019-03-17 Sun 10:14</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

@@ -5,6 +5,13 @@
 #+OPTIONS: toc:3 num:nil
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://thomasf.github.io/solarized-css/solarized-light.min.css" />
 
+* Overview
+I am currently in the process of cleaning up my Emacs config. I started using
+Emacs before [[https://github.com/jwiegley/use-package][use-package]] was really a thing, so I had many packages installed
+and had dependencies to the packages all over the place. This made bootstrapping
+a new machine with Emacs really difficult. As such the goal of my current config
+is to be as simple as possible and have the flexilibility to enable packages and
+configurations for specific use cases.
 
 * Configuration
 
@@ -162,9 +169,16 @@ always-ensure: Ensure the package exists by downloading it if it does not exist.
 
 *** evil-mode
 I use evil-mode for Vim emulation
+
+evil-move-cursor-back: don't want to move cursor back after exiting insert 
+Add more distinguishable colors for evil states
 #+BEGIN_SRC emacs-lisp
-(use-package evil)
-(evil-mode 1)
+  (use-package evil
+    :config (evil-mode 1)
+    (setq evil-move-cursor-back nil)
+    (setq evil-normal-state-cursor '("dim gray" box)
+	  evil-insert-state-cursor '("dim gray" bar)
+	  evil-emacs-state-cursor '("blue" bar)))
 #+END_SRC
 
 ** Flyspell
@@ -194,4 +208,39 @@ Use chrome as the default browser. This assumes chrome is installed.
 #+BEGIN_SRC emacs-lisp
 (setq browse-url-generic-program "/usr/bin/google-chrome"
       browse-url-browser-function 'browse-url-generic)
+#+END_SRC
+** Other Packages/Plugins
+The packages here are not *required*, but they each have their use case or
+provide a whole new experience.
+
+*** Helm
+Amazing package that provides a whole new UX
+#+BEGIN_SRC emacs-lisp
+  (use-package helm
+    :config (helm-mode 1)
+    (setq helm-M-x-fuzzy-match t
+	  helm-split-window-inside-p t)
+    :bind ("M-x" . helm-M-x))
+#+END_SRC
+
+*** Projectile
+Package for working with "projects"
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :config (projectile-global-mode 1))
+#+END_SRC
+
+*** Undo tree mode
+This makes undo/redo in emacs behave like a tree!
+#+BEGIN_SRC emacs-lisp
+  (use-package undo-tree
+    :config (global-undo-tree-mode 1))
+#+END_SRC
+
+** Font
+I am experimenting with the [[https://sourcefoundry.org/hack/][Hack]] font at the moment. The following will try to
+set the font if it exists. Installation of the font is a manual step at the moment.
+
+#+BEGIN_SRC emacs-lisp
+  (set-frame-font (find-font (font-spec :name "Hack" :weight 'normal :slant 'normal)))
 #+END_SRC
