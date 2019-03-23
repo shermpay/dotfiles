@@ -63,19 +63,34 @@
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
 
-(use-package evil)
-(evil-mode 1)
+(use-package evil
+  :config (evil-mode 1)
+  (setq evil-move-cursor-back nil)
+  (setq evil-normal-state-cursor '("dim gray" box)
+	evil-insert-state-cursor '("dim gray" bar)
+	evil-emacs-state-cursor '("blue" bar)))
 
 (add-hook 'prog-mode-hook (lambda () (flyspell-prog-mode)))
 
-(setq tramp-default-method "ssh")
-(setq tramp-verbose 0)
-(setq password-cache-expiry 3600)
-;; I don't remember what the following is for...
-;; (add-to-list 'tramp-default-proxies-alist
-;; 	     '(nil "\\`root\\'" "/ssh:%h:"))
-;; (add-to-list 'tramp-default-proxies-alist
-;; 	     '((regexp-quote (system-name)) nil nil))
-
 (setq browse-url-generic-program "/usr/bin/google-chrome"
       browse-url-browser-function 'browse-url-generic)
+
+(use-package helm
+  :config (helm-mode 1)
+  (setq helm-M-x-fuzzy-match t
+	helm-split-window-inside-p t)
+  :bind ("M-x" . helm-M-x))
+
+(use-package projectile
+  :config (projectile-global-mode 1))
+
+(use-package undo-tree
+  :config (global-undo-tree-mode 1))
+
+(use-package company
+  :config (global-company-mode))
+
+(set-frame-font (find-font (font-spec :name "Hack" :weight 'normal :slant 'normal)))
+
+(use-package moe-theme)
+(moe-dark)

@@ -3,7 +3,7 @@
 #+EMAIL: shermanpay1991@gmail.com
 #+PROPERTY: header-args :emacs-lisp    :tangle yes
 #+OPTIONS: toc:3 num:nil
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://thomasf.github.io/solarized-css/solarized-light.min.css" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://thomasf.github.io/solarized-css/solarized-light.min.css" />
 
 * Overview
 I am currently in the process of cleaning up my Emacs config. I started using
@@ -188,20 +188,6 @@ Enable flyspell mode for strings and comments
 (add-hook 'prog-mode-hook (lambda () (flyspell-prog-mode)))
 #+END_SRC
 
-** TRAMP mode
-
-This is for remote editing files using SSH
-#+BEGIN_SRC emacs-lisp
-(setq tramp-default-method "ssh")
-(setq tramp-verbose 0)
-(setq password-cache-expiry 3600)
-;; I don't remember what the following is for...
-;; (add-to-list 'tramp-default-proxies-alist
-;; 	     '(nil "\\`root\\'" "/ssh:%h:"))
-;; (add-to-list 'tramp-default-proxies-alist
-;; 	     '((regexp-quote (system-name)) nil nil))
-#+END_SRC
-
 ** Browser settings
 
 Use chrome as the default browser. This assumes chrome is installed.
@@ -209,8 +195,8 @@ Use chrome as the default browser. This assumes chrome is installed.
 (setq browse-url-generic-program "/usr/bin/google-chrome"
       browse-url-browser-function 'browse-url-generic)
 #+END_SRC
-** Other Packages/Plugins
-The packages here are not *required*, but they each have their use case or
+** Packages/Plugins
+The packages here are not /required/, but they each have their use case or
 provide a whole new experience.
 
 *** Helm
@@ -227,7 +213,8 @@ Amazing package that provides a whole new UX
 Package for working with "projects"
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
-    :config (projectile-global-mode 1))
+    :config (projectile-global-mode 1)
+    :bind-keymap ("C-c C-p" . 'projectile-command-map))
 #+END_SRC
 
 *** Undo tree mode
@@ -237,10 +224,31 @@ This makes undo/redo in emacs behave like a tree!
     :config (global-undo-tree-mode 1))
 #+END_SRC
 
-** Font
+*** Company mode
+[[https://company-mode.github.io/][company-mode]] is an autocomplete framework for Emacs. And it can work with
+various backends.
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :config (global-company-mode))
+#+END_SRC
+*** Magit mode
+Emacs interface to git
+#+BEGIN_SRC emacs-lisp
+  (use-package magit)
+#+END_SRC
+** Fancier UI
+Having a UI that looks good, makes me more productive.
+*** Font
 I am experimenting with the [[https://sourcefoundry.org/hack/][Hack]] font at the moment. The following will try to
 set the font if it exists. Installation of the font is a manual step at the moment.
 
 #+BEGIN_SRC emacs-lisp
   (set-frame-font (find-font (font-spec :name "Hack" :weight 'normal :slant 'normal)))
+#+END_SRC
+
+*** Themes
+[[https://github.com/kuanyui/moe-theme.el][moe-theme]]: Many awesome customizable features. [[https://raw.githubusercontent.com/kuanyui/moe-theme.el/master/pics/dark01.png][dark]], [[https://raw.githubusercontent.com/kuanyui/moe-theme.el/master/pics/light01.png][light]]
+#+BEGIN_SRC emacs-lisp
+  (use-package moe-theme)
+  (moe-dark)
 #+END_SRC
