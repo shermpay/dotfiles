@@ -70,6 +70,10 @@ Uniquify buffer names with "post-forward" style:
 (setq uniquify-buffer-name-style 'post-forward)
 #+END_SRC
 
+*** Keybindings
+#+BEGIN_SRC emacs-lisp
+  (define-key global-map (kbd "M-o") 'other-window)
+#+END_SRC
 ** Editing text
 subword-mode: Allows navigation and editing of "subwords"
 
@@ -113,12 +117,12 @@ Setting Auto-Save directory and Backup Directory
 ** User Interface
 
 *** Line and Column numbers
-I will like to see line and column numbers for all files.
+Show line-numbers and column numbers in the mode-line but don't show
+line numbers on the sidej
 #+BEGIN_SRC emacs-lisp
-(global-linum-mode t)
-(column-number-mode t)
+  (global-linum-mode -1)
+  (column-number-mode t)
 #+END_SRC
-
 *** Bars
 Don't like all the fancy bars
 #+BEGIN_SRC emacs-lisp
@@ -136,12 +140,9 @@ Uses echo area to display tooltips and echo keystrokes
 
 ** Emacs Server
 
-Start emacs server on port 1337.
+Start emacs server
 #+BEGIN_SRC emacs-lisp
-(setq server-port 1337)
-(setq server-use-tcp t)
-(setq server-host (system-name))
-(server-start) ; Start the emacs server
+  (server-start)
 #+END_SRC
 
 ** Package Management
@@ -156,8 +157,9 @@ Add melpa-stable repository, which has stable community packages.
 #+END_SRC
 
 *** use-package
-Bootstrap and customize it.
-always-ensure: Ensure the package exists by downloading it if it does not exist.
+Bootstrap and customize it.  always-ensure: Ensure the package exists
+by downloading it if it does not exist. However this does *not* keep
+packages up to date.
 #+BEGIN_SRC emacs-lisp
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -199,6 +201,15 @@ Use chrome as the default browser. This assumes chrome is installed.
 The packages here are not /required/, but they each have their use case or
 provide a whole new experience.
 
+*** exec-path-from-shell
+To ensure that the Linux/OSX environment variables within emacs is the same as
+the shell. (Windows is not included)
+#+BEGIN_SRC emacs-lisp
+  (use-package exec-path-from-shell
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)))
+#+END_SRC
 *** Helm
 Amazing package that provides a whole new UX
 #+BEGIN_SRC emacs-lisp
@@ -206,7 +217,9 @@ Amazing package that provides a whole new UX
     :config (helm-mode 1)
     (setq helm-M-x-fuzzy-match t
 	  helm-split-window-inside-p t)
-    :bind ("M-x" . helm-M-x))
+    :bind
+    ("M-x" . helm-M-x)
+    ("C-x C-f" . helm-find-files))
 #+END_SRC
 
 *** Projectile
@@ -214,7 +227,8 @@ Package for working with "projects"
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :config (projectile-global-mode 1)
-    :bind-keymap ("C-c C-p" . 'projectile-command-map))
+    :bind-keymap
+    ("C-c p" . projectile-command-map))
 #+END_SRC
 
 *** Undo tree mode
@@ -232,9 +246,21 @@ various backends.
     :config (global-company-mode))
 #+END_SRC
 *** Magit mode
-Emacs interface to git
+[[https://magit.vc/][magit]] is an emacs interface to git
 #+BEGIN_SRC emacs-lisp
   (use-package magit)
+#+END_SRC
+*** Flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :config (global-flycheck-mode))
+
+#+END_SRC
+*** Protocol Buffers
+Protocol Buffers are awesome.
+#+BEGIN_SRC emacs-lisp
+  (use-package protobuf-mode
+    :mode "\\.proto")
 #+END_SRC
 ** Fancier UI
 Having a UI that looks good, makes me more productive.
@@ -251,4 +277,28 @@ set the font if it exists. Installation of the font is a manual step at the mome
 #+BEGIN_SRC emacs-lisp
   (use-package moe-theme)
   (moe-dark)
+#+END_SRC
+
+** Python
+Configuration specific to python.
+*** Plugins
+Flycheck for linting and using mypy. This might need more configuration
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck-pycheckers
+    :config (with-eval-after-load 'flycheck
+	      (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)))
+#+END_SRC
+
+company-jedi for autocomplete
+#+BEGIN_SRC emacs-lisp
+  (use-package company-jedi
+    :requires company
+    :config
+    (setq jedi:environment-virtualenv (list (expand-file-name "~/.emacs.d/.python-environments/")))
+    (add-hook 'python-mode-hook 'jedi:setup)
+    (setq jedi:complete-on-dot t)
+    (setq jedi:use-shortcuts t)
+    (defun config/enable-company-jedi ()
+      (add-to-list 'company-backends 'company-jedi))
+    (add-hook 'python-mode-hook 'config/enable-company-jedi))
 #+END_SRC

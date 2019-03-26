@@ -17,6 +17,8 @@
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'post-forward)
 
+(define-key global-map (kbd "M-o") 'other-window)
+
 (global-subword-mode t)
 
 (show-paren-mode 1)
@@ -75,6 +77,11 @@
 (setq browse-url-generic-program "/usr/bin/google-chrome"
       browse-url-browser-function 'browse-url-generic)
 
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+
 (use-package helm
   :config (helm-mode 1)
   (setq helm-M-x-fuzzy-match t
@@ -82,7 +89,10 @@
   :bind ("M-x" . helm-M-x))
 
 (use-package projectile
-  :config (projectile-global-mode 1))
+  :config (projectile-global-mode 1)
+  :bind-keymap
+  ("C-c C-p" . projectile-command-map)
+  ("C-c p" . projectile-command-map))
 
 (use-package undo-tree
   :config (global-undo-tree-mode 1))
@@ -90,7 +100,16 @@
 (use-package company
   :config (global-company-mode))
 
+(use-package magit)
+
+(use-package flycheck
+  :config (global-flycheck-mode))
+
 (set-frame-font (find-font (font-spec :name "Hack" :weight 'normal :slant 'normal)))
 
 (use-package moe-theme)
 (moe-dark)
+
+(use-package flycheck-pycheckers
+  :config (with-eval-after-load 'flycheck
+	    (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)))
