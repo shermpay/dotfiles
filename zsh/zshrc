@@ -1,3 +1,8 @@
+# Gross hack because on several distros, PATH settings get blown away when
+# # /etc/profile is sourced by /etc/zsh/zprofile. This means that everything in
+# zshenv must be idempotent.
+source ~/.zshenv
+
 # The following lines were added by compinstall
 
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
@@ -12,6 +17,9 @@ HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=10000
 # End of lines configured by zsh-newuser-install
+#
+# Save every command before it is executed.
+setopt inc_append_history
 
 # Dirstack
 DIRSTACKFILE="$HOME/.cache/zsh/dirs"
@@ -62,8 +70,8 @@ fi
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 function cd_ls() {
-    emulate -L zsh
-    echo $(ls --color=auto | head -n 8)
+    # emulate -L zsh
+    # echo $(ls --color=auto | head -n 8)
 }
 
 chpwd_functions=''
@@ -75,15 +83,25 @@ chpwd_functions=(${chpwd_functions[@]} "cd_ls")
 # cmd='{$(ls --color=always -t -w 80 | head -n 10 | xargs echo)}'
 # prompt="\\nλ *> "
 # export PS1="${debian_chroot:+($debian_chroot)}"$userps1$dirps1$cmd$prompt
+
+function get_current_cl() {
+    echo $(hg exportedcl)
+}
 # zsh Prompt
+# The prompt string is first subjected to parameter expansion,
+# command substituion and arithmetic expansion.
+setopt PROMPT_SUBST
 user="%n"
 host=" %m "
-userps1="($user @ %{$fg[black]%}%K{blue}${host}%k%{$reset_color%})"
+userps1="($user @ %{$fg[blue]%}%K{white}${host}%k%{$reset_color%})"
 wd_prompt="[%3~]"
 dirps1="%{$fg[cyan]%}${wd_prompt}%{$reset_color%}"
 main_prompt="$ "
 PROMPT="${userps1}:${dirps1} ${main_prompt}"
-RPROMPT=''
+# RPROMPT='$(get_current_cl)'
+
+# Allow comments in command-line
+setopt interactivecomments
 
 # For completion
 fpath[1,0]=~/.zsh/completion/
@@ -97,3 +115,5 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 if [[ -f "$HOME/.shtools" ]]; then
     source "$HOME/.shtools"
 fi
+
+source ~/.googlerc

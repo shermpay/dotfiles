@@ -17,4 +17,4 @@ fi
 
 # Environment Variables
 # Haskel Cabal
-PATH=~/.cabal/bin:$PATH
+# PATH=~/.cabal/bin:$PATH

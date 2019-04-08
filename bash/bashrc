@@ -135,3 +135,5 @@ export EDITOR="emacsclient -n -a vim"
 export SUDO_EDITOR=$EDITOR
 export VISUAL=$EDITOR
 
+source ~/.googlerc
+
