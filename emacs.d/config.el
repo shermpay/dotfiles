@@ -38,7 +38,7 @@
  (setq auto-save-file-name-transforms
        `((".*" ,tmp t))))
 
-(global-linum-mode t)
+(global-linum-mode -1)
 (column-number-mode t)
 
 (menu-bar-mode -1) 			
@@ -48,10 +48,7 @@
 (tooltip-mode -1)
 (setq echo-keystrokes 0.01)
 
-(setq server-port 1337)
-(setq server-use-tcp t)
-(setq server-host (system-name))
-(server-start) ; Start the emacs server
+(server-start)
 
 (require 'package)
 (add-to-list 'package-archives
@@ -83,27 +80,42 @@
     (exec-path-from-shell-initialize)))
 
 (use-package helm
+  :disabled
   :config (helm-mode 1)
   (setq helm-M-x-fuzzy-match t
 	helm-split-window-inside-p t)
-  :bind ("M-x" . helm-M-x))
+  :bind
+  ("M-x" . helm-M-x)
+  ("C-x C-f" . helm-find-files))
+
+(use-package counsel
+  :diminish (ivy-mode "")
+  :config
+  (ivy-mode 1)
+  (counsel-mode 1)
+  (setq projectile-completion-system 'ivy))
 
 (use-package projectile
+  :diminish (projectile-mode . "")
   :config (projectile-global-mode 1)
   :bind-keymap
-  ("C-c C-p" . projectile-command-map)
   ("C-c p" . projectile-command-map))
 
 (use-package undo-tree
+  :diminish (undo-tree-mode . "")
   :config (global-undo-tree-mode 1))
 
 (use-package company
+  :diminish (company-mode . "")
   :config (global-company-mode))
 
 (use-package magit)
 
 (use-package flycheck
   :config (global-flycheck-mode))
+
+(use-package protobuf-mode
+  :mode "\\.proto")
 
 (set-frame-font (find-font (font-spec :name "Hack" :weight 'normal :slant 'normal)))
 
@@ -113,3 +125,14 @@
 (use-package flycheck-pycheckers
   :config (with-eval-after-load 'flycheck
 	    (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)))
+
+(use-package company-jedi
+  :requires company
+  :config
+  (setq jedi:environment-virtualenv (list (expand-file-name "~/.emacs.d/.python-environments/")))
+  (add-hook 'python-mode-hook 'jedi:setup)
+  (setq jedi:complete-on-dot t)
+  (setq jedi:use-shortcuts t)
+  (defun config/enable-company-jedi ()
+    (add-to-list 'company-backends 'company-jedi))
+  (add-hook 'python-mode-hook 'config/enable-company-jedi))

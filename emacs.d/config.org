@@ -214,6 +214,7 @@ the shell. (Windows is not included)
 Amazing package that provides a whole new UX
 #+BEGIN_SRC emacs-lisp
   (use-package helm
+    :disabled
     :config (helm-mode 1)
     (setq helm-M-x-fuzzy-match t
 	  helm-split-window-inside-p t)
@@ -222,10 +223,23 @@ Amazing package that provides a whole new UX
     ("C-x C-f" . helm-find-files))
 #+END_SRC
 
+*** Ivy/Counsel
+Much more lightweight and faster then Helm, but with the same core functionality
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel
+    :diminish (ivy-mode "")
+    :config
+    (ivy-mode 1)
+    (counsel-mode 1)
+    (setq projectile-completion-system 'ivy))
+
+#+END_SRC
+
 *** Projectile
 Package for working with "projects"
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
+    :diminish (projectile-mode . "")
     :config (projectile-global-mode 1)
     :bind-keymap
     ("C-c p" . projectile-command-map))
@@ -235,6 +249,7 @@ Package for working with "projects"
 This makes undo/redo in emacs behave like a tree!
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
+    :diminish (undo-tree-mode . "")
     :config (global-undo-tree-mode 1))
 #+END_SRC
 
@@ -243,6 +258,7 @@ This makes undo/redo in emacs behave like a tree!
 various backends.
 #+BEGIN_SRC emacs-lisp
   (use-package company
+    :diminish (company-mode . "")
     :config (global-company-mode))
 #+END_SRC
 *** Magit mode
