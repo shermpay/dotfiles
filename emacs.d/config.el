@@ -1,6 +1,7 @@
 (require 'cl-lib)
 
 (defvar my-org-dir (concat user-emacs-directory "org"))
+(defvar my-gdrive-dir "~/DriveFS/My Drive")
 
 (let ((default-directory user-emacs-directory))
   (normal-top-level-add-subdirs-to-load-path))
@@ -9,7 +10,7 @@
       user-mail-address "shermanpay1991@gmail.com")
 
 (add-hook 'emacs-startup-hook
-          (lambda () (find-file (concat my-org-dir "/todo.org"))))
+          (lambda () (find-file (concat my-gdrive-dir "/org/todo.org"))))
 (setq inhibit-startup-message t)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -151,6 +152,8 @@
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-switchb)
 
+(setq org-default-notes-file (concat my-org-dir "notes.org"))
+
 (use-package org-bullets
       :hook (org-mode . (lambda () (org-bullets-mode 1))))
 
@@ -186,6 +189,11 @@
 (add-hook 'go-mode-hook (lambda ()
 						  (set (make-local-variable 'company-backends) '(company-go))
 						  (company-mode)))
+
+(use-package paredit
+  :commands (enable-paredit-mode)
+  :init
+  (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode))
 
 (use-package vterm
 :pin "melpa")

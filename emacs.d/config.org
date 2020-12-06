@@ -28,14 +28,18 @@ Require builtin libraries here.
 My user defined variables. I prefix all my variables with "my" to ensure there
 are no name collisions with other other modes variables.
 #+BEGIN_SRC emacs-lisp
-(defvar my-org-dir (concat user-emacs-directory "org"))
+  (defvar my-gdrive-dir (getenv "MY_DRIVE"))
+  (defun my-gdrive-or-emacs-dir ()
+	(if my-gdrive-dir
+		my-gdrive-dir
+	  user-emacs-directory))
 #+END_SRC 
 
 *** Load Paths
-Add "~/.emacs.d" to load-path
+Add subdirectories of "~/.emacs.d" to load-path
 #+BEGIN_SRC emacs-lisp
-(let ((default-directory user-emacs-directory))
-  (normal-top-level-add-subdirs-to-load-path))
+  (let ((default-directory user-emacs-directory))
+	(normal-top-level-add-subdirs-to-load-path))
 #+END_SRC
 
 *** User Info
@@ -49,9 +53,9 @@ Explicitly set these.
 Right now I open a basic "todo.org" file at startup. Consider creating a
 personalized org file for startup.
 #+BEGIN_SRC emacs-lisp
-(add-hook 'emacs-startup-hook
-          (lambda () (find-file (concat my-org-dir "/todo.org"))))
-(setq inhibit-startup-message t)
+  (add-hook 'emacs-startup-hook
+			(lambda () (find-file (concat (my-gdrive-or-emacs-dir) "/org/todo.org"))))
+  (setq inhibit-startup-message t)
 #+END_SRC
 
 ** Basic stuff
@@ -157,6 +161,26 @@ Start emacs server
   (server-start)
 #+END_SRC
 
+** Emacs Desktops
+   For saving "desktops"(sessions)
+   #+begin_src emacs-lisp
+	 (desktop-save-mode 1)
+	 (add-to-list 'desktop-path "~/.emacs.d/desktops")
+   #+end_src
+** Flyspell
+
+Enable flyspell mode for strings and comments
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode-hook (lambda () (flyspell-prog-mode)))
+#+END_SRC
+
+** Browser settings
+
+Use chrome as the default browser. This assumes chrome is installed.
+#+BEGIN_SRC emacs-lisp
+(setq browse-url-generic-program "/usr/bin/google-chrome"
+      browse-url-browser-function 'browse-url-generic)
+#+END_SRC
 ** Package Management
 Package management is important!
 Add melpa-stable repository, which has stable community packages.
@@ -185,6 +209,22 @@ packages up to date.
   (setq use-package-always-pin "melpa-stable")
 #+END_SRC
 
+*** auto-package-update
+Automatically update packages.
+#+BEGIN_SRC emacs-lisp
+  (use-package auto-package-update
+    :disabled
+    :config
+	(setq auto-package-update-interval 90)
+    (setq auto-package-update-delete-old-versions t)
+    (setq auto-package-update-hide-results t)
+	(setq auto-package-update-prompt-before-update t)
+    (auto-package-update-maybe))
+#+END_SRC
+** Packages
+   The packages here are not /required/, but they each have their use case or
+   provide a whole new experience.
+
 *** evil-mode
 I use evil-mode for Vim emulation
 
@@ -199,52 +239,24 @@ Add more distinguishable colors for evil states
 	  evil-emacs-state-cursor '("green" bar)))
 #+END_SRC
 
-*** auto-package-update
-Automatically update packages.
-#+BEGIN_SRC emacs-lisp
-  (use-package auto-package-update
-    :disabled
-    :config
-    (setq auto-package-update-delete-old-versions t)
-    (setq auto-package-update-hide-results t)
-    (auto-package-update-maybe))
-#+END_SRC
-** Flyspell
-
-Enable flyspell mode for strings and comments
-#+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode-hook (lambda () (flyspell-prog-mode)))
-#+END_SRC
-
-** Browser settings
-
-Use chrome as the default browser. This assumes chrome is installed.
-#+BEGIN_SRC emacs-lisp
-(setq browse-url-generic-program "/usr/bin/google-chrome"
-      browse-url-browser-function 'browse-url-generic)
-#+END_SRC
-** Packages/Plugins
-The packages here are not /required/, but they each have their use case or
-provide a whole new experience.
-
 *** xterm-color
 Give xterm-256 colors to shells in Emacs.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package xterm-color)
+  ;; (use-package xterm-color)
 #+END_SRC
 
 *** eshell
 Builtin package. The Emacs Shell
 
 #+BEGIN_SRC emacs-lisp
-  (use-package eshell
-    :after (xterm-color)
-    :config
-	(add-hook 'eshell-before-prompt-hook (lambda () (setq xterm-color-preserve-properties t)))
-    (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
-    (setq eshell-output-filter-functions
-	  (remove 'eshell-handle-ansi-color eshell-output-filter-functions)))
+  ;; (use-package eshell
+  ;;   :after (xterm-color)
+  ;;   :config
+  ;;   (add-hook 'eshell-before-prompt-hook (lambda () (setq xterm-color-preserve-properties t)))
+  ;;   (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
+  ;;   (setq eshell-output-filter-functions
+  ;; 	(remove 'eshell-handle-ansi-color eshell-output-filter-functions)))
 #+END_SRC
 
 *** exec-path-from-shell
@@ -297,7 +309,8 @@ various backends.
 *** Magit mode
 [[https://magit.vc/][magit]] is an emacs interface to git
 #+BEGIN_SRC emacs-lisp
-  (use-package magit)
+  (use-package magit
+	:pin melpa)
 #+END_SRC
 *** Flycheck
 #+BEGIN_SRC emacs-lisp
@@ -322,6 +335,14 @@ Protocol Buffers are awesome.
 		:bind  ("C-c l"  . #'imenu-list-smart-toggle))
 	#+END_SRC
 
+*** LSP
+	Using eglot-mode for now, as it's supported at work. Also disable eglot-imenu, as it does not work.
+	#+begin_src emacs-lisp
+	  (use-package eglot
+		:pin melpa-stable
+		:config (add-to-list 'eglot-stay-out-of 'imenu))
+
+	#+end_src
 ** Fancier UI
 Having a UI that looks good, makes me more productive.
 *** Font
@@ -335,8 +356,8 @@ set the font if it exists. Installation of the font is a manual step at the mome
 *** Themes
 [[https://github.com/kuanyui/moe-theme.el][moe-theme]]: Many awesome customizable features. [[https://raw.githubusercontent.com/kuanyui/moe-theme.el/master/pics/dark01.png][dark]], [[https://raw.githubusercontent.com/kuanyui/moe-theme.el/master/pics/light01.png][light]]
 #+BEGIN_SRC emacs-lisp
-  (use-package moe-theme)
-  (moe-dark)
+  (use-package moe-theme
+	:config (moe-dark))
 #+END_SRC
 
 ** Org Mode
@@ -348,64 +369,165 @@ The following are builtin configurations. The keybindings are as recommended by 
   (global-set-key "\C-cc" 'org-capture)
   (global-set-key "\C-cb" 'org-switchb)
 #+END_SRC
-
+*** Variables
+	#+begin_src emacs-lisp
+	  (setq org-directory (concat (my-gdrive-or-emacs-dir) "/org/"))
+	  (setq org-default-notes-file (concat org-directory "notes.org"))
+	  (defconst my-org-todo-file (concat org-directory "todo.org"))
+	#+end_src
+*** Minor Modes
+	Configure minor modes to enable/disable for org-mode
+	#+begin_src emacs-lisp
+	  (defun my-org-mode-config-minor-modes ()
+		;; disable
+		(flycheck-mode -1)
+		;; enable
+		(visual-line-mode))
+	  (add-hook 'org-mode-hook #'my-org-mode-config-minor-modes)
+	#+end_src
+*** Plugins/Modules
 The following are org-mode plugins.
 #+BEGIN_SRC emacs-lisp
+  (nconc org-modules
+		  '(
+			org-tempo
+			org-capture
+			protocol
+			;; org-habit
+			;; org-id
+			;; org-brain
+			))
+  (eval-after-load 'org
+	  '(org-load-modules-maybe t))
   (use-package org-bullets
 	:hook (org-mode . (lambda () (org-bullets-mode 1))))
 #+END_SRC
+*** org-babel
+	#+begin_src emacs-lisp
+	  (org-babel-do-load-languages
+	   'org-babel-load-languages
+	   '((emacs-lisp t)
+		 (dot . t)))
+	#+end_src
+*** Capture
+	#+BEGIN_SRC emacs-lisp
+	  (setq org-capture-templates '(
+		  ("p" "Protocol" entry (file+headline org-default-notes-file "Inbox")
+			  "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+		  ("L" "Protocol Link" entry (file+headline org-default-notes-file "Inbox")
+			  "* %? [[%:link][%:description]] \nCaptured On: %U")
+		  ("t" "Action Item" entry (file+headline my-org-todo-file "Backlog") "* TODO %U %a\n%i\n%?")
+		  ("T" "Action Item" entry (file+headline my-org-todo-file "Backlog") "* TODO %U %^{title|chat AI|mail AI}\n%i\n%?")
+		  ("b" "bug" entry (file "~/bugs.org")
+		   "* TODO %(org-buganizer-create-todo-string-from-bug)"
+		   :clock-in t :clock-resume t)))
+	#+END_SRC
+*** org-protocol
+	#+begin_src javascript
+	  javascript:location.href='org-protocol://capture://t/'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection())
+	  javascript:location.href='org-protocol://capture://T/'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection())
+	#+end_src
+*** Misc
+	#+begin_src emacs-lisp
+	  (defun my-save-org-archive-file ()
+		"Save org-archive file."
+		(interactive)
+		(if (equal (file-name-extension buffer-file-name) "org")
+			(with-current-buffer (concat (buffer-name) "_archive")
+			  (save-buffer))
+		  nil))
 
-** C
-*** google-c-style
-#+BEGIN_SRC emacs-lisp
-  (use-package google-c-style
-    :pin melpa)
-#+END_SRC
-** Python
-Configuration specific to python.
-*** Plugins
-Flycheck for linting and using mypy. This might need more configuration
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck-pycheckers
-    :config (with-eval-after-load 'flycheck
-	      (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)))
-#+END_SRC
+	  ;; Finally, the newly-defined function can advise the archive function. So,
+	  ;; after a subtree in org is archived, the archive file will be automatically saved.
+	  (advice-add 'org-archive-subtree :after #'my-save-org-archive-file)
 
-company-jedi for autocomplete
-#+BEGIN_SRC emacs-lisp
-  (use-package company-jedi
-    :requires company
-    :config
-    (setq jedi:environment-virtualenv (list (expand-file-name "~/.emacs.d/.python-environments/")))
-    (add-hook 'python-mode-hook 'jedi:setup)
-    (setq jedi:complete-on-dot t)
-    (setq jedi:use-shortcuts t)
-    (defun config/enable-company-jedi ()
-      (add-to-list 'company-backends 'company-jedi))
-    (add-hook 'python-mode-hook 'config/enable-company-jedi))
-#+END_SRC
 
-** Go
-   #+BEGIN_SRC emacs-lisp
-  (defun add-hook-gofmt-before-save ()
-	(add-hook 'before-save-hook 'gofmt-before-save nil t))
-  (add-hook 'go-mode-hook 'add-hook-gofmt-before-save)
-   #+END_SRC
-   #+BEGIN_SRC emacs-lisp
-	 (use-package company-go
-	   :config
-	   (setq company-tooltip-limit 20)                       ; bigger popup window
-	   (setq company-idle-delay .3)                          ; decrease delay before autocompletion popup shows
-	   (setq company-echo-delay 0)                           ; remove annoying blinking
-	   (setq company-begin-commands '(self-insert-command))) ; start autocompletion only after typing
-   #+END_SRC
-   #+BEGIN_SRC emacs-lisp
-	 (add-hook 'go-mode-hook (lambda ()
-							   (set (make-local-variable 'company-backends) '(company-go))
-							   (company-mode)))
-   #+END_SRC
+	  (defun my-org-table-to-dot (nodes edges &optional attr subgraph)
+		"Generate a graph in dot format given NODES and EDGES."
+		(concat
+		 "digraph {\n"
+		 (mapconcat 'identity attr "\n")
+		 "\n"
+		 (mapconcat
+		  (lambda (x)
+			(format "%s [label=\"%s\" shape=%s style=\"filled\" fillcolor=\"%s\"];"
+					(car x)
+					(nth 1 x)
+					(if (string= "" (nth 2 x)) "box" (nth 2 x))
+					(if (string= "" (nth 3 x)) "none" (nth 3 x))
+					)) nodes "\n")
+		 "\n"
+		 (mapconcat
+		  (lambda (x)
+			(format "%s -> %s [taillabel=\"%s\"];"
+					(car x) (nth 1 x) (nth 2 x))) edges "\n")
+		 "}\n"
+		 subgraph
+		 "\n"))
+
+	#+end_src
+
+** Programming Languages
+*** C
+**** google-c-style
+	 #+BEGIN_SRC emacs-lisp
+   (use-package google-c-style
+     :pin melpa)
+	 #+END_SRC
+*** Python
+	Configuration specific to python.
+**** Plugins
+	 Flycheck for linting and using mypy. This might need more configuration
+	 #+BEGIN_SRC emacs-lisp
+   (use-package flycheck-pycheckers
+     :config (with-eval-after-load 'flycheck
+	       (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)))
+	 #+END_SRC
+
+	 company-jedi for autocomplete
+	 #+BEGIN_SRC emacs-lisp
+   (use-package company-jedi
+     :requires company
+     :config
+     (setq jedi:environment-virtualenv (list (expand-file-name "~/.emacs.d/.python-environments/")))
+     (add-hook 'python-mode-hook 'jedi:setup)
+     (setq jedi:complete-on-dot t)
+     (setq jedi:use-shortcuts t)
+     (defun config/enable-company-jedi ()
+       (add-to-list 'company-backends 'company-jedi))
+     (add-hook 'python-mode-hook 'config/enable-company-jedi))
+	 #+END_SRC
+
+*** Go
+	#+BEGIN_SRC emacs-lisp
+   (defun add-hook-gofmt-before-save ()
+	 (add-hook 'before-save-hook 'gofmt-before-save nil t))
+   (add-hook 'go-mode-hook 'add-hook-gofmt-before-save)
+	#+END_SRC
+	#+BEGIN_SRC emacs-lisp
+	  (use-package company-go
+		:config
+		(setq company-tooltip-limit 20)                       ; bigger popup window
+		(setq company-idle-delay .3)                          ; decrease delay before autocompletion popup shows
+		(setq company-echo-delay 0)                           ; remove annoying blinking
+		(setq company-begin-commands '(self-insert-command))) ; start autocompletion only after typing
+	#+END_SRC
+	#+BEGIN_SRC emacs-lisp
+	  (add-hook 'go-mode-hook (lambda ()
+								(set (make-local-variable 'company-backends) '(company-go))
+								(company-mode)))
+	#+END_SRC
+*** Lisp
+	#+BEGIN_SRC emacs-lisp
+	  (use-package paredit
+		:commands (enable-paredit-mode)
+		:init
+		(add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode))
+	#+END_SRC
 ** vterm
-#+BEGIN_SRC emacs-lisp
-  (use-package vterm
-  :pin "melpa")
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+	 (use-package vterm
+	   :pin "melpa"
+	   :hook (vterm-mode . (lambda () (goto-address-mode 1))))
+   #+END_SRC
+   
