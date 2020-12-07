@@ -61,12 +61,6 @@ fi
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-function cd_ls() {
-    emulate -L zsh
-    echo $(ls --color=auto | head -n 8)
-}
-
-add-zsh-hook chpwd 'cd_ls'
 
 # PS1 Prompt
 # userps1="\e[44m\[\e[1;36m\]\\u\[\e[m\]"
@@ -75,16 +69,19 @@ add-zsh-hook chpwd 'cd_ls'
 # prompt="\\nλ *> "
 # export PS1="${debian_chroot:+($debian_chroot)}"$userps1$dirps1$cmd$prompt
 # zsh Prompt
-user="%n"
-host="%m"
-newline=$'\n'
-userps1="(${host})"
-wd_prompt="[%3~]"
-dirps1="%{$fg[cyan]%}${wd_prompt}%{$reset_color%}"
-timestampps1="%{$fg[blue]%}<$(date '+%F %T')>%{$reset_color%}"
-main_prompt="$ "
-PROMPT="${userps1}${dirps1}${timestampps1}${newline}${main_prompt}"
-RPROMPT=""
+() {
+  local user="%n"
+  local host="%m"
+  local newline=$'\n'
+  local userps1="(${host})"
+  local wd_prompt="[%3~]"
+  local dirps1="%{$fg[cyan]%}${wd_prompt}%{$reset_color%}"
+  local timestampps1="%{$fg[blue]%}<$(date '+%F %T')>%{$reset_color%}"
+  local main_prompt="$ "
+
+  PROMPT="${userps1}${dirps1}${timestampps1}${newline}${main_prompt}"
+  RPROMPT=""
+}
 
 # For completion
 fpath[1,0]=~/.zsh/completion/
@@ -125,6 +122,15 @@ vterm_cmd() {
     vterm_printf "51;E$vterm_elisp"
 }
 
-# The following two commands are for vterm-buffer-name-string
-autoload -U add-zsh-ddhook
+autoload -Uz add-zsh-addhook
+# For vterm-buffer-name-string
 add-zsh-hook -Uz chpwd (){ print -Pn "\e]2;%m\a" }
+
+function cd_ls() {
+    emulate -L zsh
+    echo $(ls --color=auto | head -n 8)
+}
+
+if [ -r ~/.zshrc.local ]; then
+	source ~/.zshrc.local
+fi

@@ -44,3 +44,7 @@ path=("$gopath/bin" "$path[@]")
 if [[ -f "$HOME/.shtools" ]]; then
     source "$HOME/.shtools"
 fi
+
+if [ -r ~/.zshenv.local ]; then
+    source ~/.zshenv.local
+fi
