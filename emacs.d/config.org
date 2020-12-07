@@ -341,9 +341,9 @@ Protocol Buffers are awesome.
 *** LSP
 	Using eglot-mode for now, as it's supported at work. Also disable eglot-imenu, as it does not work.
 	#+begin_src emacs-lisp
-	  ;; (use-package eglot
-	  ;;   :pin melpa-stable
-	  ;;   :config (add-to-list 'eglot-stay-out-of 'imenu))
+	  (use-package eglot
+		:pin melpa-stable
+		:config (add-to-list 'eglot-stay-out-of 'imenu))
 
 	#+end_src
 ** Fancier UI
