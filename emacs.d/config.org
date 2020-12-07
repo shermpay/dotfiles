@@ -200,6 +200,9 @@ Bootstrap and customize it.  always-ensure: Ensure the package exists
 by downloading it if it does not exist. However this does *not* keep
 packages up to date.
 #+BEGIN_SRC emacs-lisp
+  (if (member emacs-version '("26.1" "26.2")) (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
@@ -338,9 +341,9 @@ Protocol Buffers are awesome.
 *** LSP
 	Using eglot-mode for now, as it's supported at work. Also disable eglot-imenu, as it does not work.
 	#+begin_src emacs-lisp
-	  (use-package eglot
-		:pin melpa-stable
-		:config (add-to-list 'eglot-stay-out-of 'imenu))
+	  ;; (use-package eglot
+	  ;;   :pin melpa-stable
+	  ;;   :config (add-to-list 'eglot-stay-out-of 'imenu))
 
 	#+end_src
 ** Fancier UI
@@ -499,6 +502,9 @@ The following are org-mode plugins.
 	 #+END_SRC
 
 *** Go
+	#+begin_src emacs-lisp
+	  (use-package go-mode)
+	#+end_src
 	#+BEGIN_SRC emacs-lisp
    (defun add-hook-gofmt-before-save ()
 	 (add-hook 'before-save-hook 'gofmt-before-save nil t))
