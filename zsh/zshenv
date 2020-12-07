@@ -15,6 +15,7 @@ if [ -d ~/.local/share/man ]; then
 fi
 
 export PATH MANPATH
+export PATH=$PATH:/usr/local/go/bin
 
 export EDITOR=vim
 export VISUAL="emacsclient -a vim"
