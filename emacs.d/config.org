@@ -528,6 +528,7 @@ The following are org-mode plugins.
    #+BEGIN_SRC emacs-lisp
 	 (use-package vterm
 	   :pin "melpa"
+	   :config (setq vterm-buffer-name-string "vterm [%s]")
 	   :hook (vterm-mode . (lambda () (goto-address-mode 1))))
    #+END_SRC
    
