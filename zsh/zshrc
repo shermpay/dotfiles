@@ -13,7 +13,7 @@ autoload -Uz compinit
 compinit
 # End of lines added by compinstall
 # Lines configured by zsh-newuser-install
-HISTFILE=~/.histfile
+export HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=10000
 # End of lines configured by zsh-newuser-install
@@ -47,6 +47,12 @@ autoload -U colors && colors
 # use Emacs mode
 bindkey -e
 
+# Enable Ctrl-x-e to edit command line
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey '^xe' edit-command-line
+bindkey '^x^e' edit-command-line
+
 # add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto'
@@ -67,7 +73,8 @@ if [[ -f ~/.zsh_aliases ]] ; then
 fi
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+zmodload zsh/parameter
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(echo $history[$HISTCMD]|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 function cd_ls() {
     # emulate -L zsh
@@ -90,15 +97,20 @@ function get_current_cl() {
 # zsh Prompt
 # The prompt string is first subjected to parameter expansion,
 # command substituion and arithmetic expansion.
-setopt PROMPT_SUBST
-user="%n"
-host=" %m "
-userps1="($user @ %{$fg[blue]%}%K{white}${host}%k%{$reset_color%})"
-wd_prompt="[%3~]"
-dirps1="%{$fg[cyan]%}${wd_prompt}%{$reset_color%}"
-main_prompt="$ "
-PROMPT="${userps1}:${dirps1} ${main_prompt}"
-# RPROMPT='$(get_current_cl)'
+if [ "$TERM" = "dumb" ]; then
+    unsetopt zle
+    PROMPT="> "
+else
+    setopt PROMPT_SUBST
+    user="%n"
+    host=" %m "
+    userps1="($user @ %{$fg[blue]%}%K{white}${host}%k%{$reset_color%})"
+    wd_prompt="[%3~]"
+    dirps1="%{$fg[cyan]%}${wd_prompt}%{$reset_color%}"
+    main_prompt="$ "
+    PROMPT="${userps1}:${dirps1} ${main_prompt}"
+    # RPROMPT='$(get_current_cl)'
+fi
 
 # Allow comments in command-line
 setopt interactivecomments
@@ -116,4 +128,11 @@ if [[ -f "$HOME/.shtools" ]]; then
     source "$HOME/.shtools"
 fi
 
-source ~/.googlerc
+source ~/.dotfiles.google/bashrc
+
+# HSTR configuration - add this to ~/.bashrc
+alias hh=hstr                    # hh to be alias for hstr
+export HSTR_CONFIG=hicolor        # get more colors
+export HSTR_CONFIG=raw-history-view # default to normal history
+bindkey -s "\C-r" "\eqhstr\n"     # bind hstr to Ctrl-r (for Vi mode check doc)
+

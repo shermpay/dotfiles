@@ -32,10 +32,15 @@ are no name collisions with other other modes variables.
 #+END_SRC 
 
 *** Load Paths
-Add "~/.emacs.d" to load-path
+Add "~/.emacs.d/lisp" to load-path
 #+BEGIN_SRC emacs-lisp
-(let ((default-directory user-emacs-directory))
-  (normal-top-level-add-subdirs-to-load-path))
+  ;; The following is not working for me :(
+  (let ((default-directory (concat user-emacs-directory
+				   (convert-standard-filename "lisp/"))))
+    (normal-top-level-add-subdirs-to-load-path))
+
+  ;; Workaround for now
+  (add-to-list 'load-path "/usr/local/google/home/shermanpay/.emacs.d/lisp")
 #+END_SRC
 
 *** User Info
@@ -55,7 +60,6 @@ personalized org file for startup.
 #+END_SRC
 
 ** Basic stuff
-
 *** Yes/No prompts
 Change yes or no prompts to y or n prompts
 #+BEGIN_SRC emacs-lisp
@@ -70,9 +74,15 @@ Uniquify buffer names with "post-forward" style:
 (setq uniquify-buffer-name-style 'post-forward)
 #+END_SRC
 
-*** Keybindings
+*** Window Management
+We remap "M-o" to other window, as this is such a commonly used function.
 #+BEGIN_SRC emacs-lisp
   (define-key global-map (kbd "M-o") 'other-window)
+#+END_SRC
+*** Buffer Management
+We remap "C-x C-b" to ibuffer as it is better then default.
+#+BEGIN_SRC emacs-lisp
+  (define-key global-map (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
 ** Editing text
 subword-mode: Allows navigation and editing of "subwords"
@@ -115,7 +125,6 @@ Setting Auto-Save directory and Backup Directory
 #+END_SRC
 
 ** User Interface
-
 *** Line and Column numbers
 Show line-numbers and column numbers in the mode-line but don't show
 line numbers on the sidej
@@ -142,7 +151,8 @@ Uses echo area to display tooltips and echo keystrokes
 
 Start emacs server
 #+BEGIN_SRC emacs-lisp
-  (server-start)
+ (if (display-graphic-p)
+  (server-start))
 #+END_SRC
 
 ** Package Management
@@ -152,6 +162,7 @@ Add melpa-stable repository, which has stable community packages.
 (require 'package)
 (add-to-list 'package-archives
       '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
 #+END_SRC
@@ -167,6 +178,7 @@ packages up to date.
 (eval-when-compile (require 'use-package))
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
+(setq use-package-always-pin "melpa-stable")
 #+END_SRC
 
 *** evil-mode
@@ -176,11 +188,13 @@ evil-move-cursor-back: don't want to move cursor back after exiting insert
 Add more distinguishable colors for evil states
 #+BEGIN_SRC emacs-lisp
   (use-package evil
-    :config (evil-mode 1)
-    (setq evil-move-cursor-back nil)
-    (setq evil-normal-state-cursor '("dim gray" box)
+	:init
+	(setq evil-want-keybinding nil)
+	:config (evil-mode 1)
+	(setq evil-move-cursor-back nil)
+	(setq evil-normal-state-cursor '("dim gray" box)
 	  evil-insert-state-cursor '("dim gray" bar)
-	  evil-emacs-state-cursor '("blue" bar)))
+	  evil-emacs-state-cursor '("light green" bar)))
 #+END_SRC
 
 ** Flyspell
@@ -201,6 +215,18 @@ Use chrome as the default browser. This assumes chrome is installed.
 The packages here are not /required/, but they each have their use case or
 provide a whole new experience.
 
+*** evil-collection
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-collection
+        :disabled
+	:config
+	(evil-collection-init))
+#+END_SRC
+*** evil-string-inflection
+This package provides the g~ operator to transform CamelCase words into snake_case.
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package evil-string-inflection :ensure t)
+#+END_SRC
 *** exec-path-from-shell
 To ensure that the Linux/OSX environment variables within emacs is the same as
 the shell. (Windows is not included)
@@ -285,7 +311,8 @@ I am experimenting with the [[https://sourcefoundry.org/hack/][Hack]] font at th
 set the font if it exists. Installation of the font is a manual step at the moment.
 
 #+BEGIN_SRC emacs-lisp
-  (set-frame-font (find-font (font-spec :name "Hack" :weight 'normal :slant 'normal)))
+  (set-frame-font (find-font (font-spec :name "Hack" :weight 'normal :slant 'normal)) nil t)
+  (set-frame-font (find-font (font-spec :name "Fira Code" :weight 'normal :slant 'normal)) nil t)
 #+END_SRC
 
 *** Themes
@@ -296,18 +323,19 @@ set the font if it exists. Installation of the font is a manual step at the mome
 #+END_SRC
 
 ** Python
-Configuration specific to python.
+   Configuration specific to python.
 *** Plugins
 Flycheck for linting and using mypy. This might need more configuration
 #+BEGIN_SRC emacs-lisp
-  (use-package flycheck-pycheckers
-    :config (with-eval-after-load 'flycheck
-	      (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)))
+  ;; (use-package flycheck-pycheckers
+  ;;   :config (with-eval-after-load 'flycheck
+  ;; 	    (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)))
 #+END_SRC
 
 company-jedi for autocomplete
 #+BEGIN_SRC emacs-lisp
   (use-package company-jedi
+    :disabled
     :requires company
     :config
     (setq jedi:environment-virtualenv (list (expand-file-name "~/.emacs.d/.python-environments/")))
@@ -317,4 +345,41 @@ company-jedi for autocomplete
     (defun config/enable-company-jedi ()
       (add-to-list 'company-backends 'company-jedi))
     (add-hook 'python-mode-hook 'config/enable-company-jedi))
+#+END_SRC
+
+** Clojure
+Configuration specific to Clojure
+*** Plugins
+cider is used to connect to a Clojure REPL
+#+BEGIN_SRC emacs-lispe
+  (use-package cider)
+#+END_SRC
+
+** eshell
+#+BEGIN_SRC emacs-lisp
+  (setq eshell-visual-subcommands '(("hg" "diff")
+				    ("git" "log")))
+#+END_SRC
+** VTerm
+#+BEGIN_SRC emacs-lisp
+  (use-package vterm :ensure t :pin melpa)
+#+END_SRC
+
+** xterm-color
+Translates ANSI control sequence to text-property
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package xterm-color
+  ;;   :config
+  ;;   (require 'eshell)
+  ;;   (add-hook 'eshell-before-prompt-hook
+  ;; 	    (lambda ()
+  ;; 	      (setq xterm-color-preserve-properties t)))
+
+  ;;   (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
+  ;;   (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions)))
+#+END_SRC
+
+** My Functions and Keybinding
+#+BEGIN_SRC emacs-lisp
+  (require 'my-stuff)
 #+END_SRC

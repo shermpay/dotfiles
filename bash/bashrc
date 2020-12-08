@@ -121,7 +121,17 @@ userps1="\e[44m\[\e[1;36m\]\\u\[\e[m\]"
 dirps1="\e[40m\[\e[2;37m\][\\w]\[\e[m\]"
 cmd='{$(ls --color=always -t -w 80 | head -n 10 | xargs echo)}'
 prompt="\\nλ *> "
-export PS1="${debian_chroot:+($debian_chroot)}"$userps1$dirps1$cmd$prompt
+case "$TERM" in
+  xterm*|rxvt*)
+    export PS1="${debian_chroot:+($debian_chroot)}"$userps1$dirps1$cmd$prompt
+    ;;
+  dumb)
+    export PS1="> "
+    ;;
+  *)
+    export PS1="> "
+    ;;
+esac
 
 # Commonly used directories
 export PJ=~/Dropbox/Projects
@@ -131,9 +141,9 @@ export DB=~/Dropbox
 export HW=~/Dropbox/uw
 
 # Env Variables
-export EDITOR="emacsclient -n -a vim"
+export EDITOR="emacsclient -c -a vi"
 export SUDO_EDITOR=$EDITOR
-export VISUAL=$EDITOR
+export VISUAL="emacsclient -c -a vi"
 
-source ~/.googlerc
+source ~/.dotfiles.google/bashrc
 

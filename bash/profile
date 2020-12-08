@@ -22,32 +22,9 @@ if [ -d "$HOME/bin" ] ; then
     PATH="$HOME/bin:$PATH"
 fi
 
-export UW_HOME="/home/shermpay/Dropbox/uw"
 
 # Environment Variabls
 # export JAVA_HOME='/usr/java/jdk1.8.0_25'
 # export JRE_HOME='/usr/lib/jdk1.8.0_25'
 
-export GOPATH=~/Code/Go
-export PATH=$GOROOT/bin:$PATH
-export PATH=$GOPATH/bin:$PATH
-
-# Go App Engine
-export PATH=$soft/go_appengine:$PATH
-
-export GROOVY_HOME=/home/shermpay/.gvm/groovy/current/bin/
-
 export LESS=' -R '
-
-# CLJS
-export CLOJURESCRIPT_HOME=/home/shermpay/Programming/OpenSource/Clojure/clojurescript
-PATH=$CLOJURESCRIPT_HOME/bin:$PATH
-
-# Haskel Cabal
-PATH=~/.cabal/bin:$PATH
-
-# defects4j
-export PATH=$PATH:/home/shermpay/Dropbox/uw/research/defects4j-refactoring/framework/bin
-
-#THIS MUST BE AT THE END OF THE FILE FOR GVM TO WORK!!!
-[[ -s "/home/shermpay/.gvm/bin/gvm-init.sh" ]] && source "/home/shermpay/.gvm/bin/gvm-init.sh"

@@ -2,8 +2,13 @@
 
 (defvar my-org-dir (concat user-emacs-directory "org"))
 
-(let ((default-directory user-emacs-directory))
+;; The following is not working for me :(
+(let ((default-directory (concat user-emacs-directory
+				 (convert-standard-filename "lisp/"))))
   (normal-top-level-add-subdirs-to-load-path))
+
+;; Workaround for now
+(add-to-list 'load-path "/usr/local/google/home/shermanpay/.emacs.d/lisp")
 
 (setq user-full-name "Jing Hao Sherman Pay"
       user-mail-address "shermanpay1991@gmail.com")
@@ -18,6 +23,8 @@
 (setq uniquify-buffer-name-style 'post-forward)
 
 (define-key global-map (kbd "M-o") 'other-window)
+
+(define-key global-map (kbd "C-x C-b") 'ibuffer)
 
 (global-subword-mode t)
 
@@ -48,11 +55,13 @@
 (tooltip-mode -1)
 (setq echo-keystrokes 0.01)
 
-(server-start)
+(if (display-graphic-p)
+ (server-start))
 
 (require 'package)
 (add-to-list 'package-archives
       '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
@@ -61,18 +70,28 @@
 (eval-when-compile (require 'use-package))
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
+(setq use-package-always-pin "melpa-stable")
 
 (use-package evil
-  :config (evil-mode 1)
-  (setq evil-move-cursor-back nil)
-  (setq evil-normal-state-cursor '("dim gray" box)
+      :init
+      (setq evil-want-keybinding nil)
+      :config (evil-mode 1)
+      (setq evil-move-cursor-back nil)
+      (setq evil-normal-state-cursor '("dim gray" box)
 	evil-insert-state-cursor '("dim gray" bar)
-	evil-emacs-state-cursor '("blue" bar)))
+	evil-emacs-state-cursor '("light green" bar)))
 
 (add-hook 'prog-mode-hook (lambda () (flyspell-prog-mode)))
 
 (setq browse-url-generic-program "/usr/bin/google-chrome"
       browse-url-browser-function 'browse-url-generic)
+
+(use-package evil-collection
+      :disabled
+      :config
+      (evil-collection-init))
+
+;; (use-package evil-string-inflection :ensure t)
 
 (use-package exec-path-from-shell
   :config
@@ -117,16 +136,18 @@
 (use-package protobuf-mode
   :mode "\\.proto")
 
-(set-frame-font (find-font (font-spec :name "Hack" :weight 'normal :slant 'normal)))
+(set-frame-font (find-font (font-spec :name "Hack" :weight 'normal :slant 'normal)) nil t)
+(set-frame-font (find-font (font-spec :name "Fira Code" :weight 'normal :slant 'normal)) nil t)
 
 (use-package moe-theme)
 (moe-dark)
 
-(use-package flycheck-pycheckers
-  :config (with-eval-after-load 'flycheck
-	    (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)))
+;; (use-package flycheck-pycheckers
+;;   :config (with-eval-after-load 'flycheck
+;; 	    (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)))
 
 (use-package company-jedi
+  :disabled
   :requires company
   :config
   (setq jedi:environment-virtualenv (list (expand-file-name "~/.emacs.d/.python-environments/")))
@@ -136,3 +157,20 @@
   (defun config/enable-company-jedi ()
     (add-to-list 'company-backends 'company-jedi))
   (add-hook 'python-mode-hook 'config/enable-company-jedi))
+
+(setq eshell-visual-subcommands '(("hg" "diff")
+				  ("git" "log")))
+
+(use-package vterm :ensure t :pin melpa)
+
+;; (use-package xterm-color
+;;   :config
+;;   (require 'eshell)
+;;   (add-hook 'eshell-before-prompt-hook
+;; 	    (lambda ()
+;; 	      (setq xterm-color-preserve-properties t)))
+
+;;   (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
+;;   (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions)))
+
+(require 'my-stuff)

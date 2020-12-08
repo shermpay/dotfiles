@@ -9,7 +9,8 @@ import argparse
 import subprocess
 
 # Arguments that will always be invoked
-default_args = ["--alternate-editor=vim", "--no-wait"]
+# default_args = ["--alternate-editor=vim", "--no-wait"]
+default_args = ["--alternate-editor=vim"]
 # Final command to be invoked
 cmd = ["emacsclient"] + default_args
 

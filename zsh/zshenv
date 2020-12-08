@@ -16,8 +16,8 @@ fi
 
 export PATH MANPATH
 
-export EDITOR=vim
-export VISUAL="emacsclient -a vim"
+export EDITOR=vi
+export VISUAL="emacsclient -c -a vi"
 # export PYTHONSTARTUP=~/.pythonrc
 export PAGER=less
 export LESS=R
@@ -34,3 +34,6 @@ export GTAGSFORCECPP=1
 export DIFF="/usr/bin/diff -u"
 
 # source "$HOME/.googlerc"
+
+# Fix for TRAMP
+[ $TERM = "dumb" ] && unsetopt zle && PS1='$ '
