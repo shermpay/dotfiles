@@ -83,7 +83,7 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
   local userps1="(${host})"
   local wd_prompt="[%3~]"
   local dirps1="%{$fg[cyan]%}${wd_prompt}%{$reset_color%}"
-  local timestampps1="%{$fg[blue]%}<$(date '+%F %T')>%{$reset_color%}"
+  local timestampps1="%{$fg[blue]%}<%D{%y-%m-%d %H:%M:%S}>%{$reset_color%}"
   local main_prompt="$ "
 
   PROMPT="${userps1}${dirps1}${timestampps1}${newline}${main_prompt}"
