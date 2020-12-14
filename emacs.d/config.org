@@ -348,13 +348,6 @@ Protocol Buffers are awesome.
 	#+end_src
 ** Fancier UI
 Having a UI that looks good, makes me more productive.
-*** Font
-I am experimenting with the [[https://sourcefoundry.org/hack/][Hack]] font at the moment. The following will try to
-set the font if it exists. Installation of the font is a manual step at the moment.
-
-#+BEGIN_SRC emacs-lisp
-  (set-frame-font (find-font (font-spec :name "Hack" :weight 'normal :slant 'normal)) nil t)
-#+END_SRC
 
 *** Themes
 [[https://github.com/kuanyui/moe-theme.el][moe-theme]]: Many awesome customizable features. [[https://raw.githubusercontent.com/kuanyui/moe-theme.el/master/pics/dark01.png][dark]], [[https://raw.githubusercontent.com/kuanyui/moe-theme.el/master/pics/light01.png][light]]
@@ -470,6 +463,16 @@ The following are org-mode plugins.
 
 	#+end_src
 
+** Local Config
+   Load a local configuration file if it exists. This configuration file should also contain ~custom-set-variables~.
+   #+begin_src emacs-lisp
+	 (defvar my-local-init-file (concat user-emacs-directory "init.local.el") "Local init.el file for per instance configuration.")
+	 (setq custom-file my-local-init-file)
+
+	 (if (file-exists-p my-local-init-file)
+		 (load my-local-init-file)
+	   (write-region "" nil my-local-init-file t))
+   #+end_src
 ** Programming Languages
 *** C
 **** google-c-style
@@ -537,4 +540,3 @@ The following are org-mode plugins.
 	   :config (setq vterm-buffer-name-string "vterm [%s]")
 	   :hook (vterm-mode . (lambda () (goto-address-mode 1))))
    #+END_SRC
-   
