@@ -204,12 +204,13 @@ packages up to date.
 #+END_SRC
 #+BEGIN_SRC emacs-lisp
   (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
+	(package-refresh-contents)
+	(package-install 'use-package))
   (eval-when-compile (require 'use-package))
   (require 'use-package-ensure)
   (setq use-package-always-ensure t)
   (setq use-package-always-pin "melpa-stable")
+  (setq use-package-verbose nil)			; set to t for debugging init
 #+END_SRC
 
 *** auto-package-update
@@ -225,9 +226,7 @@ Automatically update packages.
     (auto-package-update-maybe))
 #+END_SRC
 ** Packages
-   The packages here are not /required/, but they each have their use case or
-   provide a whole new experience.
-
+   Core packages that is needed for 99% of use cases.
 *** evil-mode
 I use evil-mode for Vim emulation
 
@@ -241,27 +240,6 @@ Add more distinguishable colors for evil states
 	  evil-insert-state-cursor '("dim gray" bar)
 	  evil-emacs-state-cursor '("green" bar)))
 #+END_SRC
-
-*** xterm-color
-Give xterm-256 colors to shells in Emacs.
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package xterm-color)
-#+END_SRC
-
-*** eshell
-Builtin package. The Emacs Shell
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package eshell
-  ;;   :after (xterm-color)
-  ;;   :config
-  ;;   (add-hook 'eshell-before-prompt-hook (lambda () (setq xterm-color-preserve-properties t)))
-  ;;   (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
-  ;;   (setq eshell-output-filter-functions
-  ;; 	(remove 'eshell-handle-ansi-color eshell-output-filter-functions)))
-#+END_SRC
-
 *** exec-path-from-shell
 To ensure that the Linux/OSX environment variables within emacs is the same as
 the shell. (Windows is not included)
@@ -301,19 +279,29 @@ This makes undo/redo in emacs behave like a tree!
     :config (global-undo-tree-mode 1))
 #+END_SRC
 
-*** Company mode
-[[https://company-mode.github.io/][company-mode]] is an autocomplete framework for Emacs. And it can work with
-various backends.
-#+BEGIN_SRC emacs-lisp
-  (use-package company
-    :diminish (company-mode . "")
-    :config (global-company-mode))
-#+END_SRC
 *** Magit mode
 [[https://magit.vc/][magit]] is an emacs interface to git
 #+BEGIN_SRC emacs-lisp
   (use-package magit
 	:pin melpa)
+#+END_SRC
+
+** Optional Packages
+   The packages here are not /required/, but they each have their use case or
+   provide a whole new experience.
+*** Company mode
+[[https://company-mode.github.io/][company-mode]] is an autocomplete framework for Emacs. And it can work with
+various backends.
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+	:diminish (company-mode . "")
+	:config
+	(global-company-mode)
+	(setq company-tooltip-limit 20)                       ; bigger popup window
+	(setq company-idle-delay .3)                          ; decrease delay before autocompletion popup shows
+	(setq company-echo-delay 0)                           ; remove annoying blinking
+	;; start autocompletion only after typing
+	(setq company-begin-commands '(self-insert-command)))
 #+END_SRC
 *** Flycheck
 #+BEGIN_SRC emacs-lisp
@@ -474,58 +462,34 @@ The following are org-mode plugins.
 	   (write-region "" nil my-local-init-file t))
    #+end_src
 ** Programming Languages
-*** C
+*** C/C++
 **** google-c-style
 	 #+BEGIN_SRC emacs-lisp
-   (use-package google-c-style
-     :pin melpa)
+	   (use-package google-c-style
+		 :pin melpa
+		 :hook
+		 ((c-mode c++-mode) . google-set-c-style)
+		 (c-mode-common . google-make-newline-indent))
 	 #+END_SRC
 *** Python
 	Configuration specific to python.
 **** Plugins
 	 Flycheck for linting and using mypy. This might need more configuration
 	 #+BEGIN_SRC emacs-lisp
-   (use-package flycheck-pycheckers
-     :config (with-eval-after-load 'flycheck
-	       (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)))
-	 #+END_SRC
-
-	 company-jedi for autocomplete
-	 #+BEGIN_SRC emacs-lisp
-   (use-package company-jedi
-     :requires company
-     :config
-     (setq jedi:environment-virtualenv (list (expand-file-name "~/.emacs.d/.python-environments/")))
-     (add-hook 'python-mode-hook 'jedi:setup)
-     (setq jedi:complete-on-dot t)
-     (setq jedi:use-shortcuts t)
-     (defun config/enable-company-jedi ()
-       (add-to-list 'company-backends 'company-jedi))
-     (add-hook 'python-mode-hook 'config/enable-company-jedi))
+	   (use-package flycheck-pycheckers
+		 :mode ("\\.py\\'" . python-mode)
+		 :interpreter ("python" . python-mode)
+		 :hook (flycheck-mode . flycheck-pycheckers-setup))
 	 #+END_SRC
 
 *** Go
 	#+begin_src emacs-lisp
-	  (use-package go-mode)
+	  (defun add-hook-gofmt-before-save ()
+		(add-hook 'before-save-hook 'gofmt-before-save nil t))
+	  (use-package go-mode
+		:mode ("\\.go\\'" . go-mode)
+		:hook (go-mode . add-hook-gofmt-before-save))
 	#+end_src
-	#+BEGIN_SRC emacs-lisp
-   (defun add-hook-gofmt-before-save ()
-	 (add-hook 'before-save-hook 'gofmt-before-save nil t))
-   (add-hook 'go-mode-hook 'add-hook-gofmt-before-save)
-	#+END_SRC
-	#+BEGIN_SRC emacs-lisp
-	  (use-package company-go
-		:config
-		(setq company-tooltip-limit 20)                       ; bigger popup window
-		(setq company-idle-delay .3)                          ; decrease delay before autocompletion popup shows
-		(setq company-echo-delay 0)                           ; remove annoying blinking
-		(setq company-begin-commands '(self-insert-command))) ; start autocompletion only after typing
-	#+END_SRC
-	#+BEGIN_SRC emacs-lisp
-	  (add-hook 'go-mode-hook (lambda ()
-								(set (make-local-variable 'company-backends) '(company-go))
-								(company-mode)))
-	#+END_SRC
 *** Lisp
 	#+BEGIN_SRC emacs-lisp
 	  (use-package paredit
