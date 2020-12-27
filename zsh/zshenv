@@ -33,8 +33,8 @@ export MAILDIR=$HOME"/.mail"
 export GTAGSFORCECPP=1
 
 # For Go
-gopath="$HOME/go"
-path=("$gopath/bin" "$path[@]")
+export GOPATH="$HOME/go"
+path=("$GOPATH/bin" "$path[@]")
 
 # For antlr
 # export CLASSPATH=".:/usr/local/lib/antlr-4.7.1-complete.jar:$CLASSPATH"

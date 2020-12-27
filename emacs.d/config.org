@@ -209,7 +209,7 @@ packages up to date.
   (eval-when-compile (require 'use-package))
   (require 'use-package-ensure)
   (setq use-package-always-ensure t)
-  (setq use-package-always-pin "melpa-stable")
+  (setq use-package-always-pin "melpa")
   (setq use-package-verbose nil)			; set to t for debugging init
 #+END_SRC
 
@@ -302,12 +302,6 @@ various backends.
 	(setq company-echo-delay 0)                           ; remove annoying blinking
 	;; start autocompletion only after typing
 	(setq company-begin-commands '(self-insert-command)))
-#+END_SRC
-*** Flycheck
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :config (global-flycheck-mode))
-
 #+END_SRC
 *** Protocol Buffers
 Protocol Buffers are awesome.
@@ -473,15 +467,6 @@ The following are org-mode plugins.
 	 #+END_SRC
 *** Python
 	Configuration specific to python.
-**** Plugins
-	 Flycheck for linting and using mypy. This might need more configuration
-	 #+BEGIN_SRC emacs-lisp
-	   (use-package flycheck-pycheckers
-		 :mode ("\\.py\\'" . python-mode)
-		 :interpreter ("python" . python-mode)
-		 :hook (flycheck-mode . flycheck-pycheckers-setup))
-	 #+END_SRC
-
 *** Go
 	#+begin_src emacs-lisp
 	  (defun add-hook-gofmt-before-save ()
