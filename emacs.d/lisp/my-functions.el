@@ -257,6 +257,12 @@ prefix arguments, write out the day and month name."
           t))
     nil))
 
+(defun my-json-to-csv (json)
+  (let* ((tbl-json (json-read-file "/tmp/table.json"))
+		 (tbl-lst (map 'list (lambda (row-alist) (list (alist-get 'date row-alist) (alist-get 'count row-alist))) tbl-json))
+		 (csv-lst (mapcar (lambda (row) (string-join row ",")) tbl-lst)))
+	(string-join csv-lst "\n")))
+
 (provide 'my-functions)
 
 ;;; Info lookups

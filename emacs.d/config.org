@@ -28,10 +28,9 @@ Require builtin libraries here.
 My user defined variables. I prefix all my variables with "my" to ensure there
 are no name collisions with other other modes variables.
 #+BEGIN_SRC emacs-lisp
-  (defvar my-gdrive-dir (getenv "MY_DRIVE"))
   (defun my-gdrive-or-emacs-dir ()
-	(if my-gdrive-dir
-		my-gdrive-dir
+	(if (getenv "MY_DRIVE")
+		(getenv "MY_DRIVE")
 	  user-emacs-directory))
 #+END_SRC 
 
@@ -49,6 +48,21 @@ Explicitly set these.
       user-mail-address "shermanpay1991@gmail.com")
 #+END_SRC
 
+** Bootstrap
+   Bootstrapping my Emacs.
+   #+begin_src emacs-lisp
+	 (defun my-file-decrypt->string (filename)
+	   "Decrypt GPG encrypted file FILENAME and return the decrypted string."
+	   (let ((decrypted-file (concat "/tmp/" (file-name-base filename))))
+		 (if filename
+			 (progn
+			   (epa-decrypt-file filename decrypted-file)
+			   (with-temp-buffer
+				 (insert-file-contents-literally decrypted-file)
+				 (delete-file decrypted-file)
+				 (buffer-substring-no-properties (point-min) (point-max))))
+		   (message "WARNING '%s' is not readable" filename))))
+   #+end_src
 ** Startup
 Right now I open a basic "todo.org" file at startup. Consider creating a
 personalized org file for startup.
@@ -150,9 +164,13 @@ Uses echo area to display tooltips and echo keystrokes
   (define-key global-map (kbd "C-c i") 'imenu)
 
 #+END_SRC
-** Buffer Mangement
+** Buffer/Window Mangement
 #+BEGIN_SRC emacs-lisp
   (define-key global-map (kbd "C-x C-b") 'ibuffer)
+  (setq ibuffer-expert t)
+  (setq ibuffer-show-empty-filter-groups nil)
+  (add-hook 'ibuffer-mode-hook '(lambda () (ibuffer-auto-mode 1)))
+  (setq split-height-threshold 120)
 #+END_SRC
 ** Emacs Server
 
@@ -166,6 +184,14 @@ Start emacs server
    #+begin_src emacs-lisp
 	 (desktop-save-mode 1)
 	 (add-to-list 'desktop-path "~/.emacs.d/desktops")
+   #+end_src
+** Flymake
+   flymake is the builtin static checker. 
+   #+begin_src emacs-lisp
+    (define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
+    (define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
+    (setq help-at-pt-timer 0.9)
+    (setq help-at-pt-display-when-idle '(flymake-overlay))
    #+end_src
 ** Flyspell
 
@@ -234,30 +260,44 @@ evil-move-cursor-back: don't want to move cursor back after exiting insert
 Add more distinguishable colors for evil states
 #+BEGIN_SRC emacs-lisp
   (use-package evil
-    :config (evil-mode 1)
-    (setq evil-move-cursor-back nil)
-    (setq evil-normal-state-cursor '("dim gray" box)
-	  evil-insert-state-cursor '("dim gray" bar)
-	  evil-emacs-state-cursor '("green" bar)))
+	:init
+	(setq evil-want-keybinding nil)		; For evil-collection
+	:config
+	(evil-mode 1)
+	(setq evil-move-cursor-back nil)
+	(setq evil-normal-state-cursor '("dim gray" box)
+		  evil-insert-state-cursor '("dim gray" bar)
+		  evil-emacs-state-cursor '("green" bar))
+	(evil-set-undo-system 'undo-tree))
 #+END_SRC
+
+**** evil-collection
+	 #+begin_src emacs-lisp
+	   (use-package evil-collection
+		 :after evil
+		 :config
+		 (evil-collection-init))
+	 #+end_src
 *** exec-path-from-shell
 To ensure that the Linux/OSX environment variables within emacs is the same as
 the shell. (Windows is not included)
 #+BEGIN_SRC emacs-lisp
   (use-package exec-path-from-shell
-    :config
-    (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize)))
+	:config
+	(add-to-list 'exec-path-from-shell-variables "MY_DRIVE")
+	(when (memq window-system '(mac ns x))
+	  (exec-path-from-shell-initialize)))
 #+END_SRC
 *** Ivy/Counsel
 Much more lightweight and faster then Helm, but with the same core functionality
 #+BEGIN_SRC emacs-lisp
-  (use-package counsel
-    :diminish (ivy-mode "")
-    :config
-    (ivy-mode 1)
-    (counsel-mode 1)
-    (setq projectile-completion-system 'ivy))
+	(use-package counsel
+	  :diminish (ivy-mode "")
+	  :config
+	  (ivy-mode 1)
+	  (counsel-mode 1)
+	  (setq projectile-completion-system 'ivy)
+	  (define-key  global-map (kbd "C-c s") 'swiper-isearch))
 
 #+END_SRC
 
@@ -265,10 +305,10 @@ Much more lightweight and faster then Helm, but with the same core functionality
 Package for working with "projects"
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
-    :diminish (projectile-mode . "")
-    :config (projectile-global-mode 1)
-    :bind-keymap
-    ("C-c p" . projectile-command-map))
+	:diminish (projectile-mode . "")
+	:config (projectile-global-mode 1)
+	:bind-keymap
+	("C-c p" . projectile-command-map))
 #+END_SRC
 
 *** Undo tree mode
@@ -285,7 +325,6 @@ This makes undo/redo in emacs behave like a tree!
   (use-package magit
 	:pin melpa)
 #+END_SRC
-
 ** Optional Packages
    The packages here are not /required/, but they each have their use case or
    provide a whole new experience.
@@ -328,6 +367,15 @@ Protocol Buffers are awesome.
 		:config (add-to-list 'eglot-stay-out-of 'imenu))
 
 	#+end_src
+** Experimental Packages
+   The packages here are /experimental/, and should be reviewed if unused.
+   #+begin_src emacs-lisp
+	 (use-package md4rd
+	   :defer
+	   :config
+	   (setq md4rd--oauth-access-token (my-file-decrypt->string (concat user-emacs-directory "md4rd-oauth-access-token.gpg"))
+			 md4rd--oauth-refresh-token (my-file-decrypt->string (concat user-emacs-directory "md4rd-oauth-refresh-token.gpg"))))
+   #+end_src
 ** Fancier UI
 Having a UI that looks good, makes me more productive.
 
@@ -350,6 +398,7 @@ The following are builtin configurations. The keybindings are as recommended by 
 *** Variables
 	#+begin_src emacs-lisp
 	  (setq org-directory (concat (my-gdrive-or-emacs-dir) "/org/"))
+	  (setq org-agenda-files (list org-directory))
 	  (setq org-default-notes-file (concat org-directory "notes.org"))
 	  (defconst my-org-todo-file (concat org-directory "todo.org"))
 	#+end_src
@@ -370,7 +419,7 @@ The following are org-mode plugins.
 		  '(
 			org-tempo
 			org-capture
-			protocol
+			org-protocol
 			;; org-habit
 			;; org-id
 			;; org-brain
@@ -387,24 +436,53 @@ The following are org-mode plugins.
 	   '((emacs-lisp t)
 		 (dot . t)))
 	#+end_src
-*** Capture
-	#+BEGIN_SRC emacs-lisp
-	  (setq org-capture-templates '(
-		  ("p" "Protocol" entry (file+headline org-default-notes-file "Inbox")
-			  "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-		  ("L" "Protocol Link" entry (file+headline org-default-notes-file "Inbox")
-			  "* %? [[%:link][%:description]] \nCaptured On: %U")
-		  ("t" "Action Item" entry (file+headline my-org-todo-file "Backlog") "* TODO %U %a\n%i\n%?")
-		  ("T" "Action Item" entry (file+headline my-org-todo-file "Backlog") "* TODO %U %^{title|chat AI|mail AI}\n%i\n%?")
-		  ("b" "bug" entry (file "~/bugs.org")
-		   "* TODO %(org-buganizer-create-todo-string-from-bug)"
-		   :clock-in t :clock-resume t)))
-	#+END_SRC
-*** org-protocol
-	#+begin_src javascript
-	  javascript:location.href='org-protocol://capture://t/'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection())
-	  javascript:location.href='org-protocol://capture://T/'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection())
+*** Clocking
+	#+begin_src emacs-lisp
+	  (setq org-clock-persist 'history)
+	  (org-clock-persistence-insinuate)
 	#+end_src
+*** Notifications
+	#+begin_src emacs-lisp
+	  (appt-activate)				; Builtin appt package for notifications
+	  (setq appt-message-warning-time 12)
+
+	  ;; The following runs periodically in the foreground
+	  (use-package org-notifications
+		:disabled
+		:pin melpa
+		:config
+		(org-notifications-start))
+	#+end_src
+*** org-roam
+	#+begin_src emacs-lisp
+	  (use-package org-roam
+		:disabled
+		:ensure t
+		:hook
+		(after-init . org-roam-mode)
+		:custom
+		(org-roam-directory org-directory)
+		:bind (:map org-roam-mode-map
+					(("C-c n l" . org-roam)
+					 ("C-c n f" . org-roam-find-file)
+					 ("C-c n g" . org-roam-graph))
+					:map org-mode-map
+					(("C-c n i" . org-roam-insert))
+					(("C-c n I" . org-roam-insert-immediate))))
+	#+end_src
+*** Local Config
+	#+begin_src emacs-lisp
+	  (defun my-load-org-config ()
+		"Load Emacs Lisp source code in (concat org-directory \"conf.org\")."
+		(interactive)
+		(let ((org-config-file (concat org-directory "conf.org"))
+			  (tangled-file (concat org-directory "conf.el")))
+		  (if (file-exists-p org-config-file)
+			  (org-babel-load-file org-config-file))))
+
+	  (my-load-org-config)
+	#+end_src
+	
 *** Misc
 	#+begin_src emacs-lisp
 	  (defun my-save-org-archive-file ()
@@ -444,7 +522,7 @@ The following are org-mode plugins.
 		 "\n"))
 
 	#+end_src
-
+	
 ** Local Config
    Load a local configuration file if it exists. This configuration file should also contain ~custom-set-variables~.
    #+begin_src emacs-lisp
@@ -473,19 +551,88 @@ The following are org-mode plugins.
 		(add-hook 'before-save-hook 'gofmt-before-save nil t))
 	  (use-package go-mode
 		:mode ("\\.go\\'" . go-mode)
-		:hook (go-mode . add-hook-gofmt-before-save))
+		:hook (go-mode . add-hook-gofmt-before-save)
+		:config (add-to-list 'load-path (concat (getenv "GOPATH")  "/src/golang.org/x/lint/misc/emacs/")))
 	#+end_src
 *** Lisp
 	#+BEGIN_SRC emacs-lisp
 	  (use-package paredit
+		:disabled
 		:commands (enable-paredit-mode)
 		:init
-		(add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode))
+		(add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
+		(add-hook 'clojure-mode-hook #'enable-paredit-mode))
+
+	  (use-package lispy
+		:pin melpa
+		:init
+		(add-hook 'emacs-lisp-mode-hook #'lispy-mode)
+		(add-hook 'lisp-mode-hook #'lispy-mode)
+		(add-hook 'clojure-mode-hook #'lispy-mode)
+		:config
+		(lispy-set-key-theme '(paredit))
+		(define-key lispy-mode-map-paredit (kbd "M-o") nil))
+
+
+	  (use-package lispyville
+		:pin melpa
+		:init
+		(add-hook 'lispy-mode-hook #'lispyville-mode)
+		:config
+		(lispyville-set-key-theme
+		 '(operators
+		   c-w
+		   wrap
+		   slurp/barf-lispy
+		   additional
+		   additional-motions)))
+
+
 	#+END_SRC
 ** vterm
    #+BEGIN_SRC emacs-lisp
 	 (use-package vterm
 	   :pin "melpa"
-	   :config (setq vterm-buffer-name-string "vterm [%s]")
+	   :config
+	   (setq vterm-buffer-name-string "vterm [%s]")
+	   (define-key global-map (kbd "C-c v") #'vterm)
+	   (defun my-vterm-list-buffers ()
+		 (seq-filter (lambda (buffer) (with-current-buffer buffer (equal major-mode 'vterm-mode))) (buffer-list)))
+	   (defun my-vterm-kill-process (process event)
+		 "A process sentinel. Kills PROCESS's buffer if it is live."
+		 (let ((b (process-buffer process)))
+		   (and (buffer-live-p b)
+				(kill-buffer b))))
+	   (defun my-vterm-run (command &optional buffer)
+		 "Execute string COMMAND in BUFFER creating a new buffer if it does not exist.
+
+	 Interactively, prompt for COMMAND with the current buffer's file
+	 name supplied. When called from Dired, supply the name of the
+	 file at point.
+
+	 Like `async-shell-command`, but run in a vterm for full terminal features.
+
+	 When the command terminates, the shell remains open, but when the
+	 shell exits, the buffer is killed."
+		 (let* ((vterm-buffers (mapcar #'buffer-name (my-vterm-list-buffers))))
+		   (interactive
+			(let* ((command (read-shell-command "command: ")))
+			  (list command 
+					(completing-read "buffer: " (cons (concat "*" command "*") vterm-buffers)))))
+		   (let* ((new-vterm (null (member buffer vterm-buffers))))
+			 (with-current-buffer (if new-vterm (vterm buffer) buffer) 
+			   (when new-vterm (set-process-sentinel vterm--process #'my-vterm-kill-process))
+			   (vterm-send-string command)
+			   (vterm-send-return)
+			   (pop-to-buffer (current-buffer))))))
 	   :hook (vterm-mode . (lambda () (goto-address-mode 1))))
    #+END_SRC
+
+* Functions
+  #+begin_src emacs-lisp
+	(use-package my-functions
+	  :disabled)
+  #+end_src
+* TODO Improvements
+** TODO Need function for yank or paste into a single line
+   For example given a multi line string, I want to copy and and paste it as a single line.

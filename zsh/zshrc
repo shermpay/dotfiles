@@ -1,3 +1,14 @@
+# load shell libraries
+export INCLUDEDIR="$HOME/.local/include"
+mkdir -p "$INCLUDEDIR"
+setopt +o nomatch
+for i in "$HOME"/.local/include/*;
+do
+  source "$i"
+done
+echo "loaded libraries"
+setopt -o nomatch
+
 # The following lines were added by compinstall
 
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
