@@ -109,6 +109,7 @@ save-place-mode: Save previous editing location and always go back to it
   (setq next-line-add-newlines nil)
 
   (save-place-mode 1)
+  (setq save-place-forget-unreadable-files nil) ; make emacs quit work
 
   (setq-default tab-width 4)
 #+END_SRC
@@ -176,7 +177,8 @@ Uses echo area to display tooltips and echo keystrokes
 
 Start emacs server
 #+BEGIN_SRC emacs-lisp
-  (server-start)
+  (with-eval-after-load "server"
+	  (unless (server-running-p) (server-start)))
 #+END_SRC
 
 ** Emacs Desktops
@@ -188,10 +190,11 @@ Start emacs server
 ** Flymake
    flymake is the builtin static checker. 
    #+begin_src emacs-lisp
-    (define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
-    (define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
-    (setq help-at-pt-timer 0.9)
-    (setq help-at-pt-display-when-idle '(flymake-overlay))
+	 (with-eval-after-load "flymake"
+			   (define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
+			   (define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error))
+	 (setq help-at-pt-timer 0.9)
+	 (setq help-at-pt-display-when-idle '(flymake-overlay))
    #+end_src
 ** Flyspell
 
@@ -350,8 +353,9 @@ Protocol Buffers are awesome.
 #+END_SRC
 *** Bazel/Blaze
 #+BEGIN_SRC emacs-lisp
-  (use-package bazel-mode
-    :mode "BUILD")
+	(use-package bazel
+	  :pin melpa
+	  :mode "BUILD")
 #+END_SRC
 *** imenu list
 	#+BEGIN_SRC emacs-lisp
@@ -382,8 +386,9 @@ Having a UI that looks good, makes me more productive.
 *** Themes
 [[https://github.com/kuanyui/moe-theme.el][moe-theme]]: Many awesome customizable features. [[https://raw.githubusercontent.com/kuanyui/moe-theme.el/master/pics/dark01.png][dark]], [[https://raw.githubusercontent.com/kuanyui/moe-theme.el/master/pics/light01.png][light]]
 #+BEGIN_SRC emacs-lisp
-  (use-package moe-theme
-	:config (moe-dark))
+	(use-package moe-theme
+		:pin melpa
+		:config (moe-dark))
 #+END_SRC
 
 ** Org Mode
@@ -397,6 +402,7 @@ The following are builtin configurations. The keybindings are as recommended by 
 #+END_SRC
 *** Variables
 	#+begin_src emacs-lisp
+	  (require 'org)
 	  (setq org-directory (concat (my-gdrive-or-emacs-dir) "/org/"))
 	  (setq org-agenda-files (list org-directory))
 	  (setq org-default-notes-file (concat org-directory "notes.org"))
@@ -407,7 +413,7 @@ The following are builtin configurations. The keybindings are as recommended by 
 	#+begin_src emacs-lisp
 	  (defun my-org-mode-config-minor-modes ()
 		;; disable
-		(flycheck-mode -1)
+		(eval-after-load "flycheck" (flycheck-mode -1))
 		;; enable
 		(visual-line-mode))
 	  (add-hook 'org-mode-hook #'my-org-mode-config-minor-modes)
@@ -415,17 +421,17 @@ The following are builtin configurations. The keybindings are as recommended by 
 *** Plugins/Modules
 The following are org-mode plugins.
 #+BEGIN_SRC emacs-lisp
-  (nconc org-modules
-		  '(
-			org-tempo
-			org-capture
-			org-protocol
-			;; org-habit
-			;; org-id
-			;; org-brain
-			))
-  (eval-after-load 'org
-	  '(org-load-modules-maybe t))
+  (with-eval-after-load "org"
+	(nconc org-modules
+		   '(
+			 org-tempo
+			 org-capture
+			 org-protocol
+			 ;; org-habit
+			 ;; org-id
+			 ;; org-brain
+			 ))
+	'(org-load-modules-maybe t))
   (use-package org-bullets
 	:hook (org-mode . (lambda () (org-bullets-mode 1))))
 #+END_SRC
