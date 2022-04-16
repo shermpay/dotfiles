@@ -1,12 +1,11 @@
 # load shell libraries
-export INCLUDEDIR="$HOME/.local/include"
 mkdir -p "$INCLUDEDIR"
 setopt +o nomatch
 for i in "$HOME"/.local/include/*;
 do
   source "$i"
 done
-echo "loaded libraries"
+echo ".zshrc: loaded libraries"
 setopt -o nomatch
 
 # The following lines were added by compinstall
@@ -114,6 +113,7 @@ if [[ "$INSIDE_EMACS" = 'vterm' ]] \
     && [[ -n ${EMACS_VTERM_PATH} ]] \
     && [[ -f ${EMACS_VTERM_PATH}/etc/emacs-vterm-zsh.sh ]]; then
 	source ${EMACS_VTERM_PATH}/etc/emacs-vterm-zsh.sh
+    source "${INCLUDEDIR}/vterm.sh"
 fi
 
 autoload -Uz add-zsh-addhook
