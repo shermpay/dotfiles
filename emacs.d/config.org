@@ -6,12 +6,7 @@
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://thomasf.github.io/solarized-css/solarized-light.min.css" />
 
 * Overview
-I am currently in the process of cleaning up my Emacs config. I started using
-Emacs before [[https://github.com/jwiegley/use-package][use-package]] was really a thing, so I had many packages installed
-and had dependencies to the packages all over the place. This made bootstrapping
-a new machine with Emacs really difficult. As such the goal of my current config
-is to be as simple as possible and have the flexilibility to enable packages and
-configurations for specific use cases.
+  Complete configuration for emacs. For machine specific configuration I defer to =~/.emacs.d/init.local.el= file.
 
 * Configuration
 
@@ -178,6 +173,10 @@ Uses echo area to display tooltips and echo keystrokes
   (setq split-height-threshold 120)
   (setq help-window-select t)
 #+END_SRC
+** Dired
+   #+begin_src emacs-lisp
+	 (setq dired-listing-switches "-alh")
+   #+end_src
 ** Emacs Server
 
 Start emacs server
@@ -341,6 +340,18 @@ This makes undo/redo in emacs behave like a tree!
   (use-package magit
 	:pin melpa)
 #+END_SRC
+*** Navigation
+	#+begin_src emacs-lisp
+	  (use-package avy
+		:config
+		(avy-setup-default))
+	#+end_src
+	#+begin_src emacs-lisp
+	  (use-package ace-window
+		:config
+		(global-set-key (kbd "M-o") 'ace-window)
+		(setq aw-scope 'frame))
+	#+end_src
 ** Optional Packages
    The packages here are not /required/, but they each have their use case or
    provide a whole new experience.
@@ -528,21 +539,34 @@ The following are org-mode plugins.
 		  (setq org-roam-capture-templates
 				'(("d" "default" plain "%?" :target
 				   (file+head "notes/%<%Y%m%d%H%M>-${slug}.org" "#+title: ${title}
+		,#+filetags: %^G
 		")
-				   :unnarrowed t)
+				   :unnarrowed t
+				   :kill-buffer)
 				  ("r" "recurring" entry "* %u %?" :target
-				   (file+head "notes/${slug}.org" "#+title: ${title}
-		")
+				   (file+head "notes/${slug}.org" "#+title: ${title} ")
+
 				   :unnarrowed t)
 				  ("p" "project" plain "%?" :target
 				   (file+head "projects/${slug}.org" "#+title: ${title}
+		,#+filetags: %^G
 		")
 				   :unnarrowed t)))
 		  (setq org-roam-capture-ref-templates
 				'(("r" "ref" plain "%?" :target
 				   (file+head "notes/%<%Y%m%d%H%M>-${slug}.org" "#+title: ${title}
+		,#+filetags: %^G
 		")
-				   :unnarrowed t)))
+				   :unnarrowed t)
+				  ("t" "agenda item" entry "* %^{State?|TODO|WORKING|BACKLOGGED} %u ${title}
+		%?" :target
+		(file+head "agenda/%<%Y%m%d%H%M>-${slug}.org" "#+title: ${title}
+		,#+filetags: %^G
+		")
+
+
+		:unnarrowed t
+		:kill-buffer)))
 		  :bind (("C-c n f" . org-roam-node-find)
 				 ("C-c n c" . org-roam-capture)
 				 (:map org-mode-map
@@ -656,7 +680,7 @@ The following are org-mode plugins.
 		  (add-hook 'clojure-mode-hook #'lispy-mode)
 		  (add-hook 'scheme-mode-hook #'lispy-mode)
 		  :config
-		  (lispy-set-key-theme '(paredit))
+		  (lispy-set-key-theme '(special c-digits paredit))
 		  (define-key lispy-mode-map-paredit (kbd "M-o") nil)
 		  (define-key lispy-mode-map-paredit (kbd "M-[") #'lispy-wrap-brackets)
 		  (define-key lispy-mode-map-paredit (kbd "M-{") #'lispy-wrap-braces))
@@ -726,15 +750,15 @@ The following are org-mode plugins.
 		 (setq evil-collection-mode-list (remove 'lispy evil-collection-mode-list))
 		 (evil-collection-init))
 	 #+end_src
-**** Local Config
-	 Load a local configuration file if it exists. This configuration file should also contain ~custom-set-variables~.
-	 #+begin_src emacs-lisp
-	   (defvar my-local-init-file (concat user-emacs-directory "init.local.el") "Local init.el file for per instance configuration.")
-	   (setq custom-file my-local-init-file)
+* Local Config
+  Load a local configuration file if it exists. This configuration file should also contain ~custom-set-variables~.
+  #+begin_src emacs-lisp
+	(defvar my-local-init-file (concat user-emacs-directory "init.local.el") "Local init.el file for per instance configuration.")
+	(setq custom-file my-local-init-file)
 
-	   (if (file-exists-p my-local-init-file)
-		   (load my-local-init-file)
-		 (write-region "" nil my-local-init-file t))
+	(if (file-exists-p my-local-init-file)
+		(load my-local-init-file)
+	  (write-region "" nil my-local-init-file t))
 	 #+end_src
 * Functions
   #+begin_src emacs-lisp
