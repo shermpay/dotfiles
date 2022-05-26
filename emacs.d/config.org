@@ -39,7 +39,7 @@ Add subdirectories of "~/.emacs.d" to load-path
 *** User Info
 Explicitly set these.
 #+BEGIN_SRC emacs-lisp
-(setq user-full-name "Jing Hao Sherman Pay"
+(setq user-full-name "Sherman Pay"
 	  user-mail-address "shermanpay1991@gmail.com")
 #+END_SRC
 
@@ -344,7 +344,8 @@ This makes undo/redo in emacs behave like a tree!
 	#+begin_src emacs-lisp
 	  (use-package avy
 		:config
-		(avy-setup-default))
+		(avy-setup-default)
+		(define-key evil-motion-state-map (kbd "SPC") #'avy-goto-word-or-subword-1))
 	#+end_src
 	#+begin_src emacs-lisp
 	  (use-package ace-window
@@ -448,6 +449,8 @@ The following are builtin configurations. The keybindings are as recommended by 
 	  (setq org-id-method 'ts)			   ; use timestamp
 	  ;; Create an ID if needed to make a link.
 	  (setq org-id-link-to-org-use-id t)
+	  (setq org-list-allow-alphabetical t)
+	  (org-element-update-syntax)				; this is needed for the above
 	#+end_src
 *** Minor Modes
 	Configure minor modes to enable/disable for org-mode
@@ -528,8 +531,6 @@ The following are org-mode plugins.
 		(use-package org-roam
 		  :ensure t
 		  :after org
-		  :hook
-		  (after-init . org-roam-mode)
 		  :custom
 		  (org-roam-directory org-directory)
 		  (org-roam-completion-everywhere t)
@@ -562,6 +563,7 @@ The following are org-mode plugins.
 		%?" :target
 		(file+head "agenda/%<%Y%m%d%H%M>-${slug}.org" "#+title: ${title}
 		,#+filetags: %^G
+		,#+category: %^{Category?|todo|buganizer}
 		")
 
 
