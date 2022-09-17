@@ -26,7 +26,9 @@ are no name collisions with other other modes variables.
   (defun my-gdrive-or-emacs-dir ()
 	(if (getenv "MY_DRIVE")
 		(file-name-as-directory (getenv "MY_DRIVE"))
-	  user-emacs-directory))
+	  (do
+		  (message "Missing 'MY_DRIVE' environment variable!")
+		  user-emacs-directory)))
 #+END_SRC
 
 *** Load Paths
@@ -143,6 +145,7 @@ line numbers on the sidej
   (column-number-mode t)
   (setq-default fill-column 80)
   (require 'display-line-numbers)
+  (setq display-line-numbers-type 'relative)
   (add-hook 'prog-mode-hook #'display-line-numbers--turn-on)
 #+END_SRC
 *** Bars
@@ -170,7 +173,8 @@ Uses echo area to display tooltips and echo keystrokes
   (setq ibuffer-expert t)
   (setq ibuffer-show-empty-filter-groups nil)
   (add-hook 'ibuffer-mode-hook '(lambda () (ibuffer-auto-mode 1)))
-  (setq split-height-threshold 120)
+  (setq split-height-threshold 150)
+  (setq split-width-threshold 160)
   (setq help-window-select t)
 #+END_SRC
 ** Dired
@@ -189,7 +193,9 @@ Start emacs server
    For saving "desktops"(sessions)
    #+begin_src emacs-lisp
 	 (desktop-save-mode nil)
-	 (add-to-list 'desktop-path "~/.emacs.d/desktops")
+	 (setq my/desktop-save-path "~/.emacs.d/desktops")
+	 (mkdir my/desktop-save-path :parents)
+	 (add-to-list 'desktop-path my/desktop-save-path)
    #+end_src
 ** Static checkers
 *** Flymake
@@ -280,7 +286,7 @@ Add more distinguishable colors for evil states
 	(setq evil-move-cursor-back nil)
 	(setq evil-normal-state-cursor '("dim gray" box)
 		  evil-insert-state-cursor '("dim gray" bar)
-		  evil-emacs-state-cursor '("green" bar))
+		  evil-emacs-state-cursor '("dark violet" bar))
 	(evil-set-undo-system 'undo-tree))
 #+END_SRC
 *** exec-path-from-shell
@@ -351,7 +357,128 @@ This makes undo/redo in emacs behave like a tree!
 	  (use-package ace-window
 		:config
 		(global-set-key (kbd "M-o") 'ace-window)
-		(setq aw-scope 'frame))
+		(setq aw-scope 'visible))
+	#+end_src
+*** Programming Languages
+**** C/C++
+***** google-c-style
+	#+BEGIN_SRC emacs-lisp
+		(use-package google-c-style
+		:pin melpa
+		:hook
+		((c-mode c++-mode) . google-set-c-style)
+		(c-mode-common . google-make-newline-indent))
+	#+END_SRC
+**** Python
+	Configuration specific to python.
+**** Go
+	#+begin_src emacs-lisp
+	(defun add-hook-gofmt-before-save ()
+		(add-hook 'before-save-hook 'gofmt-before-save nil t))
+	(use-package go-mode
+		:mode ("\\.go\\'" . go-mode)
+		:hook (go-mode . add-hook-gofmt-before-save)
+		:config (add-to-list 'load-path (concat (getenv "GOPATH")  "/src/golang.org/x/lint/misc/emacs/")))
+	#+end_src
+**** Lisp
+	#+BEGIN_SRC emacs-lisp
+	(use-package clojure-mode
+		:hook
+		(clojure-mode . (lambda () (require 'display-fill-column-indicator) (display-fill-column-indicator--turn-on))))
+	(use-package paredit
+		:disabled
+		:commands (enable-paredit-mode)
+		:init
+		(add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
+		(add-hook 'clojure-mode-hook #'enable-paredit-mode))
+
+	(use-package lispy
+		:pin melpa
+		:init
+		(add-hook 'emacs-lisp-mode-hook #'lispy-mode)
+		(add-hook 'lisp-mode-hook #'lispy-mode)
+		(add-hook 'clojure-mode-hook #'lispy-mode)
+		(add-hook 'scheme-mode-hook #'lispy-mode)
+		:config
+		(lispy-set-key-theme '(special c-digits paredit))
+		(define-key lispy-mode-map-paredit (kbd "M-o") nil)
+		(define-key lispy-mode-map-paredit (kbd "M-[") #'lispy-wrap-brackets)
+		(define-key lispy-mode-map-paredit (kbd "M-{") #'lispy-wrap-braces))
+
+
+	(use-package lispyville
+		:pin melpa
+		:init
+		(add-hook 'lispy-mode-hook #'lispyville-mode)
+		:config
+		(lispyville-set-key-theme
+		'(operators
+			c-w
+			wrap
+			slurp/barf-lispy
+			additional
+			additional-motions)))
+	#+END_SRC
+**** OCaml
+	 Configure OCaml stuff, currently there is some config in =.emacs= managed by ~opam user-setup install~
+	 #+begin_src emacs-lisp
+	   (require 'ocamlformat)
+	   (add-hook 'tuareg-mode-hook (lambda ()
+		 ;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
+		 (add-hook 'before-save-hook #'ocamlformat-before-save)))
+	 #+end_src
+*** vterm
+	#+BEGIN_SRC emacs-lisp
+	  (use-package vterm
+		  :pin "melpa"
+		  :config
+		  (setq vterm-buffer-name-string "vterm [%s]")
+		  (setq vterm-timer-delay 0.01)
+		  (add-to-list 'vterm-eval-cmds '("find-file-other-window" find-file-other-window))
+		  (define-key global-map (kbd "C-c v") #'vterm)
+		  (defun my/vterm-list-buffers ()
+		  (seq-filter (lambda (buffer) (with-current-buffer buffer (equal major-mode 'vterm-mode))) (buffer-list)))
+		  (defun my/vterm-kill-process (process event)
+		  "A process sentinel. Kills PROCESS's buffer if it is live."
+		  (let ((b (process-buffer process)))
+			  (and (buffer-live-p b)
+				  (kill-buffer b))))
+		  (defun my/vterm-run (command &optional buffer)
+		  "Execute string COMMAND in BUFFER creating a new buffer if it does not exist.
+
+	  Interactively, prompt for COMMAND with the current buffer's file
+	  name supplied. When called from Dired, supply the name of the
+	  file at point.
+
+	  Like `async-shell-command`, but run in a vterm for full terminal features.
+
+	  When the command terminates, the shell remains open, but when the
+	  shell exits, the buffer is killed."
+		  (interactive
+		  (let* ((command (read-shell-command "command: "))
+				  (vterm-buffers (mapcar #'buffer-name (my/vterm-list-buffers))))
+			  (list command
+				  (completing-read "buffer: " (cons (concat "*" command "*") vterm-buffers)))))
+		  (let* ((vterm-buffers (mapcar #'buffer-name (my/vterm-list-buffers)))
+				 (new-vterm (null (member buffer vterm-buffers))))
+			  (with-current-buffer (if new-vterm (vterm buffer) buffer)
+				(when new-vterm (set-process-sentinel vterm--process #'my/vterm-kill-process))
+				(vterm-send-string command)
+				(vterm-send-return)
+				(pop-to-buffer (current-buffer))
+				(rename-buffer buffer))))
+		  :hook (vterm-mode . (lambda () (goto-address-mode 1))))
+	#+END_SRC
+
+
+*** evil-collection
+	#+begin_src emacs-lisp
+	(use-package evil-collection
+		:after evil
+		:diminish (evil-collection-unimpaired-mode . "")
+		:config
+		(setq evil-collection-mode-list (remove 'lispy evil-collection-mode-list))
+		(evil-collection-init))
 	#+end_src
 ** Optional Packages
    The packages here are not /required/, but they each have their use case or
@@ -407,24 +534,20 @@ Protocol Buffers are awesome.
 	   (setq md4rd--oauth-access-token (my-file-decrypt->string (concat user-emacs-directory "md4rd-oauth-access-token.gpg"))
 			 md4rd--oauth-refresh-token (my-file-decrypt->string (concat user-emacs-directory "md4rd-oauth-refresh-token.gpg"))))
    #+end_src
-** Fancier UI
-Having a UI that looks good, makes me more productive.
 
-*** Themes
-[[https://github.com/kuanyui/moe-theme.el][moe-theme]]: Many awesome customizable features. [[https://raw.githubusercontent.com/kuanyui/moe-theme.el/master/pics/dark01.png][dark]], [[https://raw.githubusercontent.com/kuanyui/moe-theme.el/master/pics/light01.png][light]]
-#+BEGIN_SRC emacs-lisp
-	(use-package moe-theme
-		:pin melpa
-		:config (moe-dark))
-#+END_SRC
+   #+begin_src emacs-lisp
+	 (use-package highlight-indent-guides
+	   :config
+	   (setq highlight-indent-guides-method 'character)
+	   :hook
+	   (prog-mode . highlight-indent-guides-mode))
 
-*** Fonts
-	Fonts are handled by the local config as it's easier to manually set them up.
-
+   #+end_src
 ** Org Mode
 The following are builtin configurations. The keybindings are as recommended by [[info:org#Activation][info:org#Activation]].
 #+BEGIN_SRC emacs-lisp
   (setq org-hide-leading-stars t)
+  (setq org-adapt-indentation t)
   (global-set-key "\C-cl" 'org-store-link)
   (global-set-key "\C-ca" 'org-agenda)
   (global-set-key "\C-cc" 'org-capture)
@@ -526,7 +649,7 @@ The following are org-mode plugins.
 	  javascript:location.href='org-protocol://capture?template=T&url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'&body='+encodeURIComponent(window.getSelection())
 	#+end_src
 
-***** org-roam
+*** org-roam
 	  #+begin_src emacs-lisp
 		(use-package org-roam
 		  :ensure t
@@ -587,8 +710,22 @@ The following are org-mode plugins.
 				org-roam-ui-update-on-save t
 				org-roam-ui-open-on-start t))
 	  #+end_src
+**** notdeft
+	 [[https://github.com/hasu/notdeft][notdeft]] is a fast text search engine for my notes, but it requires manual installation.
 
-***** Local Config
+	 #+begin_src emacs-lisp
+	   (setq my/notdeft-package-path (expand-file-name "~/Projects/notdeft"))
+	   (add-to-list 'load-path my/notdeft-package-path)
+	   (use-package notdeft-autoloads
+		 :after
+		 org-roam
+		 :ensure nil
+		 :config
+		 (setq notdeft-directories (list (expand-file-name (concat org-roam-directory))))
+		 (setq notdeft-xapian-program (expand-file-name (concat my/notdeft-package-path "/xapian/notdeft-xapian"))))
+	 #+end_src
+
+*** Local Config
 	  #+begin_src emacs-lisp
 		(defun my-load-org-config ()
 		  "Load Emacs Lisp source code in (concat org-directory \"conf.org\")."
@@ -601,7 +738,7 @@ The following are org-mode plugins.
 		(my-load-org-config)
 	  #+end_src
 
-***** Misc
+*** Misc
 	  #+begin_src emacs-lisp
 		(defun my-save-org-archive-file ()
 		  "Save org-archive file."
@@ -640,118 +777,23 @@ The following are org-mode plugins.
 		   "\n"))
 
 	  #+end_src
+** Modern UI
+   Having a UI that looks good, makes me more productive.
 
-**** Programming Languages
-***** C/C++
-****** google-c-style
-	   #+BEGIN_SRC emacs-lisp
-		 (use-package google-c-style
-		   :pin melpa
-		   :hook
-		   ((c-mode c++-mode) . google-set-c-style)
-		   (c-mode-common . google-make-newline-indent))
-	   #+END_SRC
-***** Python
-	  Configuration specific to python.
-***** Go
-	  #+begin_src emacs-lisp
-		(defun add-hook-gofmt-before-save ()
-		  (add-hook 'before-save-hook 'gofmt-before-save nil t))
-		(use-package go-mode
-		  :mode ("\\.go\\'" . go-mode)
-		  :hook (go-mode . add-hook-gofmt-before-save)
-		  :config (add-to-list 'load-path (concat (getenv "GOPATH")  "/src/golang.org/x/lint/misc/emacs/")))
-	  #+end_src
-***** Lisp
-	  #+BEGIN_SRC emacs-lisp
-		(use-package clojure-mode
-		  :hook
-		  (clojure-mode . (lambda () (require 'display-fill-column-indicator) (display-fill-column-indicator--turn-on))))
-		(use-package paredit
-		  :disabled
-		  :commands (enable-paredit-mode)
-		  :init
-		  (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
-		  (add-hook 'clojure-mode-hook #'enable-paredit-mode))
+*** Themes
+	[[https://github.com/kuanyui/moe-theme.el][moe-theme]]: Many awesome customizable features. [[https://raw.githubusercontent.com/kuanyui/moe-theme.el/master/pics/dark01.png][dark]], [[https://raw.githubusercontent.com/kuanyui/moe-theme.el/master/pics/light01.png][light]]
+	#+BEGIN_SRC emacs-lisp
+	  ;; (use-package moe-theme
+	  ;;   :pin melpa
+	  ;;   :config (moe-light))
 
-		(use-package lispy
-		  :pin melpa
-		  :init
-		  (add-hook 'emacs-lisp-mode-hook #'lispy-mode)
-		  (add-hook 'lisp-mode-hook #'lispy-mode)
-		  (add-hook 'clojure-mode-hook #'lispy-mode)
-		  (add-hook 'scheme-mode-hook #'lispy-mode)
-		  :config
-		  (lispy-set-key-theme '(special c-digits paredit))
-		  (define-key lispy-mode-map-paredit (kbd "M-o") nil)
-		  (define-key lispy-mode-map-paredit (kbd "M-[") #'lispy-wrap-brackets)
-		  (define-key lispy-mode-map-paredit (kbd "M-{") #'lispy-wrap-braces))
+	  ;; (use-package spacemacs-theme
+	  ;;   :pin melpa)
+	#+END_SRC
 
+*** Fonts
+	Fonts are handled by the local config as it's easier to manually set them up.
 
-		(use-package lispyville
-		  :pin melpa
-		  :init
-		  (add-hook 'lispy-mode-hook #'lispyville-mode)
-		  :config
-		  (lispyville-set-key-theme
-		   '(operators
-			 c-w
-			 wrap
-			 slurp/barf-lispy
-			 additional
-			 additional-motions)))
-	  #+END_SRC
-**** vterm
-	 #+BEGIN_SRC emacs-lisp
-	   (use-package vterm
-		 :pin "melpa"
-		 :config
-		 (setq vterm-buffer-name-string "vterm [%s]")
-		 (setq vterm-timer-delay 0.01)
-		 (define-key global-map (kbd "C-c v") #'vterm)
-		 (defun my-vterm-list-buffers ()
-		   (seq-filter (lambda (buffer) (with-current-buffer buffer (equal major-mode 'vterm-mode))) (buffer-list)))
-		 (defun my-vterm-kill-process (process event)
-		   "A process sentinel. Kills PROCESS's buffer if it is live."
-		   (let ((b (process-buffer process)))
-			 (and (buffer-live-p b)
-				  (kill-buffer b))))
-		 (defun my-vterm-run (command &optional buffer)
-		   "Execute string COMMAND in BUFFER creating a new buffer if it does not exist.
-
-	   Interactively, prompt for COMMAND with the current buffer's file
-	   name supplied. When called from Dired, supply the name of the
-	   file at point.
-
-	   Like `async-shell-command`, but run in a vterm for full terminal features.
-
-	   When the command terminates, the shell remains open, but when the
-	   shell exits, the buffer is killed."
-		   (interactive
-			(let* ((command (read-shell-command "command: "))
-				   (vterm-buffers (mapcar #'buffer-name (my-vterm-list-buffers))))
-			  (list command
-					(completing-read "buffer: " (cons (concat "*" command "*") vterm-buffers)))))
-		   (let* ((vterm-buffers (mapcar #'buffer-name (my-vterm-list-buffers)))
-				  (new-vterm (null (member buffer vterm-buffers))))
-			 (with-current-buffer (if new-vterm (vterm buffer) buffer)
-			   (when new-vterm (set-process-sentinel vterm--process #'my-vterm-kill-process))
-			   (vterm-send-string command)
-			   (vterm-send-return)
-			   (pop-to-buffer (current-buffer)))))
-		 :hook (vterm-mode . (lambda () (goto-address-mode 1))))
-	 #+END_SRC
-
-
-**** evil-collection
-	 #+begin_src emacs-lisp
-	   (use-package evil-collection
-		 :after evil
-		 :diminish (evil-collection-unimpaired-mode . "")
-		 :config
-		 (setq evil-collection-mode-list (remove 'lispy evil-collection-mode-list))
-		 (evil-collection-init))
-	 #+end_src
 * Local Config
   Load a local configuration file if it exists. This configuration file should also contain ~custom-set-variables~.
   #+begin_src emacs-lisp
@@ -770,4 +812,9 @@ The following are org-mode plugins.
 * TODO Improvements
 ** TODO Need function for yank or paste into a single line
    For example given a multi line string, I want to copy and and paste it as a single line.
-   
+** TODO [2022-03-30 Wed 10:42] [[id:3b596fb3-89a7-4d81-ad56-420043cf1614][[2022-02-17 Thu 12:13] Try out org-noter]]
+   The following talk showed an effective way of taking notes side-by-side a presentation or paper, using =org-noter=.
+   [[id:2c2547a9-ec22-4b8e-bbc1-e80e1cf4e4e2][EmacsConf - 2021 - talks - One effective CS grad student workflow]]
+   This might be useful for when listening to presentations/tech talks or reading paper.s
+** TODO [2022-08-11 Thu] Explore full-text search for notes.
+** TODO [2022-08-11 Thu] automate font scaling based on monitor configuration.

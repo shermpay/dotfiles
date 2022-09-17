@@ -1,4 +1,4 @@
-!/bin/sh
+#!/bin/sh
 # Sherman Pay Jing Hao
 # Sunday, 02. March 2014
 # Installation scripts

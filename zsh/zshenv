@@ -51,3 +51,4 @@ fi
 
 # INCLUDEDIR for sharing shell scripts
 export INCLUDEDIR="$HOME/.local/include"
+. "$HOME/.cargo/env"
