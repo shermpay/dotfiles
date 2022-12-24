@@ -173,8 +173,6 @@ Uses echo area to display tooltips and echo keystrokes
   (setq ibuffer-expert t)
   (setq ibuffer-show-empty-filter-groups nil)
   (add-hook 'ibuffer-mode-hook '(lambda () (ibuffer-auto-mode 1)))
-  (setq split-height-threshold 150)
-  (setq split-width-threshold 160)
   (setq help-window-select t)
 #+END_SRC
 ** Dired
@@ -211,10 +209,77 @@ Start emacs server
 
  Enable flyspell mode for strings and comments
  #+BEGIN_SRC emacs-lisp
- (add-hook 'prog-mode-hook (lambda () (flyspell-prog-mode)))
+   (add-hook 'prog-mode-hook (lambda () (flyspell-prog-mode)))
+
+   ;; Spell checkers
+   (cond ((executable-find "enchant-2")  (setq-default ispell-program-name "enchant-2"))
+		 ((executable-find "hunspell")   (progn (setq-default ispell-program-name "hunspell") (setq ispell-really-hunspell t)))
+		 ((executable-find "aspell")     (setq-default ispell-program-name "aspell")))
  #+END_SRC
 
+** Midnight Mode
+   Midnight mode runs ~clean-buffer-list~ at a defined /midnight/ everyday. To disable the timer, eval ~(cancel-timer midnight-timer)~.
+#+begin_src emacs-lisp
+  (require 'midnight)
+  (midnight-mode 1)
+  (midnight-delay-set 'midnight-delay "01:42am")
+  (setq clean-buffer-list-delay-general 1)
+#+end_src
+*** Additional Configuration options
+	:PROPERTIES:
+	:header-args: :tangle no
+	:END:
+	To change the expiration date of all buffers, like to 1 day, set ~clean-buffer-list-delay-general~.
+
+	#+begin_src emacs-lisp
+	  (setq clean-buffer-list-delay-general 1)
+	#+end_src
+	To change the expiration date of special buffers, to 6 hours, set ~clean-buffer-list-delay-special~.
+
+	#+begin_src emacs-lisp
+	  (setq clean-buffer-list-delay-special (* 6 3600))
+	#+end_src
+	To add more buffers to the list of special buffers, add them to the list ~clean-buffer-list-kill-buffer-names~.
+
+	#+begin_src emacs-lisp
+	  (setq clean-buffer-list-kill-buffer-names (nconc clean-buffer-list-kill-buffer-names
+													   '("*buffer-selection*"
+														 "*Finder*"
+														 "*Finder Category*"
+														 "*Finder-package*"
+														 "*RE-Builder*"
+														 "*vc-change-log*")))
+	#+end_src
+	To define more regular expressions that should match special buffers, add them to ~clean-buffer-list-kill-regexps~.
+
+	#+begin_src emacs-lisp
+	  (setq clean-buffer-list-kill-regexps (nconc clean-buffer-list-kill-regexps
+												  '("\\`\\*Customize .*\\*\\'"
+													"\\`\\*\\(Wo\\)?Man .*\\*\\'")))
+	#+end_src
+	To define buffers that should never be killed, add strings to the list ~clean-buffer-list-kill-never-buffer-names~.
+
+	#+begin_src emacs-lisp
+	  (setq clean-buffer-list-kill-never-buffer-names (nconc clean-buffer-list-kill-never-buffer-names
+															 '("*eshell*"
+															   "*ielm*"
+															   "*mail*"
+															   "*w3m*"
+															   "*w3m-cache*")))
+	#+end_src
+
+	To define regular expressions for buffers that should never be killed, add them to the list ~clean-buffer-list-kill-never-regexps~.
+
+	#+begin_src emacs-lisp
+	  (setq clean-buffer-list-kill-never-regexps (nconc clean-buffer-list-kill-never-regexps
+														'("\\`\\*tramp/.*\\*\\`"
+														  "\\`\\*ftp .*\\*\\`")))
+	#+end_src
 ** Emacs OS
+*** Shell
+#+begin_src emacs-lisp
+  (setq shell-file-path "/bin/zsh")
+#+end_src
 *** dired
 	#+begin_src emacs-lisp
 	  (setq dired-dwim-target t)
@@ -223,8 +288,11 @@ Start emacs server
 
  Use chrome as the default browser. This assumes chrome is installed.
  #+BEGIN_SRC emacs-lisp
- (setq browse-url-generic-program "/usr/bin/google-chrome"
-	   browse-url-browser-function 'browse-url-generic)
+   (setq browse-url-generic-program (cl-ecase system-type
+									  (gnu/linux "/usr/bin/google-chrome")
+									  (darwin "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"))
+		 browse-url-browser-function 'browse-url-generic)
+
  #+END_SRC
 ** Package Management
 Package management is important!
@@ -232,10 +300,12 @@ Add melpa-stable repository, which has stable community packages.
 Add melpa repository for specific packages.
 #+BEGIN_SRC emacs-lisp
   (require 'package)
+  ;; (add-to-list 'package-archives
+  ;;   '("melpa-stable" . "https://stable.melpa.org/packages/") t)
   (add-to-list 'package-archives
-	'("melpa-stable" . "https://stable.melpa.org/packages/") t)
+			   '("melpa" . "https://melpa.org/packages/") t)
   (add-to-list 'package-archives
-	'("melpa" . "https://melpa.org/packages/") t)
+			   '("elpa" . "https://elpa.gnu.org/packages/") t)
   (package-initialize)
 
 #+END_SRC
@@ -305,20 +375,26 @@ Much more lightweight and faster then Helm, but with the same core functionality
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
 	:diminish (ivy-mode "")
+	:bind
+	("C-c s" . 'swiper-isearch)
+	("C-c o" . 'counsel-outline)
 	:config
 	(ivy-mode 1)
 	(counsel-mode 1)
 	(setq projectile-completion-system 'ivy)
-	(define-key  global-map (kbd "C-c s") 'swiper-isearch)
 	(defun my/find-file-no-ivy ()
-	   (interactive)
-	   (let ((ivy-state ivy-mode))
-		 (ivy-mode -1)
-		 (call-interactively 'find-file)
-		 (ivy-mode ivy-state))))
+	  (interactive)
+	  (let ((ivy-state ivy-mode))
+		(ivy-mode -1)
+		(call-interactively 'find-file)
+		(ivy-mode ivy-state))))
 
 #+END_SRC
 
+*** Smex
+	#+begin_src emacs-lisp
+	  (use-package smex)
+	#+end_src
 *** Projectile
 Package for working with "projects"
 #+BEGIN_SRC emacs-lisp
@@ -347,17 +423,21 @@ This makes undo/redo in emacs behave like a tree!
 	:pin melpa)
 #+END_SRC
 *** Navigation
+**** Avy
 	#+begin_src emacs-lisp
 	  (use-package avy
 		:config
 		(avy-setup-default)
-		(define-key evil-motion-state-map (kbd "SPC") #'avy-goto-word-or-subword-1))
+		(define-key evil-motion-state-map (kbd "SPC") #'avy-goto-word-or-subword-1)
+		(setq avy-all-windows nil
+			  avy-all-windows-alt t))
 	#+end_src
+**** Ace Window
 	#+begin_src emacs-lisp
 	  (use-package ace-window
 		:config
 		(global-set-key (kbd "M-o") 'ace-window)
-		(setq aw-scope 'visible))
+		(setq aw-scope 'frame))
 	#+end_src
 *** Programming Languages
 **** C/C++
@@ -382,68 +462,72 @@ This makes undo/redo in emacs behave like a tree!
 	#+end_src
 **** Lisp
 	#+BEGIN_SRC emacs-lisp
-	(use-package clojure-mode
-		:hook
-		(clojure-mode . (lambda () (require 'display-fill-column-indicator) (display-fill-column-indicator--turn-on))))
-	(use-package paredit
-		:disabled
-		:commands (enable-paredit-mode)
-		:init
-		(add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
-		(add-hook 'clojure-mode-hook #'enable-paredit-mode))
+	  (use-package clojure-mode
+		  :hook
+		  (clojure-mode . (lambda () (require 'display-fill-column-indicator) (display-fill-column-indicator--turn-on))))
+	  (use-package paredit
+		  :disabled
+		  :commands (enable-paredit-mode)
+		  :init
+		  (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
+		  (add-hook 'clojure-mode-hook #'enable-paredit-mode))
 
-	(use-package lispy
-		:pin melpa
-		:init
-		(add-hook 'emacs-lisp-mode-hook #'lispy-mode)
-		(add-hook 'lisp-mode-hook #'lispy-mode)
-		(add-hook 'clojure-mode-hook #'lispy-mode)
-		(add-hook 'scheme-mode-hook #'lispy-mode)
-		:config
-		(lispy-set-key-theme '(special c-digits paredit))
-		(define-key lispy-mode-map-paredit (kbd "M-o") nil)
-		(define-key lispy-mode-map-paredit (kbd "M-[") #'lispy-wrap-brackets)
-		(define-key lispy-mode-map-paredit (kbd "M-{") #'lispy-wrap-braces))
+	  (use-package lispy
+		  :pin melpa
+		  :init
+		  (add-hook 'emacs-lisp-mode-hook #'lispy-mode)
+		  (add-hook 'lisp-mode-hook #'lispy-mode)
+		  (add-hook 'clojure-mode-hook #'lispy-mode)
+		  (add-hook 'scheme-mode-hook #'lispy-mode)
+		  :config
+		  (lispy-set-key-theme '(special c-digits paredit))
+		  (define-key lispy-mode-map-paredit (kbd "M-o") nil)
+		  (define-key lispy-mode-map-paredit (kbd "M-[") #'lispy-wrap-brackets)
+		  (define-key lispy-mode-map-paredit (kbd "M-{") #'lispy-wrap-braces))
 
 
-	(use-package lispyville
-		:pin melpa
-		:init
-		(add-hook 'lispy-mode-hook #'lispyville-mode)
-		:config
-		(lispyville-set-key-theme
-		'(operators
-			c-w
-			wrap
-			slurp/barf-lispy
-			additional
-			additional-motions)))
+	  (use-package lispyville
+		  :pin melpa
+		  :init
+		  (add-hook 'lispy-mode-hook #'lispyville-mode)
+		  :config
+		  (lispyville-set-key-theme
+		  '(operators
+			  c-w
+			  wrap
+			  slurp/barf-lispy
+			  additional
+			  additional-motions)))
+
+	  (use-package flycheck-clj-kondo)
 	#+END_SRC
 **** OCaml
 	 Configure OCaml stuff, currently there is some config in =.emacs= managed by ~opam user-setup install~
 	 #+begin_src emacs-lisp
-	   (require 'ocamlformat)
-	   (add-hook 'tuareg-mode-hook (lambda ()
-		 ;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
-		 (add-hook 'before-save-hook #'ocamlformat-before-save)))
+	   (when (package-installed-p 'ocamlformat)
+		 (require 'ocamlformat)
+		 (add-hook 'tuareg-mode-hook (lambda ()
+									   ;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
+									   (add-hook 'before-save-hook #'ocamlformat-before-save))))
 	 #+end_src
 *** vterm
 	#+BEGIN_SRC emacs-lisp
 	  (use-package vterm
-		  :pin "melpa"
-		  :config
-		  (setq vterm-buffer-name-string "vterm [%s]")
-		  (setq vterm-timer-delay 0.01)
-		  (add-to-list 'vterm-eval-cmds '("find-file-other-window" find-file-other-window))
-		  (define-key global-map (kbd "C-c v") #'vterm)
-		  (defun my/vterm-list-buffers ()
+		:pin "melpa"
+		:config
+		(setq vterm-buffer-name-string "vterm [%s]")
+		(setq vterm-timer-delay 0.01)
+		(add-to-list 'vterm-eval-cmds '("find-file-other-window" find-file-other-window))
+		(define-key vterm-mode-map (kbd "C-q") #'vterm-send-next-key)
+		(define-key global-map (kbd "C-c t") #'vterm)
+		(defun my/vterm-list-buffers ()
 		  (seq-filter (lambda (buffer) (with-current-buffer buffer (equal major-mode 'vterm-mode))) (buffer-list)))
-		  (defun my/vterm-kill-process (process event)
+		(defun my/vterm-kill-process (process event)
 		  "A process sentinel. Kills PROCESS's buffer if it is live."
 		  (let ((b (process-buffer process)))
-			  (and (buffer-live-p b)
-				  (kill-buffer b))))
-		  (defun my/vterm-run (command &optional buffer)
+			(and (buffer-live-p b)
+				 (kill-buffer b))))
+		(defun my/vterm-run (command &optional buffer)
 		  "Execute string COMMAND in BUFFER creating a new buffer if it does not exist.
 
 	  Interactively, prompt for COMMAND with the current buffer's file
@@ -455,21 +539,20 @@ This makes undo/redo in emacs behave like a tree!
 	  When the command terminates, the shell remains open, but when the
 	  shell exits, the buffer is killed."
 		  (interactive
-		  (let* ((command (read-shell-command "command: "))
+		   (let* ((command (read-shell-command "command: "))
 				  (vterm-buffers (mapcar #'buffer-name (my/vterm-list-buffers))))
-			  (list command
-				  (completing-read "buffer: " (cons (concat "*" command "*") vterm-buffers)))))
+			 (list command
+				   (completing-read "buffer: " (cons (concat "*" command "*") vterm-buffers)))))
 		  (let* ((vterm-buffers (mapcar #'buffer-name (my/vterm-list-buffers)))
 				 (new-vterm (null (member buffer vterm-buffers))))
-			  (with-current-buffer (if new-vterm (vterm buffer) buffer)
-				(when new-vterm (set-process-sentinel vterm--process #'my/vterm-kill-process))
-				(vterm-send-string command)
-				(vterm-send-return)
-				(pop-to-buffer (current-buffer))
-				(rename-buffer buffer))))
+			(with-current-buffer (if new-vterm (vterm buffer) buffer)
+			  (when new-vterm (set-process-sentinel vterm--process #'my/vterm-kill-process))
+			  (vterm-send-string command)
+			  (vterm-send-return)
+			  (pop-to-buffer (current-buffer))
+			  (rename-buffer buffer))))
 		  :hook (vterm-mode . (lambda () (goto-address-mode 1))))
 	#+END_SRC
-
 
 *** evil-collection
 	#+begin_src emacs-lisp
@@ -479,6 +562,11 @@ This makes undo/redo in emacs behave like a tree!
 		:config
 		(setq evil-collection-mode-list (remove 'lispy evil-collection-mode-list))
 		(evil-collection-init))
+	#+end_src
+*** string inflection (toggle case)
+	Toggle between the different case types (ie. CamelCase, underscore_case, kebab-case).
+	#+begin_src emacs-lisp
+	  (use-package string-inflection)
 	#+end_src
 ** Optional Packages
    The packages here are not /required/, but they each have their use case or
@@ -525,8 +613,17 @@ Protocol Buffers are awesome.
 		:config (add-to-list 'eglot-stay-out-of 'imenu))
 
 	#+end_src
+*** Highligh indentation levels
+   #+begin_src emacs-lisp
+	 (use-package highlight-indent-guides
+	   :config
+	   (setq highlight-indent-guides-method 'character)
+	   :hook
+	   (prog-mode . highlight-indent-guides-mode))
+   #+end_src
 ** Experimental Packages
    The packages here are /experimental/, and should be reviewed if unused.
+*** Reddit
    #+begin_src emacs-lisp
 	 (use-package md4rd
 	   :defer
@@ -534,15 +631,20 @@ Protocol Buffers are awesome.
 	   (setq md4rd--oauth-access-token (my-file-decrypt->string (concat user-emacs-directory "md4rd-oauth-access-token.gpg"))
 			 md4rd--oauth-refresh-token (my-file-decrypt->string (concat user-emacs-directory "md4rd-oauth-refresh-token.gpg"))))
    #+end_src
+*** Burly (Frame+Window Layout Management)
+	Goals
+	1. Create a dedicated frame for global dashboard (See agenda, world-clock, proced) etc.
+	2. Same frame or different frame for workspace specific dashboard such as terminal/compilation/Version Control buffers.
+	#+begin_src emacs-lisp
+	  (use-package burly)
+	#+end_src
 
-   #+begin_src emacs-lisp
-	 (use-package highlight-indent-guides
-	   :config
-	   (setq highlight-indent-guides-method 'character)
-	   :hook
-	   (prog-mode . highlight-indent-guides-mode))
 
-   #+end_src
+** Coding
+*** Building/Testing
+	#+begin_src emacs-lisp
+	  (define-key global-map (kbd "C-c r") #'recompile)
+	#+end_src
 ** Org Mode
 The following are builtin configurations. The keybindings are as recommended by [[info:org#Activation][info:org#Activation]].
 #+BEGIN_SRC emacs-lisp
@@ -560,7 +662,8 @@ The following are builtin configurations. The keybindings are as recommended by 
 	  (defconst my/org-agenda-directory (concat org-directory "agenda/"))
 	  (defconst my/org-notes-directory (concat org-directory "notes/"))
 	  (defconst my/org-projects-directory (concat org-directory "projects/"))
-	  (setq org-agenda-files (list my/org-agenda-directory my/org-projects-directory))
+	  (defconst my/org-recurring-directory (concat org-directory "recurring/"))
+	  (setq org-agenda-files (list my/org-agenda-directory my/org-projects-directory my/org-recurring-directory))
 	  (setq org-default-notes-file (concat org-directory "notes.org"))
 	  (defconst my/org-todo-file (concat my/org-agenda-directory "todo.org"))
 	  (setq org-todo-keywords '((sequence "TODO(t)" "WORKING(w)" "BLOCKED(b)" "IN_REVIEW(r)" "VERIFY(v)"
@@ -580,7 +683,7 @@ The following are builtin configurations. The keybindings are as recommended by 
 	#+begin_src emacs-lisp
 	  (defun my-org-mode-config-minor-modes ()
 		;; disable
-		(eval-after-load "flycheck" (flycheck-mode -1))
+		(with-eval-after-load 'flycheck (flycheck-mode -1))
 		;; enable
 		(visual-line-mode))
 	  (add-hook 'org-mode-hook #'my-org-mode-config-minor-modes)
@@ -661,37 +764,35 @@ The following are org-mode plugins.
 		  (require 'org-roam-protocol)
 		  (org-roam-db-autosync-mode)
 		  (setq org-roam-capture-templates
-				'(("d" "default" plain "%?" :target
-				   (file+head "notes/%<%Y%m%d%H%M>-${slug}.org" "#+title: ${title}
+				`(("d" "default" plain "%?" :target
+				   (file+head ,(concat my/org-notes-directory "%<%Y%m%d%H%M>-${slug}.org") "#+title: ${title}
 		,#+filetags: %^G
 		")
 				   :unnarrowed t
 				   :kill-buffer)
 				  ("r" "recurring" entry "* %u %?" :target
-				   (file+head "notes/${slug}.org" "#+title: ${title} ")
+				   (file+head ,(concat my/org-recurring-directory "${slug}.org") "#+title: ${title} ")
 
 				   :unnarrowed t)
 				  ("p" "project" plain "%?" :target
-				   (file+head "projects/${slug}.org" "#+title: ${title}
+				   (file+head ,(concat my/org-projects-directory "${slug}.org") "#+title: ${title}
 		,#+filetags: %^G
 		")
 				   :unnarrowed t)))
 		  (setq org-roam-capture-ref-templates
-				'(("r" "ref" plain "%?" :target
-				   (file+head "notes/%<%Y%m%d%H%M>-${slug}.org" "#+title: ${title}
+				`(("r" "ref" plain "%?" :target
+				   (file+head ,(concat my/org-notes-directory "%<%Y%m%d%H%M>-${slug}.org") "#+title: ${title}
 		,#+filetags: %^G
 		")
 				   :unnarrowed t)
 				  ("t" "agenda item" entry "* %^{State?|TODO|WORKING|BACKLOGGED} %u ${title}
-		%?" :target
-		(file+head "agenda/%<%Y%m%d%H%M>-${slug}.org" "#+title: ${title}
+		%?"
+				   :target (file+head ,(concat my/org-agenda-directory "%<%Y%m%d%H%M>-${slug}.org") "#+title: ${title}
 		,#+filetags: %^G
 		,#+category: %^{Category?|todo|buganizer}
 		")
-
-
-		:unnarrowed t
-		:kill-buffer)))
+				   :unnarrowed t
+				   :kill-buffer)))
 		  :bind (("C-c n f" . org-roam-node-find)
 				 ("C-c n c" . org-roam-capture)
 				 (:map org-mode-map
@@ -816,5 +917,4 @@ The following are org-mode plugins.
    The following talk showed an effective way of taking notes side-by-side a presentation or paper, using =org-noter=.
    [[id:2c2547a9-ec22-4b8e-bbc1-e80e1cf4e4e2][EmacsConf - 2021 - talks - One effective CS grad student workflow]]
    This might be useful for when listening to presentations/tech talks or reading paper.s
-** TODO [2022-08-11 Thu] Explore full-text search for notes.
 ** TODO [2022-08-11 Thu] automate font scaling based on monitor configuration.

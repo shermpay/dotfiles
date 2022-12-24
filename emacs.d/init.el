@@ -16,3 +16,4 @@
   (message "Loaded %s" tangled-file))
 
 ;;; init.el ends here
+(put 'dired-find-alternate-file 'disabled nil)
