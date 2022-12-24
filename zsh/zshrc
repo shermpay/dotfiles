@@ -57,7 +57,7 @@ bindkey '^xe' edit-command-line
 bindkey '^x^e' edit-command-line
 
 # add handy aliases
-if [ -x /usr/bin/dircolors ]; then
+if [ -x /usr/bin/dircolors -o "$(uname -s)" = "Darwin" ]; then
     alias ls='ls --color=auto'
 
     alias grep='grep --color=auto'

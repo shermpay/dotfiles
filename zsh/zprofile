@@ -18,3 +18,11 @@ fi
 # Environment Variables
 # Haskel Cabal
 PATH=~/.cabal/bin:$PATH
+
+if [ "$(uname -s)" = "Darwin" ]; then
+	brewprefix=/opt/homebrew
+	export PATH="$brewprefix/bin:$brewprefix/sbin:$PATH"
+	export MANPATH="$brewprefix/share/man:$MANPATH"
+	unset brewprefix
+fi
+

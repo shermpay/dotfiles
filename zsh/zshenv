@@ -24,6 +24,11 @@ export PAGER=less
 export LESS=R
 export CFLAGS="-Wall -pipe"
 
+
+if [[ "$(uname -s)" = "Darwin" ]]; then
+  export CLICOLOR=1
+fi
+
 # export DEPOT_TOOLS_PATH='/home/shermpay/Code/OpenSource/depot_tools'
 # export PATH="$DEPOT_TOOLS_PATH":"$PATH"
 
@@ -51,4 +56,3 @@ fi
 
 # INCLUDEDIR for sharing shell scripts
 export INCLUDEDIR="$HOME/.local/include"
-. "$HOME/.cargo/env"
