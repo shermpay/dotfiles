@@ -324,7 +324,6 @@ packages up to date.
   (eval-when-compile (require 'use-package))
   (require 'use-package-ensure)
   (setq use-package-always-ensure t)
-  (setq use-package-always-pin "melpa")
   (setq use-package-verbose nil)			; set to t for debugging init
 #+END_SRC
 
@@ -342,6 +341,10 @@ Automatically update packages.
 #+END_SRC
 ** Packages
    Core packages that is needed for 99% of use cases.
+*** undo-tree
+#+begin_src emacs-lisp
+  (use-package undo-tree)
+#+end_src
 *** evil-mode
 I use evil-mode for Vim emulation
 
