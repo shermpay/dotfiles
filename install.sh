@@ -42,6 +42,7 @@ install_shell() {
     sudo apt-get -y install git curl xclip tmux zsh
     install_config "${DOTFILES}/zsh/zshenv" "${HOME}/.zshenv"
     install_config "${DOTFILES}/zsh/zshrc" "${HOME}/.zshrc"
+    install_config "${DOTFILES}/tmux.conf" "${HOME}/.tmux"
 }
 
 install_lang() {
@@ -51,7 +52,7 @@ install_lang() {
     wget https://raw.github.com/technomancy/leiningen/stable/bin/lein -O ${HOME}/bin
     chmod a+x ${HOME}/bin
     sudo apt-get -y install python3 # Python
-    sudo apt-get -y install ant maven # Java
+    # sudo apt-get -y install ant maven # Java
     sudo apt-get -y install clang	  # Clang
 
 }
