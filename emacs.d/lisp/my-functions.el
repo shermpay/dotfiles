@@ -124,19 +124,6 @@
 	  (substring f (length *current-tramp-path*))))
   (slime-connect "localhost" 4005))
 
-;;; ========================================
-;;; ---------- OCTAVE MODE
-;;; ========================================
-(defun octave-shell ()
-  (interactive)
-  (if (get-buffer "*Inferior Octave*")
-      (switch-to-buffer-other-window "*Inferior Octave*")
-    (run-octave)))
-
-(eval-after-load "octave-mode"
-  '(progn
-     (define-key octave-mode-map (kbd "C-c C-z") 'octave-shell)))
-
 ;;;;;;;;;;;;;;;;;;;
 ;; GRAPHVIZ MODE ;;
 ;;;;;;;;;;;;;;;;;;;
@@ -145,26 +132,6 @@
   (let* ((file (buffer-name))
 	(out-file (substring file 0 (- (length file) 4))))
     (shell-command (concat "dot -Tpng " file " -o " out-file ".png"))))
-
-;;; ========================================
-;;; ---------- Term
-;;; ========================================
-(defun term-other-window ()
-  (interactive)
-  (if (not (get-buffer "*ansi-term*"))
-      (progn (split-window-sensibly (selected-window))
-             (other-window 1)
-             (ansi-term (getenv "SHELL")))
-    (switch-to-buffer-other-window "*ansi-term*")))
-
-(defun new-term-other-window ()
-  (interactive)
-  (split-window-sensibly (selected-window))
-  (other-window 1)
-  (ansi-term (getenv "SHELL")))
-
-(add-hook 'term-mode-hook
-          (lambda () (define-key term-mode-map (kbd "C-S-c") #'term-interrupt-subjob)))
 
 
 ;;; ========================================
@@ -228,20 +195,6 @@ prefix arguments, write out the day and month name."
   (interactive "r\naFunction to apply: ")
   (princ (s-upper-camel-case (buffer-substring from to)) (current-buffer))
   (delete-region from to))
-
-(defun my-upper-camel-case-word ()
-  "Convert to upper camel-case from point to end of word."
-  (interactive)
-  (princ (s-upper-camel-case (thing-at-point 'symbol)) (current-buffer))
-  (mark-sexp)
-  (delete-region (point) (mark)))
-
-(defun my-lower-camel-case-word ()
-  "Convert to upper camel-case from point to end of word."
-  (interactive)
-  (princ (s-lower-camel-case (thing-at-point 'symbol)) (current-buffer))
-  (mark-sexp)
-  (delete-region (point) (mark)))
 
 (defun my-clang-format-current-buffer ()
   "Run clang-format on the current buffer."
