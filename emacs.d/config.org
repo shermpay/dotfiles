@@ -523,38 +523,8 @@ This makes undo/redo in emacs behave like a tree!
 		(add-to-list 'vterm-eval-cmds '("find-file-other-window" find-file-other-window))
 		(define-key vterm-mode-map (kbd "C-q") #'vterm-send-next-key)
 		(define-key global-map (kbd "C-c t") #'vterm)
-		(defun my/vterm-list-buffers ()
-		  (seq-filter (lambda (buffer) (with-current-buffer buffer (equal major-mode 'vterm-mode))) (buffer-list)))
-		(defun my/vterm-kill-process (process event)
-		  "A process sentinel. Kills PROCESS's buffer if it is live."
-		  (let ((b (process-buffer process)))
-			(and (buffer-live-p b)
-				 (kill-buffer b))))
-		(defun my/vterm-run (command &optional buffer)
-		  "Execute string COMMAND in BUFFER creating a new buffer if it does not exist.
-
-	  Interactively, prompt for COMMAND with the current buffer's file
-	  name supplied. When called from Dired, supply the name of the
-	  file at point.
-
-	  Like `async-shell-command`, but run in a vterm for full terminal features.
-
-	  When the command terminates, the shell remains open, but when the
-	  shell exits, the buffer is killed."
-		  (interactive
-		   (let* ((command (read-shell-command "command: "))
-				  (vterm-buffers (mapcar #'buffer-name (my/vterm-list-buffers))))
-			 (list command
-				   (completing-read "buffer: " (cons (concat "*" command "*") vterm-buffers)))))
-		  (let* ((vterm-buffers (mapcar #'buffer-name (my/vterm-list-buffers)))
-				 (new-vterm (null (member buffer vterm-buffers))))
-			(with-current-buffer (if new-vterm (vterm buffer) buffer)
-			  (when new-vterm (set-process-sentinel vterm--process #'my/vterm-kill-process))
-			  (vterm-send-string command)
-			  (vterm-send-return)
-			  (pop-to-buffer (current-buffer))
-			  (rename-buffer buffer))))
-		  :hook (vterm-mode . (lambda () (goto-address-mode 1))))
+		(require 'my-vterm)
+		:hook (vterm-mode . (lambda () (goto-address-mode 1))))
 	#+END_SRC
 
 *** evil-collection
