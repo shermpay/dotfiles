@@ -28,7 +28,8 @@
 
 (defun my-vterm--list-buffers ()
   "List all buffers where the major-mode is vterm-mode."
-  (seq-filter (lambda (buffer) (with-current-buffer buffer (equal major-mode 'vterm-mode))) (buffer-list)))
+  (seq-filter (lambda (buffer) (with-current-buffer buffer (equal major-mode 'vterm-mode)))
+              (buffer-list)))
 
 (defun my-vterm--kill-process (process event)
   "A process sentinel; kill PROCESS buffer if it is live.

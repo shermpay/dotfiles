@@ -1,223 +1,108 @@
-;;; package  --- Summary
+;;; my-functions.el --- Core library functions for my usage  -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2022  Sherman Pay
+
+;; Author: Sherman Pay <shermanpay1991@gmail.com>
+;; Keywords: lisp, convenience
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 ;;; Commentary:
-;;; Sherman Pay Jing Hao
-;;; Tuesday, 17. December 2013
-;;; Functions that I defined and find really useful
+
+;; 
 
 ;;; Code:
-(require 'cl)
+(require 'cl-lib)
 (require 's)
 (require 'dash)
+
+
 ;;; ========================================
-;;; ---------- Window/Buffer Functions
+;;; MISC
 ;;; ========================================
-(defun kill-this-buffer-tab ()
-  "Kill this buffer and deletes this tab."
+(defun my-dot-to-png ()
+  "Generate a .png from the file of the current buffer.
+
+Uses the `dot` tool."
   (interactive)
-  (progn
-    (kill-this-buffer)
-    (elscreen-kill)))
-
-;; (define-key evil-normal-state-map (kbd "C-w d") 'kill-this-buffer-tab) 
-
-;;; ========================================
-;;; ---------- EDITING Functions
-;;; ========================================
-
-;;; Paredit with Electric Return
- (defvar electrify-return-match
-    "}"
-    "If this regexp matches the text after the cursor, do an \"electric\"
-  return.")
-
-(defun electrify-return-if-match (arg)
-  "If the text after the cursor matches electrify-return-match then
-  open and indent an empty line between the cursor and the text.  Move the
-  cursor to the new line."
-  (interactive "P")
-  (let ((case-fold-search nil))
-    (if (looking-at electrify-return-match)
-	(save-excursion (newline-and-indent)))
-    (newline arg)
-    (indent-according-to-mode)))
-
-(defun prog-mode-keys ()
-  "Setup keybindings for 'prog-mode'."
-  (local-set-key [(f11)] 'compile)
-  (local-set-key (kbd "M-SPC") 'company-complete))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ---------- EVIL MODE -----------  ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; --------- C MODE --------- ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun my-c-mode-font-lock-if0 (limit)
-  "For when using if macro for comments"
-  (save-restriction
-    (widen)
-    (save-excursion
-      (goto-char (point-min))
-      (let ((depth 0) str start start-depth)
-        (while (re-search-forward "^\\s-*#\\s-*\\(if\\|else\\|endif\\)" limit 'move)
-          (setq str (match-string 1))
-          (if (string= str "if")
-              (progn
-                (setq depth (1+ depth))
-                (when (and (null start) (looking-at "\\s-+0"))
-                  (setq start (match-end 0)
-                        start-depth depth)))
-            (when (and start (= depth start-depth))
-              (c-put-font-lock-face start (match-beginning 0) 'font-lock-comment-face)
-              (setq start nil))
-            (when (string= str "endif")
-              (setq depth (1- depth)))))
-        (when (and start (> depth 0))
-          (c-put-font-lock-face start (point) 'font-lock-comment-face)))))
-  nil)
-
-(defun my-c-mode-hook ()
-  (font-lock-add-keywords
-    nil
-    '((my-c-mode-font-lock-if0 (0 font-lock-comment-face prepend))) 'add-to-end))
-
-(defun my-c-mode-common-hook ()
-  (progn
-    (local-set-key (kbd "RET") 'electrify-return-if-match)
-    (lambda () (electric-pair-mode 1))
-    (c-set-offset 'case-label '+)))
-
-(add-hook 'c-mode-hook 'my-c-mode-hook)
-(add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
-;;; ========================================
-;;; ---------- JAVA MODE
-;;; ========================================
-(defun java-defer-loading ()
-  (progn
-    (defun java-compile (&rest args)
-      "Compiles the current buffer with javac"
-      (interactive)
-      (let ((file (buffer-name)))
-	(shell-command (concat "javac -g -Xlint " file))))
-
-    (defun java-run (&rest args)
-      "Runs the current buffer with java"
-      (interactive)
-      (let ((file (buffer-name)))
-	(async-shell-command (concat "java -cp .:* " (substring file 0 (- (length file) 5))))))
-    (define-key java-mode-map (kbd "C-c C-r") 'java-run)
-    (define-key java-mode-map (kbd "C-c C-v") 'java-compile)))
-(add-hook 'java-mode-hook 'java-defer-loading)
-;;; ========================================
-;;; ---------- LISP MODE
-;;; ========================================
-;;; Slime connect to remote lisp
-(defvar *current-tramp-path* nil)
-(defun connect-to-host (path)
-  (setq *current-tramp-path* path)
-  (setq slime-translate-from-lisp-filename-function
-	(lambda (f)
-	  (concat *current-tramp-path* f)))
-  (setq slime-translate-to-lisp-filename-function
-	(lambda (f)
-	  (substring f (length *current-tramp-path*))))
-  (slime-connect "localhost" 4005))
-
-;;;;;;;;;;;;;;;;;;;
-;; GRAPHVIZ MODE ;;
-;;;;;;;;;;;;;;;;;;;
-(defun dot-to-png ()
-  (interactive)
-  (let* ((file (buffer-name))
-	(out-file (substring file 0 (- (length file) 4))))
+  (let* ((file (buffer-file-name))
+		 (out-file (substring file 0 (- (length file) 4))))
     (shell-command (concat "dot -Tpng " file " -o " out-file ".png"))))
 
-
-;;; ========================================
-;;; ---------- MISC
-;;; ========================================
-(defun caesar-cipher (s n)
+(defun my-caesar-cipher (s n)
+  "Apply a caesar cipher to S using N as the offset."
   (apply #'string
          (mapcar (lambda (x) (+ (mod (+ n (- x ?a)) 26) ?a)) (downcase s))))
 
-(defun all-caesar-ciphers (s)
-  (dotimes (n 26)
-    (print (caesar-cipher s n))))
-
-;;; reverse pairs in a list
-(defun reverse-pairs (lst)
-  "Reverse pairs in a list"
-  (labels ((aux (lst result)
-		(if (null lst)
+(defun my-reverse-pairs (list)
+  "Reverse pairs in LIST."
+  (cl-labels ((aux (list result)
+		(if (null list)
 		    result
-		  (aux (rest (cdr lst)) (cons (-take 2 lst) result)))))
-    (reduce (lambda (x acc) (append x acc)) (aux lst (list)))))
+		  (aux (cl-rest (cdr list)) (cons (-take 2 list) result)))))
+    (cl-reduce (lambda (x acc) (append x acc)) (aux list (list)))))
 
-;;; Reverse char-pairs in a list
-(defun reverse-char-pairs (beg end)
-  "Reverse pairs of characters in a string"
+(defun my-reverse-char-pairs (beg end)
+  "Reverse pairs of characters in a string from BEG to END."
   (interactive (if (use-region-p)
 		   (list (region-beginning) (region-end))
 		 (list (point-min) (point-min))))
   (progn
-    (insert (concat (reverse-pairs
+    (insert (concat (my-reverse-pairs
 		     (string-to-list (buffer-substring-no-properties beg end)))))
     (delete-region beg end)))
 
-;;; generates a list of characters from START to END
-;;; Prepends/Appends a string if given
-(defun* generate-characters (start end &key (prepend "") (append ""))
-  (loop for x from (string-to-char start) to (string-to-char end)
-	collect (concat prepend (char-to-string x) append)))
+(cl-defun my-generate-characters (start end &key (prepend "") (append ""))
+  "Generate a list of characters from START to END.
 
-(defun gen-chars ()
-  "Generates characters from START to END"
+Prepend the string with PREPEND and append to the string with APPEND."
+  (cl-loop for x from (string-to-char start) to (string-to-char end)
+		collect (concat prepend (char-to-string x) append)))
+
+(defun my-gen-chars ()
+  "Generate characters from START to END."
   (interactive)
   (let ((start (read-from-minibuffer "Start character: "))
 	(end (read-from-minibuffer "End character: ")))
-    (generate-characters start end)))
+    (my-generate-characters start end)))
 
-;; Add date capabilites
-(defun insert-date (prefix)
-  "Insert the current date. With p
-prefix arguments, write out the day and month name."
+(defun my-insert-date (insert-date-format)
+  "Insert the current date.
+
+Prefix argument controls INSERT-DATE-FORMAT."
   (interactive "P")
   (let ((format (cond
-		 ((not prefix) "%d.%m.%Y")
-		 ((equal prefix '(4)) "%Y-%m-%d")
-		 ((equal prefix '(16)) "%A, %d. %B %Y")))
-	(system-time-locale "de_DE"))
+				 ((null insert-date-format) "%d.%m.%Y")
+				 ((equal insert-date-format '(4)) "%Y-%m-%d")
+				 ((equal insert-date-format '(16)) "%A, %d. %B %Y")))
+		(system-time-locale "de_DE"))
     (insert (format-time-string format))))
 
+
 (defun my-apply-function-to-region (from to function)
-  "Apply an elisp function to region in FROM TO."
+  "Apply an elisp FUNCTION to region in FROM TO."
   (interactive "r\naFunction to apply: ")
-  (princ (s-upper-camel-case (buffer-substring from to)) (current-buffer))
+  (princ (funcall function (buffer-substring from to)) (current-buffer))
   (delete-region from to))
 
-(defun my-clang-format-current-buffer ()
-  "Run clang-format on the current buffer."
-  (if (eq major-mode 'c++-mode)
-      (let ((clang-fmt
-             (apply #'concat
-                    (-interpose " " (list *my-clang-format* *my-clang-format-args*))))
-            (old-point (point)))
-        (progn
-          (shell-command-on-region (point-min) (point-max) clang-fmt
-                                   :current-buffer :replace)
-          (goto-char old-point)
-          t))
-    nil))
-
-(defun my-json-to-csv (json)
+(require 'json)
+(defun my-json-to-csv ()
+  "Convert JSON to CSV format."
   (let* ((tbl-json (json-read-file "/tmp/table.json"))
-		 (tbl-lst (map 'list (lambda (row-alist) (list (alist-get 'date row-alist) (alist-get 'count row-alist))) tbl-json))
+		 (tbl-lst (cl-map 'list (lambda (row-alist) (list (alist-get 'date row-alist) (alist-get 'count row-alist))) tbl-json))
 		 (csv-lst (mapcar (lambda (row) (string-join row ",")) tbl-lst)))
 	(string-join csv-lst "\n")))
 
 (provide 'my-functions)
-
-;;; Info lookups
-
 ;;; my-functions.el ends here
