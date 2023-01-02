@@ -172,7 +172,9 @@ Uses echo area to display tooltips and echo keystrokes
   (define-key global-map (kbd "C-x C-b") 'ibuffer)
   (setq ibuffer-expert t)
   (setq ibuffer-show-empty-filter-groups nil)
-  (add-hook 'ibuffer-mode-hook '(lambda () (ibuffer-auto-mode 1)))
+  (defun ibuffer-auto-mode-enable ()
+	(ibuffer-auto-mode 1))
+  (add-hook 'ibuffer-mode-hook #'ibuffer-auto-mode-enable)
   (setq help-window-select t)
 #+END_SRC
 ** Dired
@@ -322,8 +324,6 @@ packages up to date.
 	(package-refresh-contents)
 	(package-install 'use-package))
   (eval-when-compile (require 'use-package))
-  (require 'use-package-ensure)
-  (setq use-package-always-ensure t)
   (setq use-package-verbose nil)			; set to t for debugging init
 #+END_SRC
 
@@ -332,6 +332,7 @@ Automatically update packages.
 #+BEGIN_SRC emacs-lisp
   (use-package auto-package-update
 	:disabled
+	:ensure nil
 	:config
 	(setq auto-package-update-interval 90)
 	(setq auto-package-update-delete-old-versions t)
@@ -339,12 +340,19 @@ Automatically update packages.
 	(setq auto-package-update-prompt-before-update t)
 	(auto-package-update-maybe))
 #+END_SRC
-** Packages
+** Core Packages
    Core packages that is needed for 99% of use cases.
-*** undo-tree
-#+begin_src emacs-lisp
-  (use-package undo-tree)
-#+end_src
+*** Undo tree mode
+This makes undo/redo in emacs behave like a tree!
+#+BEGIN_SRC emacs-lisp
+  (use-package undo-tree
+	:ensure t
+	:diminish (undo-tree-mode . "")
+	:config (global-undo-tree-mode 1)
+	(setq my/undo-tree-history-dir (concat user-emacs-directory "undo-tree-history"))
+	(make-directory my/undo-tree-history-dir t)
+	(setq undo-tree-history-directory-alist `(("." . ,my/undo-tree-history-dir))))
+#+END_SRC
 *** evil-mode
 I use evil-mode for Vim emulation
 
@@ -352,6 +360,7 @@ evil-move-cursor-back: don't want to move cursor back after exiting insert
 Add more distinguishable colors for evil states
 #+BEGIN_SRC emacs-lisp
   (use-package evil
+	:ensure t
 	:init
 	(setq evil-want-keybinding nil)		; For evil-collection
 	:config
@@ -367,6 +376,7 @@ To ensure that the Linux/OSX environment variables within emacs is the same as
 the shell. (Windows is not included)
 #+BEGIN_SRC emacs-lisp
   (use-package exec-path-from-shell
+	:ensure t
 	:config
 	(add-to-list 'exec-path-from-shell-variables "MY_DRIVE")
 	(add-to-list 'exec-path-from-shell-variables "INCLUDEDIR")
@@ -377,6 +387,7 @@ the shell. (Windows is not included)
 Much more lightweight and faster then Helm, but with the same core functionality
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
+	:ensure t
 	:diminish (ivy-mode "")
 	:bind
 	("C-c s" . 'swiper-isearch)
@@ -398,33 +409,6 @@ Much more lightweight and faster then Helm, but with the same core functionality
 	#+begin_src emacs-lisp
 	  (use-package smex)
 	#+end_src
-*** Projectile
-Package for working with "projects"
-#+BEGIN_SRC emacs-lisp
-  (use-package projectile
-	:diminish (projectile-mode . "")
-	:config (projectile-global-mode 1)
-	:bind-keymap
-	("C-c p" . projectile-command-map))
-#+END_SRC
-
-*** Undo tree mode
-This makes undo/redo in emacs behave like a tree!
-#+BEGIN_SRC emacs-lisp
-  (use-package undo-tree
-	:diminish (undo-tree-mode . "")
-	:config (global-undo-tree-mode 1)
-	(setq my/undo-tree-history-dir (concat user-emacs-directory "undo-tree-history"))
-	(make-directory my/undo-tree-history-dir t)
-	(setq undo-tree-history-directory-alist `(("." . ,my/undo-tree-history-dir))))
-#+END_SRC
-
-*** Magit mode
-[[https://magit.vc/][magit]] is an emacs interface to git
-#+BEGIN_SRC emacs-lisp
-  (use-package magit
-	:pin melpa)
-#+END_SRC
 *** Navigation
 **** Avy
 	#+begin_src emacs-lisp
@@ -442,81 +426,105 @@ This makes undo/redo in emacs behave like a tree!
 		(global-set-key (kbd "M-o") 'ace-window)
 		(setq aw-scope 'frame))
 	#+end_src
-*** Programming Languages
-**** C/C++
-***** google-c-style
-	#+BEGIN_SRC emacs-lisp
-		(use-package google-c-style
-		:pin melpa
-		:hook
-		((c-mode c++-mode) . google-set-c-style)
-		(c-mode-common . google-make-newline-indent))
-	#+END_SRC
-**** Python
-	Configuration specific to python.
-**** Go
-	#+begin_src emacs-lisp
-	(defun add-hook-gofmt-before-save ()
-		(add-hook 'before-save-hook 'gofmt-before-save nil t))
-	(use-package go-mode
-		:mode ("\\.go\\'" . go-mode)
-		:hook (go-mode . add-hook-gofmt-before-save)
-		:config (add-to-list 'load-path (concat (getenv "GOPATH")  "/src/golang.org/x/lint/misc/emacs/")))
-	#+end_src
-**** Lisp
-	#+BEGIN_SRC emacs-lisp
-	  (use-package clojure-mode
-		  :hook
-		  (clojure-mode . (lambda () (require 'display-fill-column-indicator) (display-fill-column-indicator--turn-on))))
-	  (use-package paredit
-		  :disabled
-		  :commands (enable-paredit-mode)
-		  :init
-		  (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
-		  (add-hook 'clojure-mode-hook #'enable-paredit-mode))
-
-	  (use-package lispy
-		  :pin melpa
-		  :init
-		  (add-hook 'emacs-lisp-mode-hook #'lispy-mode)
-		  (add-hook 'lisp-mode-hook #'lispy-mode)
-		  (add-hook 'clojure-mode-hook #'lispy-mode)
-		  (add-hook 'scheme-mode-hook #'lispy-mode)
-		  :config
-		  (lispy-set-key-theme '(special c-digits paredit))
-		  (define-key lispy-mode-map-paredit (kbd "M-o") nil)
-		  (define-key lispy-mode-map-paredit (kbd "M-[") #'lispy-wrap-brackets)
-		  (define-key lispy-mode-map-paredit (kbd "M-{") #'lispy-wrap-braces))
+** Programming Languages
+*** C/C++
+**** google-c-style
+ #+BEGIN_SRC emacs-lisp
+   (use-package google-c-style
+	 :ensure nil
+	 :pin melpa
+	 :hook
+	 ((c-mode c++-mode) . google-set-c-style)
+	 (c-mode-common . google-make-newline-indent))
+ #+END_SRC
+*** Go
+ #+begin_src emacs-lisp
+   (defun add-hook-gofmt-before-save ()
+	   (add-hook 'before-save-hook 'gofmt-before-save nil t))
+   (use-package go-mode
+	 :ensure nil
+	 :mode ("\\.go\\'" . go-mode)
+	 :hook (go-mode . add-hook-gofmt-before-save)
+	 :config (add-to-list 'load-path (concat (getenv "GOPATH")  "/src/golang.org/x/lint/misc/emacs/")))
+ #+end_src
+*** Lisp
+**** General 
+ #+BEGIN_SRC emacs-lisp
+   (use-package lispy
+	 :ensure nil
+	 :init
+	 (add-hook 'emacs-lisp-mode-hook #'lispy-mode)
+	 (add-hook 'lisp-mode-hook #'lispy-mode)
+	 (add-hook 'clojure-mode-hook #'lispy-mode)
+	 (add-hook 'scheme-mode-hook #'lispy-mode)
+	 :config
+	 (lispy-set-key-theme '(special c-digits paredit))
+	 (define-key lispy-mode-map-paredit (kbd "M-o") nil)
+	 (define-key lispy-mode-map-paredit (kbd "M-[") #'lispy-wrap-brackets)
+	 (define-key lispy-mode-map-paredit (kbd "M-{") #'lispy-wrap-braces))
 
 
-	  (use-package lispyville
-		  :pin melpa
-		  :init
-		  (add-hook 'lispy-mode-hook #'lispyville-mode)
-		  :config
-		  (lispyville-set-key-theme
-		  '(operators
-			  c-w
-			  wrap
-			  slurp/barf-lispy
-			  additional
-			  additional-motions)))
+   (use-package lispyville
+	 :ensure nil
+	 :init
+	 (add-hook 'lispy-mode-hook #'lispyville-mode)
+	 :config
+	 (lispyville-set-key-theme
+	  '(operators
+		c-w
+		wrap
+		slurp/barf-lispy
+		additional
+		additional-motions)))
 
-	  (use-package flycheck-clj-kondo)
-	#+END_SRC
-**** OCaml
-	 Configure OCaml stuff, currently there is some config in =.emacs= managed by ~opam user-setup install~
+ #+END_SRC
+**** Emacs-Lisp
+   #+begin_src emacs-lisp
+	 (setq flycheck-emacs-lisp-load-path 'inherit)
+   #+end_src
+**** Clojure
 	 #+begin_src emacs-lisp
-	   (when (package-installed-p 'ocamlformat)
-		 (require 'ocamlformat)
-		 (add-hook 'tuareg-mode-hook (lambda ()
-									   ;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
-									   (add-hook 'before-save-hook #'ocamlformat-before-save))))
+	   (use-package clojure-mode
+		 :ensure nil
+		 :hook
+		 (clojure-mode . (lambda () (require 'display-fill-column-indicator) (display-fill-column-indicator--turn-on))))
+
+	   (use-package flycheck-clj-kondo)
 	 #+end_src
+*** OCaml
+   Configure OCaml stuff, currently there is some config in =.emacs= managed by ~opam user-setup install~
+   #+begin_src emacs-lisp
+	 (when (package-installed-p 'ocamlformat)
+	   (require 'ocamlformat)
+	   (add-hook 'tuareg-mode-hook (lambda ()
+									 ;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
+									 (add-hook 'before-save-hook #'ocamlformat-before-save))))
+   #+end_src
+** Optional Packages
+   The packages here are not /required/, but they each have their use case or
+   provide a whole new experience.
+*** Projectile
+Package for working with "projects"
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+	:ensure nil
+	:diminish (projectile-mode . "")
+	:config (projectile-global-mode 1)
+	:bind-keymap
+	("C-c p" . projectile-command-map))
+#+END_SRC
+
+*** Magit mode
+[[https://magit.vc/][magit]] is an emacs interface to git
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+	:ensure nil
+	:pin melpa)
+#+END_SRC
 *** vterm
 	#+BEGIN_SRC emacs-lisp
 	  (use-package vterm
-		:pin "melpa"
+		:ensure nil
 		:config
 		(setq vterm-buffer-name-string "vterm [%s]")
 		(setq vterm-timer-delay 0.01)
@@ -526,10 +534,10 @@ This makes undo/redo in emacs behave like a tree!
 		(require 'my-vterm)
 		:hook (vterm-mode . (lambda () (goto-address-mode 1))))
 	#+END_SRC
-
 *** evil-collection
 	#+begin_src emacs-lisp
-	(use-package evil-collection
+	  (use-package evil-collection
+		:ensure nil
 		:after evil
 		:diminish (evil-collection-unimpaired-mode . "")
 		:config
@@ -539,16 +547,15 @@ This makes undo/redo in emacs behave like a tree!
 *** string inflection (toggle case)
 	Toggle between the different case types (ie. CamelCase, underscore_case, kebab-case).
 	#+begin_src emacs-lisp
-	  (use-package string-inflection)
+	  (use-package string-inflection
+		:ensure nil)
 	#+end_src
-** Optional Packages
-   The packages here are not /required/, but they each have their use case or
-   provide a whole new experience.
 *** Company mode
 	[[https://company-mode.github.io/][company-mode]] is an autocomplete framework for Emacs. And it can work with
 	various backends.
 	#+BEGIN_SRC emacs-lisp
 	  (use-package company
+		:ensure nil
 		:diminish (company-mode . "")
 		:config
 		(global-company-mode)
@@ -559,21 +566,24 @@ This makes undo/redo in emacs behave like a tree!
 		(setq company-begin-commands '(self-insert-command)))
 	#+END_SRC
 *** Protocol Buffers
-Protocol Buffers are awesome.
+Protocol Buffers are useful.
 #+BEGIN_SRC emacs-lisp
   (use-package protobuf-mode
+	:ensure nil
 	:mode "\\.proto")
 #+END_SRC
 *** Bazel/Blaze
 #+BEGIN_SRC emacs-lisp
   (use-package bazel
 	:disabled
+	:ensure nil
 	:pin melpa
 	:mode "BUILD")
 #+END_SRC
 *** imenu list
 	#+BEGIN_SRC emacs-lisp
 	  (use-package imenu-list
+		:ensure nil
 		:bind  ("C-c l"  . #'imenu-list-smart-toggle))
 	#+END_SRC
 
@@ -581,14 +591,15 @@ Protocol Buffers are awesome.
 	Disabling eglot as at work, there is a builtin version, which is probably more compatible.
 	#+begin_src emacs-lisp
 	  (use-package eglot
-                :disabled
-		:pin melpa-stable
+		:disabled
+		:ensure nil
 		:config (add-to-list 'eglot-stay-out-of 'imenu))
 
 	#+end_src
 *** Highligh indentation levels
    #+begin_src emacs-lisp
 	 (use-package highlight-indent-guides
+	   :ensure nil
 	   :config
 	   (setq highlight-indent-guides-method 'character)
 	   :hook
@@ -611,7 +622,13 @@ Protocol Buffers are awesome.
 	#+begin_src emacs-lisp
 	  (use-package burly)
 	#+end_src
+*** Dashboard
 
+#+begin_src emacs-lisp
+  (use-package dashboard
+	:config
+	(dashboard-setup-startup-hook))
+#+end_src
 
 ** Coding
 *** Building/Testing
@@ -676,6 +693,7 @@ The following are org-mode plugins.
 			 ))
 	(org-load-modules-maybe t))
   (use-package org-bullets
+	:ensure nil
 	:hook (org-mode . (lambda () (org-bullets-mode 1))))
 #+END_SRC
 *** org-babel
@@ -699,6 +717,7 @@ The following are org-mode plugins.
 	  ;; The following runs periodically in the foreground
 	  (use-package org-notifications
 		:disabled
+		:ensure nil
 		:pin melpa
 		:config
 		(org-notifications-start))
@@ -728,17 +747,18 @@ The following are org-mode plugins.
 *** org-roam
 	  #+begin_src emacs-lisp
 		(use-package org-roam
-		  :ensure t
+		  :ensure nil
 		  :after org
 		  :custom
 		  (org-roam-directory org-directory)
 		  (org-roam-completion-everywhere t)
 		  :config
+		  (require 'org-roam-capture)
 		  (require 'org-roam-protocol)
 		  (org-roam-db-autosync-mode)
 		  (setq org-roam-capture-templates
 				`(("d" "default" plain "%?" :target
-				   (file+head ,(concat my/org-notes-directory "%<%Y%m%d%H%M>-${slug}.org") "#+title: ${title}
+				   (file+head ,(concat my/org-notes-directory "%<%Y%m%d>-${slug}.org") "#+title: ${title}
 		,#+filetags: %^G
 		")
 				   :unnarrowed t
@@ -754,13 +774,13 @@ The following are org-mode plugins.
 				   :unnarrowed t)))
 		  (setq org-roam-capture-ref-templates
 				`(("r" "ref" plain "%?" :target
-				   (file+head ,(concat my/org-notes-directory "%<%Y%m%d%H%M>-${slug}.org") "#+title: ${title}
+				   (file+head ,(concat my/org-notes-directory "%<%Y%m%d>-${slug}.org") "#+title: ${title}
 		,#+filetags: %^G
 		")
 				   :unnarrowed t)
 				  ("t" "agenda item" entry "* %^{State?|TODO|WORKING|BACKLOGGED} %u ${title}
 		%?"
-				   :target (file+head ,(concat my/org-agenda-directory "%<%Y%m%d%H%M>-${slug}.org") "#+title: ${title}
+				   :target (file+head ,(concat my/org-agenda-directory "%<%Y%m%d>-${slug}.org") "#+title: ${title}
 		,#+filetags: %^G
 		,#+category: %^{Category?|todo|buganizer}
 		")
@@ -788,15 +808,16 @@ The following are org-mode plugins.
 	 [[https://github.com/hasu/notdeft][notdeft]] is a fast text search engine for my notes, but it requires manual installation.
 
 	 #+begin_src emacs-lisp
-	   (setq my/notdeft-package-path (expand-file-name "~/Projects/notdeft"))
-	   (add-to-list 'load-path my/notdeft-package-path)
+	   (setq my-notdeft-package-path (expand-file-name "~/Projects/OpenSource/notdeft"))
+	   (add-to-list 'load-path my-notdeft-package-path)
+	   (add-to-list 'load-path (concat my-notdeft-package-path "/extras"))
 	   (use-package notdeft-autoloads
 		 :after
 		 org-roam
 		 :ensure nil
 		 :config
 		 (setq notdeft-directories (list (expand-file-name (concat org-roam-directory))))
-		 (setq notdeft-xapian-program (expand-file-name (concat my/notdeft-package-path "/xapian/notdeft-xapian"))))
+		 (setq notdeft-xapian-program (expand-file-name (concat my-notdeft-package-path "/xapian/notdeft-xapian"))))
 	 #+end_src
 
 *** Local Config
