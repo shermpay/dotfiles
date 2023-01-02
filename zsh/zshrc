@@ -111,10 +111,8 @@ zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
 
 # emacs vterm
-if [[ "$INSIDE_EMACS" = 'vterm' ]] \
-    && [[ -n ${EMACS_VTERM_PATH} ]] \
-    && [[ -f ${EMACS_VTERM_PATH}/etc/emacs-vterm-zsh.sh ]]; then
-	source ${EMACS_VTERM_PATH}/etc/emacs-vterm-zsh.sh
+if [[ "$INSIDE_EMACS" = 'vterm' ]] ; then
+    echo "loading emacs-vterm-zsh.zh ..."
     source "${INCLUDEDIR}/vterm.sh"
 fi
 
