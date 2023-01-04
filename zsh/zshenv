@@ -50,9 +50,9 @@ if [[ -f "$HOME/.shtools" ]]; then
     source "$HOME/.shtools"
 fi
 
+# INCLUDEDIR for sharing shell scripts
+export INCLUDEDIR="$HOME/.local/include"
+
 if [[ -r ~/.zshenv.local ]]; then
     source ~/.zshenv.local
 fi
-
-# INCLUDEDIR for sharing shell scripts
-export INCLUDEDIR="$HOME/.local/include"

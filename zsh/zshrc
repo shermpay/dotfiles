@@ -112,7 +112,7 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 
 # emacs vterm
 if [[ "$INSIDE_EMACS" = 'vterm' ]] ; then
-    echo "loading emacs-vterm-zsh.zh ..."
+    echo "loading vterm.sh ..." 
     source "${INCLUDEDIR}/vterm.sh"
 fi
 
@@ -121,6 +121,9 @@ function cd_ls() {
     emulate -L zsh
     echo $(ls --color=auto | head -n 8)
 }
+
+ # Fix for TRAMP
+ [[ $TERM = "dumb" ]] && unsetopt zle && PS1='$ '
 
 if [ -r ~/.zshrc.local ]; then
 	echo "loading .zshrc.local ..."
