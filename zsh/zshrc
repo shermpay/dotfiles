@@ -20,8 +20,20 @@ compinit
 # Lines configured by zsh-newuser-install
 HISTFILE=~/.histfile
 HISTSIZE=10000
-SAVEHIST=10000
+SAVEHIST=80000
 # End of lines configured by zsh-newuser-install
+
+# Immediately append
+setopt INC_APPEND_HISTORY
+export HISTTIMEFORMAT="[%F %T] "
+
+# Add timestamp to history
+setopt EXTENDED_HISTORY
+
+# Ignore duplicates when searching
+setopt HIST_FIND_NO_DUPS
+# The following will skip writing duplicates to the history file.
+# setopt HIST_IGNORE_ALL_DUPS
 
 # Dirstack
 DIRSTACKFILE="$HOME/.cache/zsh/dirs"
@@ -129,3 +141,6 @@ if [ -r ~/.zshrc.local ]; then
 	echo "loading .zshrc.local ..."
 	source ~/.zshrc.local
 fi
+
+
+[ -f "/Users/shermanpay/.ghcup/env" ] && source "/Users/shermanpay/.ghcup/env" # ghcup-env
