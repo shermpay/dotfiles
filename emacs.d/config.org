@@ -17,34 +17,6 @@ Require builtin libraries here.
   (require 'cl-lib)
 #+END_SRC
 
-** Environment
-
-*** My variables
-My user defined variables. I prefix all my variables with "my" to ensure there
-are no name collisions with other other modes variables.
-#+BEGIN_SRC emacs-lisp
-  (defun my-gdrive-or-emacs-dir ()
-	(if (getenv "MY_DRIVE")
-		(file-name-as-directory (getenv "MY_DRIVE"))
-	  (do
-		  (message "Missing 'MY_DRIVE' environment variable!")
-		  user-emacs-directory)))
-#+END_SRC
-
-*** Load Paths
-Add subdirectories of "~/.emacs.d" to load-path
-#+BEGIN_SRC emacs-lisp
-  (let ((default-directory user-emacs-directory))
-	(normal-top-level-add-subdirs-to-load-path))
-#+END_SRC
-
-*** User Info
-Explicitly set these.
-#+BEGIN_SRC emacs-lisp
-(setq user-full-name "Sherman Pay"
-	  user-mail-address "shermanpay1991@gmail.com")
-#+END_SRC
-
 ** Bootstrap
    Bootstrapping my Emacs.
    #+begin_src emacs-lisp
@@ -76,148 +48,6 @@ Change yes or no prompts to y or n prompts
 (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
-*** Uniquify
-Uniquify buffer names with "post-forward" style:
-   /foo/bar/name will become name|/foo/bar
-#+BEGIN_SRC emacs-lisp
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'post-forward)
-#+END_SRC
-
-*** Keybindings
-#+BEGIN_SRC emacs-lisp
-  (define-key global-map (kbd "M-o") 'other-window)
-#+END_SRC
-** Editing
-subword-mode: Allows navigation and editing of "subwords"
-
-show-paren-mode: Show matching parentheses
-
-next-line-add-newlines: If non-nil 'next-line' inserts a newline
-
-save-place-mode: Save previous editing location and always go back to it
-#+BEGIN_SRC emacs-lisp
-  (global-subword-mode t)
-
-  (show-paren-mode 1)
-  (setq show-paren-style 'expression)
-
-  (setq next-line-add-newlines nil)
-
-  (save-place-mode 1)
-  (setq save-place-forget-unreadable-files nil) ; make emacs quit work
-
-  (setq-default tab-width 4)
-#+END_SRC
-
-*** Ansi Color codes
-Enable Ansi color codes for compilation buffers
-#+BEGIN_SRC emacs-lisp
-(require 'ansi-color)
-#+END_SRC
-
-*** Debugging Emacs
-#+BEGIN_SRC emacs-lisp
-(setq debug-on-error t)
-#+END_SRC
-
-*** Backups
-Setting Auto-Save directory and Backup Directory
-#+BEGIN_SRC emacs-lisp
-(let ((tmp (concat user-emacs-directory "tmp")))
- (setq backup-directory-alist
-	   `((".*" . ,tmp)))
- (setq auto-save-file-name-transforms
-	   `((".*" ,tmp t))))
-#+END_SRC
-
-*** Imenu
-#+BEGIN_SRC emacs-lisp
-  (define-key global-map (kbd "C-c i") 'imenu)
-
-#+END_SRC
-** User Interface
-
-*** Line and Column numbers
-Show line-numbers and column numbers in the mode-line but don't show
-line numbers on the sidej
-#+BEGIN_SRC emacs-lisp
-  (column-number-mode t)
-  (setq-default fill-column 80)
-  (require 'display-line-numbers)
-  (setq display-line-numbers-type 'relative)
-  (add-hook 'prog-mode-hook #'display-line-numbers--turn-on)
-#+END_SRC
-*** Bars
-Don't like all the fancy bars
-#+BEGIN_SRC emacs-lisp
-(menu-bar-mode -1)
-(menu-bar-no-scroll-bar)
-(tool-bar-mode -1)
-#+END_SRC
-
-*** Echo Area
-Uses echo area to display tooltips and echo keystrokes
-#+BEGIN_SRC emacs-lisp
-(tooltip-mode -1)
-(setq echo-keystrokes 0.01)
-#+END_SRC
-
-*** Fractional Font Size
-	#+begin_src emacs-lisp
-	  (setq frame-resize-pixelwise t)
-	#+end_src
-** Buffer/Window Mangement
-#+BEGIN_SRC emacs-lisp
-  (define-key global-map (kbd "C-x C-b") 'ibuffer)
-  (setq ibuffer-expert t)
-  (setq ibuffer-show-empty-filter-groups nil)
-  (defun ibuffer-auto-mode-enable ()
-	(ibuffer-auto-mode 1))
-  (add-hook 'ibuffer-mode-hook #'ibuffer-auto-mode-enable)
-  (setq help-window-select t)
-#+END_SRC
-** Dired
-   #+begin_src emacs-lisp
-	 (setq dired-listing-switches "-alh")
-   #+end_src
-** Emacs Server
-
-Start emacs server
-#+BEGIN_SRC emacs-lisp
-  (with-eval-after-load "server"
-	  (unless (server-running-p) (server-start)))
-#+END_SRC
-
-** Emacs Desktops
-   For saving "desktops"(sessions)
-   #+begin_src emacs-lisp
-	 (desktop-save-mode nil)
-	 (setq my/desktop-save-path "~/.emacs.d/desktops")
-	 (mkdir my/desktop-save-path :parents)
-	 (add-to-list 'desktop-path my/desktop-save-path)
-   #+end_src
-** Static checkers
-*** Flymake
-	flymake is the builtin static checker.
-	#+begin_src emacs-lisp
-	  (with-eval-after-load "flymake"
-				(define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
-				(define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error))
-	  (setq help-at-pt-timer 0.9)
-	  (setq help-at-pt-display-when-idle '(flymake-overlay))
-	#+end_src
-*** Flyspell
-
- Enable flyspell mode for strings and comments
- #+BEGIN_SRC emacs-lisp
-   (add-hook 'prog-mode-hook (lambda () (flyspell-prog-mode)))
-
-   ;; Spell checkers
-   (cond ((executable-find "enchant-2")  (setq-default ispell-program-name "enchant-2"))
-		 ((executable-find "hunspell")   (progn (setq-default ispell-program-name "hunspell") (setq ispell-really-hunspell t)))
-		 ((executable-find "aspell")     (setq-default ispell-program-name "aspell")))
- #+END_SRC
 
 ** Midnight Mode
    Midnight mode runs ~clean-buffer-list~ at a defined /midnight/ everyday. To disable the timer, eval ~(cancel-timer midnight-timer)~.
@@ -277,112 +107,6 @@ Start emacs server
 														'("\\`\\*tramp/.*\\*\\`"
 														  "\\`\\*ftp .*\\*\\`")))
 	#+end_src
-** Emacs OS
-*** Shell
-#+begin_src emacs-lisp
-  (setq shell-file-path "/bin/zsh")
-#+end_src
-*** dired
-	#+begin_src emacs-lisp
-	  (setq dired-dwim-target t)
-	#+end_src
-*** Browser settings
-
- Use chrome as the default browser. This assumes chrome is installed.
- #+BEGIN_SRC emacs-lisp
-   (setq browse-url-generic-program (cl-ecase system-type
-									  (gnu/linux "/usr/bin/google-chrome")
-									  (darwin "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"))
-		 browse-url-browser-function 'browse-url-generic)
-
- #+END_SRC
-** Package Management
-Package management is important!
-Add melpa-stable repository, which has stable community packages.
-Add melpa repository for specific packages.
-#+BEGIN_SRC emacs-lisp
-  (require 'package)
-  ;; (add-to-list 'package-archives
-  ;;   '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-  (add-to-list 'package-archives
-			   '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives
-			   '("elpa" . "https://elpa.gnu.org/packages/") t)
-  (package-initialize)
-
-#+END_SRC
-
-*** use-package
-Bootstrap and customize it.  always-ensure: Ensure the package exists
-by downloading it if it does not exist. However this does *not* keep
-packages up to date.
-#+BEGIN_SRC emacs-lisp
-  (if (member emacs-version '("26.1" "26.2")) (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp
-  (unless (package-installed-p 'use-package)
-	(package-refresh-contents)
-	(package-install 'use-package))
-  (eval-when-compile (require 'use-package))
-  (setq use-package-verbose nil)			; set to t for debugging init
-#+END_SRC
-
-*** auto-package-update
-Automatically update packages.
-#+BEGIN_SRC emacs-lisp
-  (use-package auto-package-update
-	:disabled
-	:ensure nil
-	:config
-	(setq auto-package-update-interval 90)
-	(setq auto-package-update-delete-old-versions t)
-	(setq auto-package-update-hide-results t)
-	(setq auto-package-update-prompt-before-update t)
-	(auto-package-update-maybe))
-#+END_SRC
-** Core Packages
-   Core packages that is needed for 99% of use cases.
-*** Undo tree mode
-This makes undo/redo in emacs behave like a tree!
-#+BEGIN_SRC emacs-lisp
-  (use-package undo-tree
-	:ensure t
-	:diminish (undo-tree-mode . "")
-	:config (global-undo-tree-mode 1)
-	(setq my/undo-tree-history-dir (concat user-emacs-directory "undo-tree-history"))
-	(make-directory my/undo-tree-history-dir t)
-	(setq undo-tree-history-directory-alist `(("." . ,my/undo-tree-history-dir))))
-#+END_SRC
-*** evil-mode
-I use evil-mode for Vim emulation
-
-evil-move-cursor-back: don't want to move cursor back after exiting insert
-Add more distinguishable colors for evil states
-#+BEGIN_SRC emacs-lisp
-  (use-package evil
-	:ensure t
-	:init
-	(setq evil-want-keybinding nil)		; For evil-collection
-	:config
-	(evil-mode 1)
-	(setq evil-move-cursor-back nil)
-	(setq evil-normal-state-cursor '("dim gray" box)
-		  evil-insert-state-cursor '("dim gray" bar)
-		  evil-emacs-state-cursor '("dark violet" bar))
-	(evil-set-undo-system 'undo-tree))
-#+END_SRC
-*** exec-path-from-shell
-To ensure that the Linux/OSX environment variables within emacs is the same as
-the shell. (Windows is not included)
-#+BEGIN_SRC emacs-lisp
-  (use-package exec-path-from-shell
-	:ensure t
-	:config
-	(add-to-list 'exec-path-from-shell-variables "MY_DRIVE")
-	(add-to-list 'exec-path-from-shell-variables "INCLUDEDIR")
-	(when (memq window-system '(mac ns x))
-	  (exec-path-from-shell-initialize)))
-#+END_SRC
 *** Ivy/Counsel
 Much more lightweight and faster then Helm, but with the same core functionality
 #+BEGIN_SRC emacs-lisp
@@ -409,97 +133,6 @@ Much more lightweight and faster then Helm, but with the same core functionality
 	#+begin_src emacs-lisp
 	  (use-package smex)
 	#+end_src
-*** Navigation
-**** Avy
-	#+begin_src emacs-lisp
-	  (use-package avy
-		:config
-		(avy-setup-default)
-		(define-key evil-motion-state-map (kbd "SPC") #'avy-goto-word-or-subword-1)
-		(setq avy-all-windows nil
-			  avy-all-windows-alt t))
-	#+end_src
-**** Ace Window
-	#+begin_src emacs-lisp
-	  (use-package ace-window
-		:config
-		(global-set-key (kbd "M-o") 'ace-window)
-		(setq aw-scope 'frame))
-	#+end_src
-** Programming Languages
-*** C/C++
-**** google-c-style
- #+BEGIN_SRC emacs-lisp
-   (use-package google-c-style
-	 :ensure nil
-	 :pin melpa
-	 :hook
-	 ((c-mode c++-mode) . google-set-c-style)
-	 (c-mode-common . google-make-newline-indent))
- #+END_SRC
-*** Go
- #+begin_src emacs-lisp
-   (defun add-hook-gofmt-before-save ()
-	   (add-hook 'before-save-hook 'gofmt-before-save nil t))
-   (use-package go-mode
-	 :ensure nil
-	 :mode ("\\.go\\'" . go-mode)
-	 :hook (go-mode . add-hook-gofmt-before-save)
-	 :config (add-to-list 'load-path (concat (getenv "GOPATH")  "/src/golang.org/x/lint/misc/emacs/")))
- #+end_src
-*** Lisp
-**** General 
- #+BEGIN_SRC emacs-lisp
-   (use-package lispy
-	 :ensure nil
-	 :init
-	 (add-hook 'emacs-lisp-mode-hook #'lispy-mode)
-	 (add-hook 'lisp-mode-hook #'lispy-mode)
-	 (add-hook 'clojure-mode-hook #'lispy-mode)
-	 (add-hook 'scheme-mode-hook #'lispy-mode)
-	 :config
-	 (lispy-set-key-theme '(special c-digits paredit))
-	 (define-key lispy-mode-map-paredit (kbd "M-o") nil)
-	 (define-key lispy-mode-map-paredit (kbd "M-[") #'lispy-wrap-brackets)
-	 (define-key lispy-mode-map-paredit (kbd "M-{") #'lispy-wrap-braces))
-
-
-   (use-package lispyville
-	 :ensure nil
-	 :init
-	 (add-hook 'lispy-mode-hook #'lispyville-mode)
-	 :config
-	 (lispyville-set-key-theme
-	  '(operators
-		c-w
-		wrap
-		slurp/barf-lispy
-		additional
-		additional-motions)))
-
- #+END_SRC
-**** Emacs-Lisp
-   #+begin_src emacs-lisp
-	 (setq flycheck-emacs-lisp-load-path 'inherit)
-   #+end_src
-**** Clojure
-	 #+begin_src emacs-lisp
-	   (use-package clojure-mode
-		 :ensure nil
-		 :hook
-		 (clojure-mode . (lambda () (require 'display-fill-column-indicator) (display-fill-column-indicator--turn-on))))
-
-	   (use-package flycheck-clj-kondo)
-	 #+end_src
-*** OCaml
-   Configure OCaml stuff, currently there is some config in =.emacs= managed by ~opam user-setup install~
-   #+begin_src emacs-lisp
-	 (when (package-installed-p 'ocamlformat)
-	   (require 'ocamlformat)
-	   (add-hook 'tuareg-mode-hook (lambda ()
-									 ;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
-									 (add-hook 'before-save-hook #'ocamlformat-before-save))))
-   #+end_src
 ** Optional Packages
    The packages here are not /required/, but they each have their use case or
    provide a whole new experience.
@@ -514,42 +147,6 @@ Package for working with "projects"
 	("C-c p" . projectile-command-map))
 #+END_SRC
 
-*** Magit mode
-[[https://magit.vc/][magit]] is an emacs interface to git
-#+BEGIN_SRC emacs-lisp
-  (use-package magit
-	:ensure nil
-	:pin melpa)
-#+END_SRC
-*** vterm
-	#+BEGIN_SRC emacs-lisp
-	  (use-package vterm
-		:ensure nil
-		:config
-		(setq vterm-buffer-name-string "vterm [%s]")
-		(setq vterm-timer-delay 0.01)
-		(add-to-list 'vterm-eval-cmds '("find-file-other-window" find-file-other-window))
-		(define-key vterm-mode-map (kbd "C-q") #'vterm-send-next-key)
-		(define-key global-map (kbd "C-c t") #'vterm)
-		(require 'my-vterm)
-		:hook (vterm-mode . (lambda () (goto-address-mode 1))))
-	#+END_SRC
-*** evil-collection
-	#+begin_src emacs-lisp
-	  (use-package evil-collection
-		:ensure nil
-		:after evil
-		:diminish (evil-collection-unimpaired-mode . "")
-		:config
-		(setq evil-collection-mode-list (remove 'lispy evil-collection-mode-list))
-		(evil-collection-init))
-	#+end_src
-*** string inflection (toggle case)
-	Toggle between the different case types (ie. CamelCase, underscore_case, kebab-case).
-	#+begin_src emacs-lisp
-	  (use-package string-inflection
-		:ensure nil)
-	#+end_src
 *** Company mode
 	[[https://company-mode.github.io/][company-mode]] is an autocomplete framework for Emacs. And it can work with
 	various backends.
@@ -565,13 +162,6 @@ Package for working with "projects"
 		;; start autocompletion only after typing
 		(setq company-begin-commands '(self-insert-command)))
 	#+END_SRC
-*** Protocol Buffers
-Protocol Buffers are useful.
-#+BEGIN_SRC emacs-lisp
-  (use-package protobuf-mode
-	:ensure nil
-	:mode "\\.proto")
-#+END_SRC
 *** Bazel/Blaze
 #+BEGIN_SRC emacs-lisp
   (use-package bazel
@@ -591,20 +181,23 @@ Protocol Buffers are useful.
 	Disabling eglot as at work, there is a builtin version, which is probably more compatible.
 	#+begin_src emacs-lisp
 	  (use-package eglot
-		:disabled
-		:ensure nil
-		:config (add-to-list 'eglot-stay-out-of 'imenu))
+		:ensure nil)
 
 	#+end_src
-*** Highligh indentation levels
+*** Highlight indentation levels
    #+begin_src emacs-lisp
 	 (use-package highlight-indent-guides
 	   :ensure nil
+	   :if (package-installed-p 'highlight-indent-guides)
 	   :config
 	   (setq highlight-indent-guides-method 'character)
 	   :hook
 	   (prog-mode . highlight-indent-guides-mode))
    #+end_src
+*** Lexer and parser generators
+	#+begin_src emacs-lisp
+	#+end_src
+	
 ** Experimental Packages
    The packages here are /experimental/, and should be reviewed if unused.
 *** Reddit
@@ -626,15 +219,11 @@ Protocol Buffers are useful.
 
 #+begin_src emacs-lisp
   (use-package dashboard
+	:disabled
 	:config
 	(dashboard-setup-startup-hook))
 #+end_src
 
-** Coding
-*** Building/Testing
-	#+begin_src emacs-lisp
-	  (define-key global-map (kbd "C-c r") #'recompile)
-	#+end_src
 ** Org Mode
 The following are builtin configurations. The keybindings are as recommended by [[info:org#Activation][info:org#Activation]].
 #+BEGIN_SRC emacs-lisp
@@ -693,6 +282,7 @@ The following are org-mode plugins.
 			 ))
 	(org-load-modules-maybe t))
   (use-package org-bullets
+	:if (package-installed-p 'org-bullets)
 	:ensure nil
 	:hook (org-mode . (lambda () (org-bullets-mode 1))))
 #+END_SRC
