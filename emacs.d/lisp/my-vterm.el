@@ -58,15 +58,20 @@ shell exits, the buffer is killed."
      (list command
            (completing-read "buffer: " (cons (concat "*" command "*") vterm-buffers)))))
   (let* ((vterm-buffers (mapcar #'buffer-name (my-vterm--list-buffers)))
-         (new-vterm (null (member buffer vterm-buffers))))
+         (new-vterm (null (member buffer vterm-buffers)))
+         (dir default-directory))
     (with-current-buffer (if new-vterm (vterm buffer) buffer)
+      ;; This is needed so vterm does not rename the buffer
+      (setq-local vterm-buffer-name-string nil)
       (when new-vterm (set-process-sentinel vterm--process #'my-vterm--kill-process))
+      (vterm-send-string (format "cd %s" dir))
+      (vterm-send-return)
       (vterm-send-string command)
       (vterm-send-return)
+      (vterm--set-title buffer)
       (rename-buffer buffer)
       (pop-to-buffer (current-buffer))
       (current-buffer))))
-
 
 (defun my-vterm-start-process (command &key buffer)
   "Execute string COMMAND in BUFFER creating a new buffer if it does not exist.

@@ -104,5 +104,32 @@ Prefix argument controls INSERT-DATE-FORMAT."
 		 (csv-lst (mapcar (lambda (row) (string-join row ",")) tbl-lst)))
 	(string-join csv-lst "\n")))
 
+(defconst my-conf-symbol-prefix "my-conf--")
+
+(defun my-conf-add-to-list (list-symbol key value)
+  "Add VALUE to LIST-SYMBOL overriding the VALUE mapped to KEY."
+
+  (cl-check-type key symbol)
+
+  (let* ((list-value (symbol-value list-symbol))
+		 (conf-alist-symbol (intern (concat my-conf-symbol-prefix
+											(symbol-name list-symbol))))
+		 (conf-alist (if (boundp conf-alist-symbol)
+						 (symbol-value conf-alist-symbol)
+					   '()))
+		 (original-pair (assoc key conf-alist))
+		 (original-value (cdr original-pair)))
+	(if original-pair
+		(setcdr original-pair value)
+	  (push (cons key value) conf-alist))
+
+	(set conf-alist-symbol conf-alist)
+
+	(if original-value
+		(set list-symbol (delete original-value list-value)))
+
+	(add-to-list list-symbol value)))
+
+
 (provide 'my-functions)
 ;;; my-functions.el ends here
