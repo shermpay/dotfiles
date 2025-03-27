@@ -25,6 +25,7 @@
 (setq next-line-add-newlines nil)
 (save-place-mode 1)
 
+(setq-default tab-width 4)
 ;;;; Buffers
 (use-package uniquify
   :config
@@ -50,14 +51,16 @@
 
 
 ;;;; Compilation
-(use-package ansi-color)
+(use-package ansi-color
+  :config
+  (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
 
 ;;;; Backups
 (let ((tmp (concat user-emacs-directory "tmp")))
- (setq backup-directory-alist
-	   `((".*" . ,tmp)))
- (setq auto-save-file-name-transforms
-	   `((".*" ,tmp t))))
+  (setq backup-directory-alist
+	`((".*" . ,tmp)))
+  (setq auto-save-file-name-transforms
+	`((".*" ,tmp t))))
 
 ;;;; UI
 (column-number-mode t)
@@ -89,9 +92,13 @@
   (setq dired-dwim-target t)
   (setq dired-listing-switches "-alh"))
 (setq browse-url-generic-program (cl-ecase system-type
-								   (gnu/linux "/usr/bin/google-chrome")
-								   (darwin "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"))
-	  browse-url-browser-function 'browse-url-generic)
+							   (gnu/linux "/usr/bin/google-chrome")
+							   (darwin "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"))
+      browse-url-browser-function 'browse-url-generic)
+
+;;;; project.el
+
+(setq project-vc-extra-root-markers '("MODULE.bazel" "go.mod" ".dir-locals.el"))
 
 ;;;; Keybinds
 (define-key global-map (kbd "M-o") 'other-window)
@@ -144,7 +151,10 @@
   (setq evil-normal-state-cursor '("dim gray" box)
 		evil-insert-state-cursor '("dim gray" bar)
 		evil-emacs-state-cursor '("dark violet" bar))
-  (evil-set-undo-system 'undo-tree))
+  (evil-set-undo-system 'undo-tree)
+
+  (dolist (m '(dired-mode))
+	(add-to-list 'evil-emacs-state-modes m)))
 
 (use-package exec-path-from-shell
   :ensure t
@@ -336,6 +346,7 @@
   )
 
 
+;; TODO: Migrate to completion-preview-mode
 (use-package corfu
   ;; Optional customizations
   :custom
@@ -411,8 +422,9 @@
   (setq treesit-language-source-alist
 		'((c . ("https://github.com/tree-sitter/tree-sitter-c" "v0.21.0"))
 		  (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp" "v0.20.5"))
-		  (yaml . ("https://github.com/ikatyang/tree-sitter-yaml" "v0.5.0")))))
-
+		  (yaml . ("https://github.com/ikatyang/tree-sitter-yaml" "v0.5.0"))
+		  (cmake . ("https://github.com/uyha/tree-sitter-cmake" "v0.5.0")))))
+ 
 ;;;; Lisp
 (use-package lispy
   :ensure nil
@@ -468,7 +480,6 @@
 ;;   (add-hook 'tuareg-mode-hook (lambda ()
 ;; 				;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
 ;; 				(add-hook 'before-save-hook #'ocamlformat-before-save))))
-
 ;;; Additional Packages
 ;;;; Magit
 (use-package magit
@@ -523,6 +534,13 @@
 
 (require 'org)
 
+;;;; Helpful
+(use-package helpful
+  :bind (("C-h f" . helpful-callable)
+	 ("C-h v" . helpful-variable)
+	 ("C-h k" . helpful-key)
+	 ("C-h x" . helpful-command)
+	  ))
 ;;; Org Mode
 ;;;; The following are builtin configurations. 
 (setq org-hide-leading-stars t)
@@ -692,6 +710,8 @@
   :config
   (setq notdeft-directories (list (expand-file-name (concat org-roam-directory))))
   (setq notdeft-xapian-program (expand-file-name (concat my-notdeft-package-path "/xapian/notdeft-xapian"))))
+;;; Fun
+(use-package md4rd)
 ;;; Local init.el
 (defvar my-local-init-file (concat user-emacs-directory "init.local.el") "Local init.el file for per instance configuration.")
 (setq custom-file my-local-init-file)
