@@ -99,11 +99,41 @@
 ;;;; project.el
 
 (setq project-vc-extra-root-markers '("MODULE.bazel" "go.mod" ".dir-locals.el"))
+(setq project-compilation-buffer-name-function 'project-prefixed-buffer-name)
+
+;;;; tramp
+(add-to-list 'tramp-remote-path 'tramp-own-remote-path)
 
 ;;;; Keybinds
 (define-key global-map (kbd "M-o") 'other-window)
 
 (define-key global-map (kbd "C-c r") #'recompile)
+
+;;; Buffer/Window/Frame Management
+(setopt switch-to-buffer-obey-display-actions t)
+  
+(setopt display-buffer-alist nil)
+
+(setopt display-buffer-alist
+		'(((derived-mode comint-mode compilation-mode vterm-mode)
+		   (display-buffer-reuse-mode-window
+			display-buffer-in-direction)
+		   (inhibit-same-window . t)
+		   (mode comint-mode compilation-mode vterm-mode vterm-copy-mode)
+		   (direction . bottom))
+		  ((derived-mode Info-mode help-mode helpful-mode)
+		   (display-buffer-reuse-window
+			display-buffer-in-side-window)
+		   (inhibit-same-window . t)
+		   (window-width . 0.33)
+		   (mode Info-mode help-mode helpful-mode)
+		   (side . right)
+		   (slot . 0))
+		  ))
+
+
+;;;; Help/documentation sidebar
+;;;; IBuffer/Imenu/dired sidebar?
 
 ;;; Package Management
 (use-package package
@@ -144,7 +174,7 @@
 (use-package evil
   :ensure t
   :init
-  (setq evil-want-keybinding nil)		; For evil-collection
+  ;; (setq evil-want-keybinding nil)		; For evil-collection
   :config
   (evil-mode 1)
   (setq evil-move-cursor-back nil)
@@ -153,7 +183,7 @@
 		evil-emacs-state-cursor '("dark violet" bar))
   (evil-set-undo-system 'undo-tree)
 
-  (dolist (m '(dired-mode))
+  (dolist (m '(dired-mode vterm-mode))
 	(add-to-list 'evil-emacs-state-modes m)))
 
 (use-package exec-path-from-shell
@@ -291,8 +321,8 @@
   ;; Optionally configure the register formatting. This improves the register
   ;; preview for `consult-register', `consult-register-load',
   ;; `consult-register-store' and the Emacs built-ins.
-  (setq register-preview-delay 0.5
-        register-preview-function #'consult-register-format)
+  (setopt register-preview-delay 0.5
+		  register-preview-function #'consult-register-format)
 
   ;; Optionally tweak the register preview window.
   ;; This adds thin lines, sorting and hides the mode line of the window.
@@ -305,11 +335,13 @@
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :config
+  (add-to-list 'consult-buffer-filter "vterm\s+.*")
 
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
-  ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key "M-.")
+  ; (setopt consult-preview-key 'any)
+  (setopt consult-preview-key '(:debounce 0.3 any))
+  ;; (setopt consult-preview-key "M-.")
   ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
   ;; For some commands and buffer sources it is useful to configure the
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
@@ -537,10 +569,16 @@
 ;;;; Helpful
 (use-package helpful
   :bind (("C-h f" . helpful-callable)
-	 ("C-h v" . helpful-variable)
-	 ("C-h k" . helpful-key)
-	 ("C-h x" . helpful-command)
-	  ))
+		 ("C-h v" . helpful-variable)
+		 ("C-h k" . helpful-key)
+		 ("C-h x" . helpful-command))
+  :config
+  (defun my-helpful--reference-positions (orig-fn &rest args)
+	;; This speeds up helpful, when the symbol in question is in a large file.
+	'())
+
+  (advice-add 'helpful--reference-positions :around #'my-helpful--reference-positions)
+  )
 ;;; Org Mode
 ;;;; The following are builtin configurations. 
 (setq org-hide-leading-stars t)
@@ -654,7 +692,7 @@
   (setq org-roam-capture-templates
 		`(("d" "default" plain "%?" :target
 		   (file+head ,(concat my/org-notes-directory "%<%Y%m%d>-${slug}.org") "#+title: ${title}
-		,#+filetags: %^G
+		#+filetags: %^G
 		")
 		   :unnarrowed t
 		   :kill-buffer)
@@ -664,20 +702,20 @@
 		   :unnarrowed t)
 		  ("p" "project" plain "%?" :target
 		   (file+head ,(concat my/org-projects-directory "${slug}.org") "#+title: ${title}
-		,#+filetags: %^G
+		#+filetags: %^G
 		")
 		   :unnarrowed t)))
   (setq org-roam-capture-ref-templates
 		`(("r" "ref" plain "%?" :target
 		   (file+head ,(concat my/org-notes-directory "%<%Y%m%d>-${slug}.org") "#+title: ${title}
-		,#+filetags: %^G
+		#+filetags: %^G
 		")
 		   :unnarrowed t)
 		  ("t" "agenda item" entry "* %^{State?|TODO|WORKING|BACKLOGGED} %u ${title}
 		%?"
 		   :target (file+head ,(concat my/org-agenda-directory "%<%Y%m%d>-${slug}.org") "#+title: ${title}
-		,#+filetags: %^G
-		,#+category: %^{Category?|todo|buganizer}
+		#+filetags: %^G
+		#+category: %^{Category?|todo|buganizer}
 		")
 		   :unnarrowed t
 		   :kill-buffer)))
