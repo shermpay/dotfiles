@@ -65,13 +65,14 @@
 ;;;; UI
 (column-number-mode t)
 (require 'display-line-numbers)
-(setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type t)
 (add-hook 'prog-mode-hook #'display-line-numbers--turn-on)
 (menu-bar-mode -1)
 (menu-bar-no-scroll-bar)
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (setq echo-keystrokes 0.01)
+(setq visible-bell t)
 
 ;;;; Emacs Server
 (with-eval-after-load "server"
@@ -90,7 +91,8 @@
 (use-package dired
   :config
   (setq dired-dwim-target t)
-  (setq dired-listing-switches "-alh"))
+  (setq dired-listing-switches "-alh")
+  (put 'dired-find-alternate-file 'disabled nil))
 (setq browse-url-generic-program (cl-ecase system-type
 							   (gnu/linux "/usr/bin/google-chrome")
 							   (darwin "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"))
@@ -458,11 +460,29 @@
 		  (cmake . ("https://github.com/uyha/tree-sitter-cmake" "v0.5.0")))))
  
 ;;;; Lisp
+;;;;; Common Lisp
+(use-package slime
+  :config
+  (setq inferior-lisp-program "sbcl"))
+
+(setq flycheck-emacs-lisp-load-path 'inherit)
+;;;;; Clojure
+(use-package clojure-mode
+  :ensure nil
+  :hook
+  (clojure-mode . (lambda () (require 'display-fill-column-indicator) (display-fill-column-indicator--turn-on))))
+
+(use-package flycheck-clj-kondo)
+
+(use-package flycheck-mode
+  :hook clojure-mode)
+
+;;;;; Lisp Shared
 (use-package lispy
   :ensure nil
   :if (package-installed-p 'lispy)
   :hook
-  ((emacs-lisp-mode-hook lisp-mode-hook clojure-mode-hook scheme-mode-hook) . lispy-mode)
+  (((emacs-lisp-mode lisp-mode clojure-mode scheme-mode) . lispy-mode))
   :config
   (lispy-set-key-theme '(special c-digits paredit))
   (define-key lispy-mode-map-paredit (kbd "M-o") nil)
@@ -473,7 +493,7 @@
   :ensure nil
   :if (package-installed-p 'lispyville)
   :hook
-  (lispy-mode-hook . lispyville-mode)
+  (lispy-mode . lispyville-mode)
   :config
   (lispyville-set-key-theme
    '(operators
@@ -483,14 +503,6 @@
 	 additional
 	 additional-motions)))
 
-(setq flycheck-emacs-lisp-load-path 'inherit)
-;;;;; Clojure
-;; (use-package clojure-mode
-;;   :ensure nil
-;;   :hook
-;;   (clojure-mode . (lambda () (require 'display-fill-column-indicator) (display-fill-column-indicator--turn-on))))
-
-;; (use-package flycheck-clj-kondo)
 
 ;;;; C/C++
 
@@ -749,7 +761,7 @@
   (setq notdeft-directories (list (expand-file-name (concat org-roam-directory))))
   (setq notdeft-xapian-program (expand-file-name (concat my-notdeft-package-path "/xapian/notdeft-xapian"))))
 ;;; Fun
-(use-package md4rd)
+;; (use-package md4rd)
 ;;; Local init.el
 (defvar my-local-init-file (concat user-emacs-directory "init.local.el") "Local init.el file for per instance configuration.")
 (setq custom-file my-local-init-file)
@@ -757,7 +769,6 @@
 (if (file-exists-p my-local-init-file)
 	(load my-local-init-file)
   (write-region "" nil my-local-init-file t))
-(put 'dired-find-alternate-file 'disabled nil)
 ;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
 (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
 ;; ## end of OPAM user-setup addition for emacs / base ## keep this line
