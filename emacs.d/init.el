@@ -104,7 +104,9 @@
 (setq project-compilation-buffer-name-function 'project-prefixed-buffer-name)
 
 ;;;; tramp
-(add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+(use-package tramp
+	     :config
+(add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
 ;;;; Keybinds
 (define-key global-map (kbd "M-o") 'other-window)
@@ -138,22 +140,37 @@
 ;;;; Help/documentation sidebar
 ;;;; IBuffer/Imenu/dired sidebar?
 
-;;; Package Management
-(use-package package
-  :config
-  (require 'package)
-  ;; (add-to-list 'package-archives
-  ;;   '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-  (add-to-list 'package-archives
-			   '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives
-			   '("elpa" . "https://elpa.gnu.org/packages/") t)
-  (package-initialize))
+;;;; Package Management
+;; (use-package package
+;;   :config
+;;   (require 'package)
+;;   ;; (add-to-list 'package-archives
+;;   ;;   '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+;;   (add-to-list 'package-archives
+;; 			   '("melpa" . "https://melpa.org/packages/") t)
+;;   (add-to-list 'package-archives
+;; 			   '("elpa" . "https://elpa.gnu.org/packages/") t)
+;;   (package-initialize))
+;;; Straight
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
 ;;;; Auto updates
 (use-package auto-package-update
   :disabled
-  :ensure nil
   :config
   (setq auto-package-update-interval 90)
   (setq auto-package-update-delete-old-versions t)
@@ -163,7 +180,7 @@
 
 ;;; Core Packages
 (use-package undo-tree
-  :ensure t
+  :straight t
   :diminish (undo-tree-mode . "")
   :config (global-undo-tree-mode 1)
   (setq my/undo-tree-history-dir (concat user-emacs-directory "undo-tree-history"))
@@ -175,7 +192,7 @@
   (evil-mode . my-evil-undo-system))
 
 (use-package evil
-  :ensure t
+  :straight t
   :init
   ;; (setq evil-want-keybinding nil)		; For evil-collection
   :config
@@ -190,13 +207,14 @@
 	(add-to-list 'evil-emacs-state-modes m)))
 
 (use-package exec-path-from-shell
-  :ensure t
+  :straight t
   :config
   (add-to-list 'exec-path-from-shell-variables "MY_DRIVE")
   (add-to-list 'exec-path-from-shell-variables "INCLUDEDIR")
   (exec-path-from-shell-initialize))
 
 (use-package vertico
+  :straight t
   :init
   (vertico-mode)
 
@@ -251,6 +269,7 @@
   (setq read-extended-command-predicate #'command-completion-default-include-p));; Enable vertico
 
 (use-package orderless
+  :straight t
   :init
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
@@ -260,6 +279,7 @@
         completion-category-overrides '((file (styles partial-completion)))))
 
 (use-package consult
+  :straight t
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings in `mode-specific-map'
          ("C-c M-x" . consult-mode-command)
@@ -383,6 +403,7 @@
 
 ;; TODO: Migrate to completion-preview-mode
 (use-package corfu
+  :straight t
   ;; Optional customizations
   :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -423,6 +444,7 @@
 
 ;;;; Navigation
 (use-package avy
+  :straight t
   :config
   (avy-setup-default)
   (define-key evil-motion-state-map (kbd "SPC") #'avy-goto-word-or-subword-1)
@@ -430,6 +452,7 @@
 		avy-all-windows-alt t))
 
 (use-package ace-window
+  :straight t
   :config
   (global-set-key (kbd "M-o") 'ace-window)
   (setq aw-scope 'frame))
@@ -469,40 +492,18 @@
 (setq flycheck-emacs-lisp-load-path 'inherit)
 ;;;;; Clojure
 (use-package clojure-mode
-  :ensure nil
+  :straight t
   :hook
   (clojure-mode . (lambda () (require 'display-fill-column-indicator) (display-fill-column-indicator--turn-on))))
 
-(use-package flycheck-clj-kondo)
+(use-package flycheck-clj-kondo
+  :straight t)
 
 (use-package flycheck-mode
+  :straight (flycheck-mode :type git :host github :repo "flycheck/flycheck")
   :hook clojure-mode)
 
 ;;;;; Lisp Shared
-(use-package lispy
-  :ensure nil
-  :if (package-installed-p 'lispy)
-  :hook
-  (((emacs-lisp-mode lisp-mode clojure-mode scheme-mode) . lispy-mode))
-  :config
-  (lispy-set-key-theme '(special c-digits paredit))
-  (define-key lispy-mode-map-paredit (kbd "M-o") nil)
-  (define-key lispy-mode-map-paredit (kbd "M-[") #'lispy-wrap-brackets)
-  (define-key lispy-mode-map-paredit (kbd "M-{") #'lispy-wrap-braces))
-
-(use-package lispyville
-  :ensure nil
-  :if (package-installed-p 'lispyville)
-  :hook
-  (lispy-mode . lispyville-mode)
-  :config
-  (lispyville-set-key-theme
-   '(operators
-	 c-w
-	 wrap
-	 slurp/barf-lispy
-	 additional
-	 additional-motions)))
 
 
 ;;;; C/C++
@@ -532,12 +533,11 @@
 ;;; Additional Packages
 ;;;; Magit
 (use-package magit
-  :ensure nil
-  :pin melpa)
+  :straight t)
 
 ;;;; Terminal
 (use-package vterm
-  :ensure nil
+  :straight t
   :config
   (setq vterm-buffer-name-string "vterm [%s]")
   (setq vterm-timer-delay 0.01)
@@ -548,32 +548,21 @@
   (require 'my-vterm)
   :hook (vterm-mode . (lambda () (goto-address-mode 1))))
 
-;;;; Evil Collection for non-fundamental buffers
-;; (use-package evil-collection
-;;   :ensure nil
-;;   :after evil
-;;   :diminish (evil-collection-unimpaired-mode . "")
-;;   :config
-;;   (setq evil-collection-mode-list (remove 'lispy evil-collection-mode-list))
-;;   (evil-collection-init))
+
 
 ;;;; Toggle between the different case types (ie. CamelCase, underscore_case, kebab-case).
-;; (use-package string-inflection
-;;   :ensure nil)
+;; (use-package string-inflection)
 
 ;;;; Protobufs/Bazel
 (use-package protobuf-mode
-  :ensure nil
   :mode "\\.proto")
 (use-package bazel
   :disabled
-  :ensure nil
   :pin melpa
   :mode "BUILD")
 
 ;;;; Highlight Indentation Levels
 (use-package highlight-indent-guides
-  :ensure nil
   :if (package-installed-p 'highlight-indent-guides)
   :config
   (setq highlight-indent-guides-method 'character)
@@ -665,7 +654,6 @@
   (org-load-modules-maybe t))
 (use-package org-bullets
   :if (package-installed-p 'org-bullets)
-  :ensure nil
   :hook (org-mode . (lambda () (org-bullets-mode 1))))
 
 ;;;; Notifications
@@ -676,7 +664,6 @@
 ;; The following runs periodically in the foreground
 (use-package org-notifications
   :disabled
-  :ensure nil
   :pin melpa
   :config
   (org-notifications-start))
@@ -697,7 +684,6 @@
 
 ;;;; org-roam
 (use-package org-roam
-  :ensure nil
   :after org
   :custom
   (org-roam-directory org-directory)
@@ -746,7 +732,6 @@
 
 
 (use-package org-roam-ui
-  :ensure t
   :after org-roam
   :config
   (setq org-roam-ui-sync-theme t
@@ -761,7 +746,6 @@
 (use-package notdeft-autoloads
   :after
   org-roam
-  :ensure nil
   :config
   (setq notdeft-directories (list (expand-file-name (concat org-roam-directory))))
   (setq notdeft-xapian-program (expand-file-name (concat my-notdeft-package-path "/xapian/notdeft-xapian"))))
@@ -774,10 +758,6 @@
 (if (file-exists-p my-local-init-file)
 	(load my-local-init-file)
   (write-region "" nil my-local-init-file t))
-;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
-(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
-;; ## end of OPAM user-setup addition for emacs / base ## keep this line
-
 
 ;;; Local Variables
 ;; Local Variables:
