@@ -18,7 +18,7 @@
 ;;; Basic Configuration
 (setq debug-on-error t)
 (setq inhibit-startup-message t)
-
+(setopt enable-local-eval t)
 (global-subword-mode t)
 (show-paren-mode 1)
 (setq show-paren-style 'expression)
@@ -117,11 +117,12 @@
 (setopt display-buffer-alist nil)
 
 (setopt display-buffer-alist
-		'(((derived-mode comint-mode compilation-mode vterm-mode)
+		'(((derived-mode comint-mode compilation-mode eshell-mode vterm-mode)
 		   (display-buffer-reuse-mode-window
 			display-buffer-in-direction)
 		   (inhibit-same-window . t)
-		   (mode comint-mode compilation-mode vterm-mode vterm-copy-mode)
+		   (window-height . 0.33)
+		   (mode comint-mode compilation-mode eshell-mode vterm-mode vterm-copy-mode)
 		   (direction . bottom))
 		  ((derived-mode Info-mode help-mode helpful-mode)
 		   (display-buffer-reuse-window
@@ -507,13 +508,23 @@
 ;;;; C/C++
 
 ;;;; Go
-(defun add-hook-gofmt-before-save ()
-  (add-hook 'before-save-hook 'gofmt-before-save nil t))
+(defun  ()
+  (if (file-remote-p (buffer-file-name))
+	  (add-hook 'before-save-hook 'gofmt-before-save nil t)
+
+	))
+
 (use-package go-mode
   :ensure nil
   :mode ("\\.go\\'" . go-mode)
   :hook (go-mode . add-hook-gofmt-before-save)
-  :config (add-to-list 'load-path (concat (getenv "GOPATH")  "/src/golang.org/x/lint/misc/emacs/")))
+  :config
+  (add-to-list 'load-path (concat (getenv "GOPATH")  "/src/golang.org/x/lint/misc/emacs/"))
+  (defun my-gofmt-before-save (orig-fun &rest args)
+	(unless (file-remote-p (buffer-file-name))
+	  (funcall orig-fun args)))
+  (advice-add 'gofmt-before-save :around #'my-gofmt-before-save)
+  )
 
 ;;;; OCaml
 (use-package tuareg
