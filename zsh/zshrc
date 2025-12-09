@@ -1,3 +1,19 @@
+# mode: -*- sh -*-
+# Emacs TRAMP and "dumb" terminals
+if [[ $TERM = "dumb" ]]; then
+  unsetopt zle
+  unsetopt prompt_cr
+  unsetopt prompt_subst
+  if whence -w precmd >/dev/null; then
+      unfunction precmd
+  fi
+  if whence -w preexec >/dev/null; then
+      unfunction preexec
+  fi
+  PS1='$ '
+  return
+fi
+
 # load shell libraries
 mkdir -p "$INCLUDEDIR"
 setopt +o nomatch
@@ -23,6 +39,7 @@ HISTSIZE=10000
 SAVEHIST=80000
 # End of lines configured by zsh-newuser-install
 
+# History
 # Immediately append
 setopt INC_APPEND_HISTORY
 export HISTTIMEFORMAT="[%F %T] "
@@ -34,6 +51,9 @@ setopt EXTENDED_HISTORY
 setopt HIST_FIND_NO_DUPS
 # The following will skip writing duplicates to the history file.
 # setopt HIST_IGNORE_ALL_DUPS
+
+# Ingore commands that start with spaces
+setopt hist_ignore_space
 
 # Dirstack
 DIRSTACKFILE="$HOME/.cache/zsh/dirs"
@@ -134,13 +154,7 @@ function cd_ls() {
     echo $(ls --color=auto | head -n 8)
 }
 
- # Fix for TRAMP
- [[ $TERM = "dumb" ]] && unsetopt zle && PS1='$ '
-
 if [ -r ~/.zshrc.local ]; then
 	echo "loading .zshrc.local ..."
 	source ~/.zshrc.local
 fi
-
-
-[ -f "/Users/shermanpay/.ghcup/env" ] && source "/Users/shermanpay/.ghcup/env" # ghcup-env
