@@ -508,12 +508,6 @@
 ;;;; C/C++
 
 ;;;; Go
-(defun  ()
-  (if (file-remote-p (buffer-file-name))
-	  (add-hook 'before-save-hook 'gofmt-before-save nil t)
-
-	))
-
 (use-package go-mode
   :ensure nil
   :mode ("\\.go\\'" . go-mode)
