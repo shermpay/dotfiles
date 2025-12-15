@@ -1,15 +1,11 @@
 ;;; init.el -- Summary
 ;;; Commentary:
-;;; Load my org babel config
-
 ;;; Code:
 
 ;;; Requires
 (require 'cl-lib)
-
 ;;; Load path
-(let ((default-directory user-emacs-directory))
-  (normal-top-level-add-subdirs-to-load-path))
+(add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
 ;;; User Info
 (setq user-full-name "Sherman Pay"
@@ -168,17 +164,12 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;;;; Auto updates
-(use-package auto-package-update
-  :disabled
-  :config
-  (setq auto-package-update-interval 90)
-  (setq auto-package-update-delete-old-versions t)
-  (setq auto-package-update-hide-results t)
-  (setq auto-package-update-prompt-before-update t)
-  (auto-package-update-maybe))
+;;; Load transient explicitly early to prevent loading of the builtin package
+(use-package transient
+  :straight t)
 
 ;;; Core Packages
+
 (use-package undo-tree
   :straight t
   :diminish (undo-tree-mode . "")
@@ -545,20 +536,18 @@
   (add-to-list 'vterm-eval-cmds '("find-file-other-window" find-file-other-window))
   (define-key vterm-mode-map (kbd "C-q") #'vterm-send-next-key)
   (define-key global-map (kbd "C-c t") #'vterm)
-  (require 'my-vterm)
   :hook (vterm-mode . (lambda () (goto-address-mode 1))))
-
-
 
 ;;;; Toggle between the different case types (ie. CamelCase, underscore_case, kebab-case).
 ;; (use-package string-inflection)
 
 ;;;; Protobufs/Bazel
 (use-package protobuf-mode
+  :disabled
   :mode "\\.proto")
+
 (use-package bazel
   :disabled
-  :pin melpa
   :mode "BUILD")
 
 ;;;; Highlight Indentation Levels
@@ -574,6 +563,7 @@
 
 ;;;; Helpful
 (use-package helpful
+  :straight t
   :bind (("C-h f" . helpful-callable)
 		 ("C-h v" . helpful-variable)
 		 ("C-h k" . helpful-key)
