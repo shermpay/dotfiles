@@ -418,6 +418,7 @@
   :init
   (global-corfu-mode))
 
+
 ;; A few more useful configurations...
 (use-package emacs
   :init
@@ -525,6 +526,15 @@
 ;;;; Magit
 (use-package magit
   :straight t)
+
+;;;; Within Terminal
+(use-package clipetty
+  :straight t
+  :hook (after-init . global-clipetty-mode))
+;; corfu requires child frames for popups which is only possible Emacs 31+.
+(when (< emacs-major-version 31)
+  (use-package corfu-terminal
+	:straight t))
 
 ;;;; Terminal
 (use-package vterm
