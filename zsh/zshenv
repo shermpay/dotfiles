@@ -1,6 +1,6 @@
 #!/bin/zsh
 # -*- sh -*-
-typeset -U path
+typeset -U path manpath
 
 if [ -d ~/bin ]; then
     path=(~/bin "$path[@]")
@@ -8,6 +8,10 @@ fi
 
 if [ -d ~/.local/bin ]; then
     path=(~/.local/bin "$path[@]")
+fi
+
+if whence manpath >> /dev/null ; then
+	manpath="$(manpath -q)"
 fi
 
 if [ -d ~/.local/share/man ]; then
