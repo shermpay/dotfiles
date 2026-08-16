@@ -1,4 +1,4 @@
-;;; init.el -- Summary
+;;; init.el -- Summary  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 
@@ -73,14 +73,6 @@
 ;;;; Emacs Server
 (with-eval-after-load "server"
   (unless (server-running-p) (server-start)))
-
-;;;; Emacs Desktop
-(use-package emacs
-  :config
-  (desktop-save-mode t)
-  (setq my-desktop-save-path "~/.emacs.d/desktops")
-  (mkdir my-desktop-save-path :parents)
-  (add-to-list 'desktop-path my-desktop-save-path))
 
 ;;;; OS
 (setq shell-file-path "/bin/zsh")
@@ -164,12 +156,11 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;;; Load transient explicitly early to prevent loading of the builtin package
-(use-package transient
-  :straight t)
+;;;; Builtin overrides
+(dolist (pkg '(transient org))
+  (straight-use-package pkg))
 
 ;;; Core Packages
-
 (use-package undo-tree
   :straight t
   :diminish (undo-tree-mode . "")
@@ -349,7 +340,7 @@
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :config
-  (add-to-list 'consult-buffer-filter "vterm\s+.*")
+  ;; (add-to-list 'consult-buffer-filter "vterm\s+.*")
 
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
@@ -464,7 +455,9 @@
 	  ((executable-find "aspell")     (setq-default ispell-program-name "aspell")))
 
 ;;;; LSP
-(use-package eglot)
+(use-package eglot
+  :bind
+  (("C-c C-e" . eglot-code-actions)))
 
 ;;;; Treesitter
 (use-package treesit
@@ -473,11 +466,21 @@
 		'((c . ("https://github.com/tree-sitter/tree-sitter-c" "v0.21.0"))
 		  (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp" "v0.20.5"))
 		  (yaml . ("https://github.com/ikatyang/tree-sitter-yaml" "v0.5.0"))
-		  (cmake . ("https://github.com/uyha/tree-sitter-cmake" "v0.5.0")))))
+		  (cmake . ("https://github.com/uyha/tree-sitter-cmake" "v0.5.0"))
+		  (rust . ("https://github.com/tree-sitter/tree-sitter-rust" "v0.24.0")))))
  
 ;;;; Lisp
+;;;;; Emacs Lisp
+(use-package emacs
+  :custom
+  (trusted-content (add-to-list 'trusted-content "~/.emacs.d/lisp/")))
+(use-package elsa
+  :straight t)
+(use-package flycheck-elsa
+  :straight t)
 ;;;;; Common Lisp
 (use-package slime
+  :disabled
   :config
   (setq inferior-lisp-program "sbcl"))
 
@@ -502,19 +505,20 @@
 
 ;;;; Go
 (use-package go-mode
-  :ensure nil
+  :straight t
   :mode ("\\.go\\'" . go-mode)
-  :hook (go-mode . add-hook-gofmt-before-save)
+  :hook (before-save . gofmt-before-save)
   :config
   (add-to-list 'load-path (concat (getenv "GOPATH")  "/src/golang.org/x/lint/misc/emacs/"))
+  (setopt gofmt-command "goimports")
   (defun my-gofmt-before-save (orig-fun &rest args)
 	(unless (file-remote-p (buffer-file-name))
-	  (funcall orig-fun args)))
-  (advice-add 'gofmt-before-save :around #'my-gofmt-before-save)
-  )
+	  (funcall orig-fun)))
+  (advice-add 'gofmt-before-save :around #'my-gofmt-before-save))
 
 ;;;; OCaml
 (use-package tuareg
+  :disabled
   :ensure nil)
 ;; (use-package ocamlformat
 ;;   :ensure nil
@@ -522,6 +526,13 @@
 ;;   (add-hook 'tuareg-mode-hook (lambda ()
 ;; 				;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
 ;; 				(add-hook 'before-save-hook #'ocamlformat-before-save))))
+;;;; Rust
+(use-package rust-mode
+  :straight t
+  :init
+  (setopt rust-mode-treesitter-derive t)
+  :config
+  (setq rust-format-on-save t))
 ;;; Additional Packages
 ;;;; Magit
 (use-package magit
@@ -574,6 +585,8 @@
 ;;;; Helpful
 (use-package helpful
   :straight t
+  :custom
+  (evil-emacs-state-modes (add-to-list 'evil-emacs-state-modes 'helpful-mode))
   :bind (("C-h f" . helpful-callable)
 		 ("C-h v" . helpful-variable)
 		 ("C-h k" . helpful-key)
@@ -585,6 +598,20 @@
 
   (advice-add 'helpful--reference-positions :around #'my-helpful--reference-positions)
   )
+;;;; Devdocs
+(use-package devdocs
+  :straight t
+  :bind
+  (("C-c M-d" . devdocs-lookup)))
+;;;; Ripgrep
+(use-package rg
+  :straight t)
+;;;; Debuggers
+(use-package realgud
+  :straight t)
+
+(use-package realgud-lldb
+  :straight t)
 ;;; Org Mode
 ;;;; The following are builtin configurations. 
 (setq org-hide-leading-stars t)
@@ -684,6 +711,7 @@
 
 ;;;; org-roam
 (use-package org-roam
+  :straight t
   :after org
   :custom
   (org-roam-directory org-directory)
@@ -758,6 +786,16 @@
 (if (file-exists-p my-local-init-file)
 	(load my-local-init-file)
   (write-region "" nil my-local-init-file t))
+
+;;; Emacs Desktop
+;; This has to be at the end, so that all required packages are loaded prior to restoring desktop.
+(use-package emacs
+  :config
+  (desktop-save-mode t)
+  (setq my-desktop-save-path "~/.emacs.d/desktops")
+  (mkdir my-desktop-save-path :parents)
+  (add-to-list 'desktop-path my-desktop-save-path))
+
 
 ;;; Local Variables
 ;; Local Variables:
