@@ -107,16 +107,17 @@
 (setopt display-buffer-alist nil)
 
 (setopt display-buffer-alist
-		'(((derived-mode comint-mode compilation-mode eshell-mode vterm-mode)
+		'(((derived-mode comint-mode compilation-mode eshell-mode vterm-mode ghostel-mode)
 		   (display-buffer-reuse-mode-window
 			display-buffer-in-direction)
 		   (inhibit-same-window . t)
 		   (window-height . 0.33)
-		   (mode comint-mode compilation-mode eshell-mode vterm-mode vterm-copy-mode)
+		   (mode comint-mode compilation-mode eshell-mode vterm-mode vterm-copy-mode ghostel-mode)
 		   (direction . bottom))
 		  ((derived-mode Info-mode help-mode helpful-mode)
 		   (display-buffer-reuse-window
-			display-buffer-in-side-window)
+			;; display-buffer-in-side-window)
+			display-buffer-in-direction)
 		   (inhibit-same-window . t)
 		   (window-width . 0.33)
 		   (mode Info-mode help-mode helpful-mode)
@@ -160,6 +161,8 @@
 (dolist (pkg '(transient org))
   (straight-use-package pkg))
 
+;;; Tab Bar
+(use-package tab-bar-mode)
 ;;; Core Packages
 (use-package undo-tree
   :straight t
@@ -185,7 +188,7 @@
 		evil-emacs-state-cursor '("dark violet" bar))
   (evil-set-undo-system 'undo-tree)
 
-  (dolist (m '(dired-mode vterm-mode))
+  (dolist (m '(dired-mode vterm-mode ghostel-mode tab-switcher-mode))
 	(add-to-list 'evil-emacs-state-modes m)))
 
 (use-package exec-path-from-shell
@@ -467,7 +470,8 @@
 		  (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp" "v0.20.5"))
 		  (yaml . ("https://github.com/ikatyang/tree-sitter-yaml" "v0.5.0"))
 		  (cmake . ("https://github.com/uyha/tree-sitter-cmake" "v0.5.0"))
-		  (rust . ("https://github.com/tree-sitter/tree-sitter-rust" "v0.24.0")))))
+		  (rust . ("https://github.com/tree-sitter/tree-sitter-rust" "v0.24.0"))
+		  (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod" "v1.1.0")))))
  
 ;;;; Lisp
 ;;;;; Emacs Lisp
@@ -508,24 +512,20 @@
   :straight t
   :mode ("\\.go\\'" . go-mode)
   :hook (before-save . gofmt-before-save)
+  ;; :hook (go-mode . add-hook-gofmt-before-save)
   :config
   (add-to-list 'load-path (concat (getenv "GOPATH")  "/src/golang.org/x/lint/misc/emacs/"))
   (setopt gofmt-command "goimports")
   (defun my-gofmt-before-save (orig-fun &rest args)
 	(unless (file-remote-p (buffer-file-name))
-	  (funcall orig-fun)))
+	  (funcall orig-fun args)))
   (advice-add 'gofmt-before-save :around #'my-gofmt-before-save))
+  
+;; (remove-hook 'go-mode-hook 'add-hook-gofmt-before-save)
+(use-package go-ts-mode
+  :config
+  (setq go-ts-mode-indent-offset 4))
 
-;;;; OCaml
-(use-package tuareg
-  :disabled
-  :ensure nil)
-;; (use-package ocamlformat
-;;   :ensure nil
-;;   :config
-;;   (add-hook 'tuareg-mode-hook (lambda ()
-;; 				;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
-;; 				(add-hook 'before-save-hook #'ocamlformat-before-save))))
 ;;;; Rust
 (use-package rust-mode
   :straight t
@@ -533,10 +533,28 @@
   (setopt rust-mode-treesitter-derive t)
   :config
   (setq rust-format-on-save t))
+
+;;;; OCaml
+(use-package tuareg
+  :disabled
+  :ensure nil)
+(use-package ocamlformat
+  :ensure nil
+  :config
+  (add-hook 'tuareg-mode-hook (lambda ()
+				;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
+				(add-hook 'before-save-hook #'ocamlformat-before-save))))
 ;;; Additional Packages
+;;;; IBuffer/Imenu/dired sidebar?
+(use-package imenu-list
+  :straight t)
 ;;;; Magit
 (use-package magit
-  :straight t)
+  :straight t
+  :demand t
+  :hook
+  (magit-status-sections . magit-insert-user-header)
+  )
 
 ;;;; Within Terminal
 (use-package clipetty
@@ -556,8 +574,16 @@
   (setq vterm-max-scrollback 100000)
   (add-to-list 'vterm-eval-cmds '("find-file-other-window" find-file-other-window))
   (define-key vterm-mode-map (kbd "C-q") #'vterm-send-next-key)
-  (define-key global-map (kbd "C-c t") #'vterm)
+  ;; (define-key global-map (kbd "C-c t") #'vterm)
   :hook (vterm-mode . (lambda () (goto-address-mode 1))))
+
+(use-package ghostel
+  :straight t
+  :bind
+  ("C-c t" . #'ghostel)
+  :config
+  (add-to-list 'project-switch-commands '(ghostel-project "Ghostel" "t") t))
+
 
 ;;;; Toggle between the different case types (ie. CamelCase, underscore_case, kebab-case).
 ;; (use-package string-inflection)
@@ -787,16 +813,13 @@
 	(load my-local-init-file)
   (write-region "" nil my-local-init-file t))
 
-;;; Emacs Desktop
-;; This has to be at the end, so that all required packages are loaded prior to restoring desktop.
+;;;; Emacs Desktop
 (use-package emacs
   :config
-  (desktop-save-mode t)
+  ;; (desktop-save-mode t)
   (setq my-desktop-save-path "~/.emacs.d/desktops")
   (mkdir my-desktop-save-path :parents)
   (add-to-list 'desktop-path my-desktop-save-path))
-
-
 ;;; Local Variables
 ;; Local Variables:
 ;; eval: (outline-minor-mode 1)
