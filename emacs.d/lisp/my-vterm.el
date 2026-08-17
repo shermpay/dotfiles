@@ -73,6 +73,15 @@ shell exits, the buffer is killed."
       (pop-to-buffer (current-buffer))
       (current-buffer))))
 
+(defun my-vterm-update-env (name)
+  "Copy value env variable from Emacs into the current shell"
+  (interactive (list (read-envvar-name "Update environment variable: " t )))
+  (unless (derived-mode-p '(vterm-mode))
+    (error "current-buffer is not vterm buffer"))
+  (let ((value (getenv name)))
+    (vterm-send-string (format "export %s=%s" name value))
+    (vterm-send-return)))
+
 (defun my-vterm-start-process (command &key buffer)
   "Execute string COMMAND in BUFFER creating a new buffer if it does not exist.
 
