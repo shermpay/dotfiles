@@ -409,8 +409,25 @@
   ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
   ;; be used globally (M-/).  See also the customization variable
   ;; `global-corfu-modes' to exclude certain modes.
-  :init
+  :bind
+  (:map corfu-map
+		("C-c /" . corfu-complete))
+  :config
   (global-corfu-mode))
+
+
+(use-package completion-preview
+  :if (>= emacs-major-version 30)
+  :bind (:map completion-preview-active-mode-map
+			  ("M-n" . completion-preview-next-candidate)
+			  ("M-p" . completion-preview-prev-candidate)
+			  ("C-i" . completion-preview-complete)
+			  )
+  :config
+  (keymap-unset completion-preview-active-mode-map "M-i")
+  (global-completion-preview-mode)
+  )
+
 
 
 ;; A few more useful configurations...
@@ -557,13 +574,40 @@
   )
 
 ;;;; Within Terminal
-(use-package clipetty
-  :straight t
-  :hook (after-init . global-clipetty-mode))
-;; corfu requires child frames for popups which is only possible Emacs 31+.
-(when (< emacs-major-version 31)
+(unless (display-graphic-p)
+  (use-package evil-terminal-cursor-changer
+	:straight t
+	:custom
+	(etcc-use-color t)
+	:config
+	(etcc-on)
+	)
+  (use-package clipetty
+	:straight t
+	:hook (after-init . global-clipetty-mode)
+	:config
+	;; The following is needed to support mosh
+	;; https://github.com/spudlyo/clipetty/issues/20
+	(defun my-clipetty--tty (ssh-tty tmux)
+	  "Return which TTY we should send our OSC payload to.
+Both the SSH-TTY and TMUX arguments should come from the selected
+frame's environment."
+	  (if (or (not ssh-tty) (not (file-exists-p ssh-tty)))
+		  (terminal-name)
+		(if tmux
+			(let ((tmux-ssh-tty (clipetty--get-tmux-ssh-tty)))
+			  (if tmux-ssh-tty tmux-ssh-tty ssh-tty))
+		  ssh-tty)))
+
+	(advice-add 'clipetty--tty :override #'my-clipetty--tty))
+
   (use-package corfu-terminal
-	:straight t))
+	:if (< emacs-major-version 31)
+	:straight t
+	:config
+	(corfu-terminal-mode)))
+
+
 
 ;;;; Terminal
 (use-package vterm
