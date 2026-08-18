@@ -11,7 +11,7 @@ if [ -d ~/.local/bin ]; then
 fi
 
 if whence manpath >> /dev/null ; then
-	manpath="$(manpath -q)"
+	manpath="$(manpath -q -g)"
 fi
 
 if [ -d ~/.local/share/man ]; then
@@ -21,8 +21,8 @@ fi
 export PATH MANPATH
 export PATH=$PATH:/usr/local/go/bin
 
-export EDITOR=vim
-export VISUAL="emacsclient -a vim"
+export EDITOR='emacsclient -r -a vim'
+export VISUAL="emacsclient -r -a vim"
 # export PYTHONSTARTUP=~/.pythonrc
 export PAGER=less
 export LESS=R
@@ -54,8 +54,26 @@ if [[ -f "$HOME/.shtools" ]]; then
     source "$HOME/.shtools"
 fi
 
-# INCLUDEDIR for sharing shell scripts
-export INCLUDEDIR="$HOME/.local/include"
+SSH_AUTH_SOCK_FILE="$HOME/.ssh/ssh_auth_sock"
+if [ -n "$SSH_AUTH_SOCK" ]; then
+  echo -n "$SSH_AUTH_SOCK" > "$SSH_AUTH_SOCK_FILE"
+fi
+
+get_ssh_auth_sock() {
+  cat "$SSH_AUTH_SOCK_FILE"
+}
+
+update_ssh_auth_sock() {
+  export SSH_AUTH_SOCK=$(get_ssh_auth_sock)
+}
+
+# LOCAL_ZSHLIB_DIR for sharing shell scripts
+export LOCAL_ZSHLIB_DIR="$HOME/.local/lib/zsh"
+setopt +o nomatch
+for file in "$LOCAL_ZSHLIB_DIR/"*; do
+  source "$file"
+done
+setopt -o nomatch
 
 if [[ -r ~/.zshenv.local ]]; then
     source ~/.zshenv.local
