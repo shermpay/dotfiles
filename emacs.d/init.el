@@ -196,6 +196,7 @@
   :config
   (add-to-list 'exec-path-from-shell-variables "MY_DRIVE")
   (add-to-list 'exec-path-from-shell-variables "INCLUDEDIR")
+  (add-to-list 'exec-path-from-shell-variables "MAILDIR")
   (exec-path-from-shell-initialize))
 
 (use-package vertico
@@ -673,17 +674,40 @@ frame's environment."
   :straight t
   :bind
   (("C-c M-d" . devdocs-lookup)))
+
 ;;;; Ripgrep
 (use-package rg
   :straight t)
+
 ;;;; Debuggers
 (use-package realgud
   :straight t)
 
 (use-package realgud-lldb
   :straight t)
+
+;;;; notmuch (email)
+(use-package notmuch
+  :straight t
+  :config
+  (defun my-notmuch-open-in-gmail ()
+  "Open the current notmuch email in the Gmail web interface."
+  (interactive)
+  (let* ((msg-id (notmuch-show-get-message-id t)) ;; Gets the ID without the "id:" prefix
+		 ;; Change "/u/0/" if your primary work/personal Gmail is on a different profile index
+		 (gmail-url (concat "https://mail.google.com/mail/u/0/#search/rfc822msgid:"
+							(url-hexify-string msg-id))))
+	(if msg-id
+		(progn
+		  (message "Opening in Gmail...")
+		  (browse-url gmail-url))
+	  (error "No message found at point"))))
+;; Bind it to "B" (for Browser) inside notmuch-show-mode
+  (with-eval-after-load 'notmuch
+	(define-key notmuch-show-mode-map (kbd "B") #'my-notmuch-open-in-gmail)))
+
 ;;; Org Mode
-;;;; The following are builtin configurations. 
+;;;; The following are builtin configurations.
 (setq org-hide-leading-stars t)
 (setq org-adapt-indentation t)
 (global-set-key "\C-cl" 'org-store-link)
