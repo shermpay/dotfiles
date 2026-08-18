@@ -817,8 +817,8 @@ frame's environment."
   (setq org-roam-capture-templates
 		`(("d" "default" plain "%?" :target
 		   (file+head ,(concat my/org-notes-directory "%<%Y%m%d>-${slug}.org") "#+title: ${title}
-		#+filetags: %^G
-		")
+#+filetags: %^G
+")
 		   :unnarrowed t
 		   :kill-buffer)
 		  ("r" "recurring" entry "* %u %?" :target
@@ -827,21 +827,21 @@ frame's environment."
 		   :unnarrowed t)
 		  ("p" "project" plain "%?" :target
 		   (file+head ,(concat my/org-projects-directory "${slug}.org") "#+title: ${title}
-		#+filetags: %^G
-		")
+#+filetags: %^G
+")
 		   :unnarrowed t)))
   (setq org-roam-capture-ref-templates
 		`(("r" "ref" plain "%?" :target
 		   (file+head ,(concat my/org-notes-directory "%<%Y%m%d>-${slug}.org") "#+title: ${title}
-		#+filetags: %^G
-		")
+#+filetags: %^G
+")
 		   :unnarrowed t)
 		  ("t" "agenda item" entry "* %^{State?|TODO|WORKING|BACKLOGGED} %u ${title}
-		%?"
+%?"
 		   :target (file+head ,(concat my/org-agenda-directory "%<%Y%m%d>-${slug}.org") "#+title: ${title}
-		#+filetags: %^G
-		#+category: %^{Category?|todo|buganizer}
-		")
+#+filetags: %^G
+#+category: %^{Category?|todo|buganizer}
+")
 		   :unnarrowed t
 		   :kill-buffer)))
   :bind (("C-c n f" . org-roam-node-find)
@@ -855,13 +855,15 @@ frame's environment."
 
 (use-package org-roam-ui
   :after org-roam
+  :straight t
   :config
   (setq org-roam-ui-sync-theme t
 		org-roam-ui-follow t
 		org-roam-ui-update-on-save t
 		org-roam-ui-open-on-start t))
+
 ;;;; notdeft
-;;;; [[https://github.com/hasu/notdeft][notdeft]] is a fast text search engine for my notes, but it requires manual installation.
+;;;;; [[https://github.com/hasu/notdeft][notdeft]] is a fast text search engine for my notes, but it requires manual installation.
 (setq my-notdeft-package-path (expand-file-name "~/Projects/OpenSource/notdeft"))
 (add-to-list 'load-path my-notdeft-package-path)
 (add-to-list 'load-path (concat my-notdeft-package-path "/extras"))
