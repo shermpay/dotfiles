@@ -14,16 +14,6 @@ if [[ $TERM = "dumb" ]]; then
   return
 fi
 
-# load shell libraries
-mkdir -p "$INCLUDEDIR"
-setopt +o nomatch
-for i in "$HOME"/.local/include/*;
-do
-  source "$i"
-done
-echo ".zshrc: loaded libraries"
-setopt -o nomatch
-
 # The following lines were added by compinstall
 
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
@@ -55,18 +45,7 @@ setopt HIST_FIND_NO_DUPS
 # Ingore commands that start with spaces
 setopt hist_ignore_space
 
-# Dirstack
-DIRSTACKFILE="$HOME/.cache/zsh/dirs"
-mkdir -p "$HOME/.cache/zsh"
-if [[ -f $DIRSTACKFILE ]] && [[ $#dirstack -eq 0 ]]; then
-  dirstack=( ${(f)"$(< $DIRSTACKFILE)"} )
-  [[ -d $dirstack[1] ]] && cd $dirstack[1]
-fi
-chpwd() {
-  print -l $PWD ${(u)dirstack} >$DIRSTACKFILE
-}
-
-DIRSTACKSIZE=20
+autoload -Uz add-zsh-hook
 
 setopt autopushd pushdsilent pushdtohome
 
@@ -145,14 +124,19 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 # emacs vterm
 if [[ "$INSIDE_EMACS" = 'vterm' ]] ; then
     echo "loading vterm.sh ..." 
-    source "${INCLUDEDIR}/vterm.sh"
+    source "${LOCAL_ZSHLIB_DIR}/vterm.sh"
 fi
 
-autoload -Uz add-zsh-addhook
-function cd_ls() {
-    emulate -L zsh
-    echo $(ls --color=auto | head -n 8)
+__osc_2_current_cmd() {
+  print -Pn "\e]2;[%2d]$1\a"
 }
+
+__osc_2_current_dir() {
+  print -Pn "\e]2;%~\a"
+}
+
+add-zsh-hook preexec __osc_2_current_cmd
+add-zsh-hook chpwd __osc_2_current_dir
 
 if [ -r ~/.zshrc.local ]; then
 	echo "loading .zshrc.local ..."
