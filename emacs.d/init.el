@@ -13,7 +13,6 @@
 
 ;;; Basic Configuration
 (setq debug-on-error t)
-(setq inhibit-startup-message t)
 (setopt enable-local-eval t)
 (global-subword-mode t)
 (show-paren-mode 1)
@@ -72,9 +71,6 @@
   (visible-bell t)
   :config
   (column-number-mode)
-  (menu-bar-mode -1)
-  (menu-bar-no-scroll-bar)
-  (tool-bar-mode -1)
   (tooltip-mode -1)
   (tab-bar-mode))
 
@@ -132,45 +128,29 @@
 		   (side . right)
 		   (slot . 0))
 		  ))
-
-
 ;;;; Help/documentation sidebar
-
 ;;;; Package Management
 (use-package package
   :config
-  (require 'package)
   ;; (add-to-list 'package-archives
   ;;   '("melpa-stable" . "https://stable.melpa.org/packages/") t)
   (add-to-list 'package-archives
 			   '("melpa" . "https://melpa.org/packages/") t)
   (add-to-list 'package-archives
 			   '("elpa" . "https://elpa.gnu.org/packages/") t)
-  (package-initialize))
-;;; Straight
-(defvar bootstrap-version)
-(let ((bootstrap-file
-	   (expand-file-name
-		"straight/repos/straight.el/bootstrap.el"
-		(or (bound-and-true-p straight-base-dir)
-			user-emacs-directory)))
-	  (bootstrap-version 7))
-  (unless (file-exists-p bootstrap-file)
-	(with-current-buffer
-		(url-retrieve-synchronously
-		 "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-		 'silent 'inhibit-cookies)
-	  (goto-char (point-max))
-	  (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+  (when (< emacs-major-version 27)
+	  (package-initialize)))
 
 ;;;; Builtin overrides
 (dolist (pkg '(transient org))
   (straight-use-package pkg))
 
-;;; Tab Bar
-(use-package tab-bar-mode)
 ;;; Core Packages
+(use-package compat
+  :straight t
+  :config
+  (require 'compat-31))
+
 (use-package undo-tree
   :straight t
   :diminish (undo-tree-mode . "")
