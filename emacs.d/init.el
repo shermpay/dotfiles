@@ -551,6 +551,7 @@
   :disabled
   :ensure nil)
 (use-package ocamlformat
+  :disabled
   :ensure nil
   :config
   (add-hook 'tuareg-mode-hook (lambda ()
