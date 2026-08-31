@@ -858,15 +858,16 @@ frame's environment."
 
 ;;;; notdeft
 ;;;;; [[https://github.com/hasu/notdeft][notdeft]] is a fast text search engine for my notes, but it requires manual installation.
-(setq my-notdeft-package-path (expand-file-name "~/Projects/OpenSource/notdeft"))
-(add-to-list 'load-path my-notdeft-package-path)
-(add-to-list 'load-path (concat my-notdeft-package-path "/extras"))
-(use-package notdeft-autoloads
-  :after
-  org-roam
-  :config
-  (setq notdeft-directories (list (expand-file-name (concat org-roam-directory))))
-  (setq notdeft-xapian-program (expand-file-name (concat my-notdeft-package-path "/xapian/notdeft-xapian"))))
+(defvar my-notdeft-package-path (expand-file-name "~/Projects/OpenSource/notdeft"))
+(when (file-directory-p  my-notdeft-package-path)
+  (add-to-list 'load-path my-notdeft-package-path)
+  (add-to-list 'load-path (concat my-notdeft-package-path "/extras"))
+  (use-package notdeft-autoloads
+	:after
+	org-roam
+	:config
+	(setq notdeft-directories (list (expand-file-name (concat org-roam-directory))))
+	(setq notdeft-xapian-program (expand-file-name (concat my-notdeft-package-path "/xapian/notdeft-xapian")))))
 ;;; Fun
 ;; (use-package md4rd)
 ;;; Local init.el
