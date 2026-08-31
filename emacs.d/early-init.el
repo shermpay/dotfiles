@@ -31,6 +31,11 @@
   (load bootstrap-file nil 'nomessage))
 
 ;;; UI
+(setopt default-frame-alist
+        '((fullscreen . maximized)))
+(setopt initial-frame-alist
+        '((fullscreen . fullboth)
+          (fullscreen-restore . maximized)))
 (setq inhibit-startup-screen t)
 
 (menu-bar-mode -1)

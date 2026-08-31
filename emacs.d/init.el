@@ -105,6 +105,13 @@
 
 (define-key global-map (kbd "C-c r") #'recompile)
 
+;;;; Enable disabled commands
+(dolist (sym '(narrow-to-region
+			   narrow-to-page
+			   upcase-region
+			   downcase-region))
+  (put sym 'disabled nil))
+
 ;;; Buffer/Window/Frame Management
 (setopt switch-to-buffer-obey-display-actions t)
 
@@ -180,6 +187,8 @@
 
 (use-package exec-path-from-shell
   :straight t
+  :custom
+  (exec-path-from-shell-arguments '("-l"))
   :config
   (add-to-list 'exec-path-from-shell-variables "MY_DRIVE")
   (add-to-list 'exec-path-from-shell-variables "INCLUDEDIR")
@@ -564,10 +573,13 @@
 ;;;; Magit
 (use-package magit
   :straight t
+  ;; Needed to load default value of magit-status-section-hook.
+  ;; Since magit-status-section-hook does not have ###autoload
   :demand t
   :hook
-  (magit-status-sections . magit-insert-user-header)
-  )
+  (magit-status-sections . magit-insert-user-header))
+
+
 
 ;;;; Within Terminal
 (unless (display-graphic-p)
