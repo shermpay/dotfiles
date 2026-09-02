@@ -24,7 +24,11 @@
 (setopt use-short-answers t)
 ;;;; kill-ring
 (setq save-interprogram-paste-before-kill t)
-;;;; Buffers
+;;;; isearch
+(use-package isearch
+  :custom
+  (isearch-lazy-count t))
+;;;; Buffers/Frames/
 (use-package uniquify
   :config
   ;; /foo/bar/name => name|/foo/bar
@@ -48,6 +52,26 @@
   (savehist-mode))
 
 
+(setopt switch-to-buffer-obey-display-actions t)
+(setopt display-buffer-alist nil)
+(setopt display-buffer-alist
+		'(((derived-mode comint-mode compilation-mode eshell-mode vterm-mode ghostel-mode)
+		   (display-buffer-reuse-mode-window
+			display-buffer-in-direction)
+		   (inhibit-same-window . t)
+		   (window-height . 0.33)
+		   (mode comint-mode compilation-mode eshell-mode vterm-mode vterm-copy-mode ghostel-mode)
+		   (direction . bottom))
+		  ((derived-mode Info-mode help-mode helpful-mode)
+		   (display-buffer-reuse-window
+			;; display-buffer-in-side-window)
+			display-buffer-in-direction)
+		   (inhibit-same-window . t)
+		   (window-width . 0.33)
+		   (mode Info-mode help-mode helpful-mode)
+		   (side . right)
+		   (slot . 0))
+		  ))
 ;;;; Compilation
 (use-package ansi-color
   :config
@@ -123,7 +147,10 @@
   :config
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
-;;;; Keybinds
+;;;; Inputs
+(use-package repeat
+  :config
+  (repeat-mode 1))
 (define-key global-map (kbd "M-o") 'other-window)
 (define-key global-map (kbd "C-c r") #'recompile)
 
@@ -134,30 +161,6 @@
 			   downcase-region))
   (put sym 'disabled nil))
 
-;;; Buffer/Window/Frame Management
-(setopt switch-to-buffer-obey-display-actions t)
-
-(setopt display-buffer-alist nil)
-
-(setopt display-buffer-alist
-		'(((derived-mode comint-mode compilation-mode eshell-mode vterm-mode ghostel-mode)
-		   (display-buffer-reuse-mode-window
-			display-buffer-in-direction)
-		   (inhibit-same-window . t)
-		   (window-height . 0.33)
-		   (mode comint-mode compilation-mode eshell-mode vterm-mode vterm-copy-mode ghostel-mode)
-		   (direction . bottom))
-		  ((derived-mode Info-mode help-mode helpful-mode)
-		   (display-buffer-reuse-window
-			;; display-buffer-in-side-window)
-			display-buffer-in-direction)
-		   (inhibit-same-window . t)
-		   (window-width . 0.33)
-		   (mode Info-mode help-mode helpful-mode)
-		   (side . right)
-		   (slot . 0))
-		  ))
-;;;; Help/documentation sidebar
 ;;;; Package Management
 (use-package package
   :config
