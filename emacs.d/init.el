@@ -61,18 +61,41 @@
 	`((".*" ,tmp t))))
 
 ;;;; UI
-(require 'display-line-numbers)
-(setq display-line-numbers-type t)		; t means absolute
-(add-hook 'prog-mode-hook #'display-line-numbers--turn-on)
+(use-package display-line-numbers
+  :custom
+  (display-line-numbers-type t)		; t means absolute
+  :hook
+  ((prog-mode . display-line-numbers--turn-on))
+  :config
+  ;; No need line number on mode-line
+  (line-number-mode -1))
 
 (use-package emacs
   :custom
   (echo-keystrokes 0.01)
   (visible-bell t)
+  (mode-line-compact 'long)
   :config
   (column-number-mode)
   (tooltip-mode -1)
-  (tab-bar-mode))
+  (tab-bar-mode)
+  (which-function-mode)
+  (setq-default mode-line-format
+				'("%e" mode-line-front-space
+				  (:propertize
+				   ("" mode-line-mule-info mode-line-client mode-line-modified
+					mode-line-remote mode-line-window-dedicated)
+				   display (min-width (6.0)))
+				  mode-line-frame-identification mode-line-buffer-identification " "
+				  mode-line-position evil-mode-line-tag
+				  (project-mode-line project-mode-line-format) (vc-mode vc-mode) " "
+				  mode-line-end-spaces))
+  (setq-default header-line-format
+				'(" ⚿ " header-line-indent mode-line-modes mode-line-misc-info))
+  (keymap-set mode-line-major-mode-keymap "<header-line>"
+			  (keymap-lookup mode-line-major-mode-keymap "<mode-line>"))
+  (keymap-set mode-line-minor-mode-keymap "<header-line>"
+			  (keymap-lookup mode-line-minor-mode-keymap "<mode-line>")))
 
 ;;;; Emacs Server
 (with-eval-after-load "server"
@@ -86,8 +109,8 @@
   (setq dired-listing-switches "-alh")
   (put 'dired-find-alternate-file 'disabled nil))
 (setq browse-url-generic-program (cl-ecase system-type
-							   (gnu/linux "/usr/bin/google-chrome")
-							   (darwin "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"))
+								   (gnu/linux "/usr/bin/google-chrome")
+								   (darwin "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"))
 	  browse-url-browser-function 'browse-url-generic)
 
 ;;;; project.el
@@ -97,12 +120,11 @@
 
 ;;;; tramp
 (use-package tramp
-		 :config
-(add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+  :config
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
 ;;;; Keybinds
 (define-key global-map (kbd "M-o") 'other-window)
-
 (define-key global-map (kbd "C-c r") #'recompile)
 
 ;;;; Enable disabled commands
@@ -146,7 +168,7 @@
   (add-to-list 'package-archives
 			   '("elpa" . "https://elpa.gnu.org/packages/") t)
   (when (< emacs-major-version 27)
-	  (package-initialize)))
+	(package-initialize)))
 
 ;;;; Builtin overrides
 (dolist (pkg '(transient org))
@@ -206,7 +228,7 @@
   ;; Show more candidates
   ;; (setq vertico-count 20)
 
- ;; Grow and shrink the Vertico minibuffer
+  ;; Grow and shrink the Vertico minibuffer
   ;; (setq vertico-resize t)
 
   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
@@ -344,7 +366,7 @@
 
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
-  ; (setopt consult-preview-key 'any)
+  ;; (setopt consult-preview-key 'any)
   (setopt consult-preview-key '(:debounce 0.3 any))
   ;; (setopt consult-preview-key "M-.")
   ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
@@ -499,10 +521,6 @@
 (use-package emacs
   :custom
   (trusted-content (add-to-list 'trusted-content "~/.emacs.d/lisp/")))
-(use-package elsa
-  :straight t)
-(use-package flycheck-elsa
-  :straight t)
 ;;;;; Common Lisp
 (use-package slime
   :disabled
@@ -539,9 +557,9 @@
   (setopt gofmt-command "goimports")
   (defun my-gofmt-before-save (orig-fun &rest args)
 	(unless (file-remote-p (buffer-file-name))
-	  (funcall orig-fun args)))
+	  (funcall orig-fun)))
   (advice-add 'gofmt-before-save :around #'my-gofmt-before-save))
-  
+
 ;; (remove-hook 'go-mode-hook 'add-hook-gofmt-before-save)
 (use-package go-ts-mode
   :config
@@ -564,8 +582,8 @@
   :ensure nil
   :config
   (add-hook 'tuareg-mode-hook (lambda ()
-				;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
-				(add-hook 'before-save-hook #'ocamlformat-before-save))))
+								;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
+								(add-hook 'before-save-hook #'ocamlformat-before-save))))
 ;;; Additional Packages
 ;;;; IBuffer/Imenu/dired sidebar?
 (use-package imenu-list
@@ -698,18 +716,18 @@ frame's environment."
   :straight t
   :config
   (defun my-notmuch-open-in-gmail ()
-  "Open the current notmuch email in the Gmail web interface."
-  (interactive)
-  (let* ((msg-id (notmuch-show-get-message-id t)) ;; Gets the ID without the "id:" prefix
-		 ;; Change "/u/0/" if your primary work/personal Gmail is on a different profile index
-		 (gmail-url (concat "https://mail.google.com/mail/u/0/#search/rfc822msgid:"
-							(url-hexify-string msg-id))))
-	(if msg-id
-		(progn
-		  (message "Opening in Gmail...")
-		  (browse-url gmail-url))
-	  (error "No message found at point"))))
-;; Bind it to "B" (for Browser) inside notmuch-show-mode
+	"Open the current notmuch email in the Gmail web interface."
+	(interactive)
+	(let* ((msg-id (notmuch-show-get-message-id t)) ;; Gets the ID without the "id:" prefix
+		   ;; Change "/u/0/" if your primary work/personal Gmail is on a different profile index
+		   (gmail-url (concat "https://mail.google.com/mail/u/0/#search/rfc822msgid:"
+							  (url-hexify-string msg-id))))
+	  (if msg-id
+		  (progn
+			(message "Opening in Gmail...")
+			(browse-url gmail-url))
+		(error "No message found at point"))))
+  ;; Bind it to "B" (for Browser) inside notmuch-show-mode
   (with-eval-after-load 'notmuch
 	(define-key notmuch-show-mode-map (kbd "B") #'my-notmuch-open-in-gmail)))
 
@@ -891,13 +909,13 @@ frame's environment."
 	(load my-local-init-file)
   (write-region "" nil my-local-init-file t))
 
-;;;; Emacs Desktop
-(use-package emacs
+;;; Emacs Desktop
+(use-package desktop
+  :hook (server-after-make-frame . desktop-save-mode)
   :config
-  ;; (desktop-save-mode t)
-  (setq my-desktop-save-path "~/.emacs.d/desktops")
-  (mkdir my-desktop-save-path :parents)
-  (add-to-list 'desktop-path my-desktop-save-path))
+  (let ((my-desktop-save-path "~/.emacs.d/desktops"))
+	(mkdir my-desktop-save-path :parents)
+	(add-to-list 'desktop-path my-desktop-save-path)))
 ;;; Local Variables
 ;; Local Variables:
 ;; eval: (outline-minor-mode 1)
