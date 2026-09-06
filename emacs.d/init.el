@@ -18,9 +18,14 @@
 (show-paren-mode 1)
 (setq show-paren-style 'expression)
 (setq next-line-add-newlines nil)
-(save-place-mode 1)
 
 (setq-default tab-width 4)
+(use-package simple
+  :config
+  (indent-tabs-mode -1))
+(use-package loaddefs
+  :config
+  (editorconfig-mode))
 (setopt use-short-answers t)
 ;;;; kill-ring
 (setq save-interprogram-paste-before-kill t)
@@ -46,12 +51,6 @@
   (midnight-mode 1)
   (midnight-delay-set 'midnight-delay "01:42am")
   (setq clean-buffer-list-delay-general 1))
-;; Persist history over Emacs restarts.
-(use-package savehist
-  :init
-  (savehist-mode))
-
-
 (setopt switch-to-buffer-obey-display-actions t)
 (setopt display-buffer-alist nil)
 (setopt display-buffer-alist
@@ -77,13 +76,6 @@
   :config
   (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
 
-;;;; Backups
-(let ((tmp (concat user-emacs-directory "tmp")))
-  (setq backup-directory-alist
-	`((".*" . ,tmp)))
-  (setq auto-save-file-name-transforms
-	`((".*" ,tmp t))))
-
 ;;;; UI
 (use-package display-line-numbers
   :custom
@@ -102,7 +94,6 @@
   :config
   (column-number-mode)
   (tooltip-mode -1)
-  (tab-bar-mode)
   (which-function-mode)
   (setq-default mode-line-format
 				'("%e" mode-line-front-space
@@ -121,10 +112,33 @@
   (keymap-set mode-line-minor-mode-keymap "<header-line>"
 			  (keymap-lookup mode-line-minor-mode-keymap "<mode-line>")))
 
+(use-package tab-bar
+  :config
+  (tab-bar-mode)
+  (tab-bar-history-mode))
+
+(use-package pixel-scroll
+  :config
+  (pixel-scroll-mode)
+  ;; (pixel-scroll-precision-mode) ;; see bug#69972
+  )
+
 ;;;; Emacs Server
 (with-eval-after-load "server"
   (unless (server-running-p) (server-start)))
 
+;;;; Sessions and Backups
+(use-package saveplace
+  :config
+  (save-place-mode))
+(use-package savehist
+  :config
+  (savehist-mode))
+(let ((tmp (concat user-emacs-directory "tmp")))
+  (setq backup-directory-alist
+		`((".*" . ,tmp)))
+  (setq auto-save-file-name-transforms
+		`((".*" ,tmp t))))
 ;;;; OS
 (setq shell-file-path "/bin/zsh")
 (use-package dired
@@ -138,7 +152,9 @@
 	  browse-url-browser-function 'browse-url-generic)
 
 ;;;; project.el
-
+(use-package project
+  :custom
+  (project-mode-line t))
 (setq project-vc-extra-root-markers '("MODULE.bazel" "go.mod" ".dir-locals.el"))
 (setq project-compilation-buffer-name-function 'project-prefixed-buffer-name)
 
