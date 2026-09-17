@@ -575,7 +575,7 @@
   (add-to-list 'load-path (concat (getenv "GOPATH")  "/src/golang.org/x/lint/misc/emacs/"))
   (setopt gofmt-command "goimports")
   (defun my-gofmt-before-save (orig-fun &rest args)
-	(unless (file-remote-p (buffer-file-name))
+	(unless (and (buffer-file-name) (file-remote-p (buffer-file-name)))
 	  (funcall orig-fun)))
   (advice-add 'gofmt-before-save :around #'my-gofmt-before-save))
 
