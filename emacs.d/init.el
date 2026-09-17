@@ -179,6 +179,8 @@
 
 ;;;; Package Management
 (use-package package
+  :custom
+  (package-install-upgrade-built-in t)
   :config
   ;; (add-to-list 'package-archives
   ;;   '("melpa-stable" . "https://stable.melpa.org/packages/") t)
@@ -187,11 +189,11 @@
   (add-to-list 'package-archives
 			   '("elpa" . "https://elpa.gnu.org/packages/") t)
   (when (< emacs-major-version 27)
-	(package-initialize)))
-
-;;;; Builtin overrides
-(dolist (pkg '(transient org))
-  (straight-use-package pkg))
+	(package-initialize))
+  (straight-pull-recipe-repositories)
+  ;; Builtin overrides
+  (dolist (pkg '(transient org))
+	(straight-use-package pkg)))
 
 ;;; Core Packages
 (use-package compat
