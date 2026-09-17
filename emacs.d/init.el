@@ -47,10 +47,15 @@
 	(ibuffer-auto-mode 1))
   (add-hook 'ibuffer-mode-hook #'ibuffer-auto-mode-enable))
 (use-package midnight
+  :custom
+  (clean-buffer-list-delay-general 1)
+  (clean-buffer-list-kill-never-regexps (add-to-list 'clean-buffer-list-kill-never-regexps
+                                                     "\\`\\*.*-eshell\\*\\'"
+                                                     t))
   :config
   (midnight-mode 1)
-  (midnight-delay-set 'midnight-delay "01:42am")
-  (setq clean-buffer-list-delay-general 1))
+  (midnight-delay-set 'midnight-delay "01:42am"))
+
 (setopt switch-to-buffer-obey-display-actions t)
 (setopt display-buffer-alist nil)
 (setopt display-buffer-alist
