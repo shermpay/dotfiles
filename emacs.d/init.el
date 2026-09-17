@@ -214,13 +214,38 @@
 (use-package evil
   :straight t
   :init
-  ;; (setq evil-want-keybinding nil)		; For evil-collection
+  (setq evil-want-keybinding nil)		; Remove keybindings defined in evil-keybindings.el
+  :custom
+  (evil-move-cursor-back nil)
+  (evil-disable-insert-state-bindings t)
   :config
   (evil-mode 1)
-  (setq evil-move-cursor-back nil)
-  (setq evil-normal-state-cursor '("dim gray" box)
-		evil-insert-state-cursor '("dim gray" bar)
-		evil-emacs-state-cursor '("dark violet" bar))
+  (defvar my-evil-cursor-colors 'light)
+
+  (defun my-evil-toggle-cursor-colors (&optional cursor-colors args)
+	"Set evil cursor colors based on CURSOR-COLORS."
+	(interactive)
+	(unless cursor-colors
+	  (setq cursor-colors (cl-case my-evil-cursor-colors
+							((light) 'dark)
+							((dark) 'light)
+							)))
+	(cl-case cursor-colors
+	  ((dark) (setq evil-normal-state-cursor '("dim gray" box)
+					 evil-insert-state-cursor '("dim gray" (bar . 4))
+					 evil-emacs-state-cursor '("dark violet" bar)
+					 my-evil-cursor-colors cursor-colors))
+	  ((light) (setq evil-normal-state-cursor '("light salmon" box)
+					  evil-insert-state-cursor '("light salmon" (bar . 4))
+					  evil-emacs-state-cursor '("magenta" (bar . 4))
+					  my-evil-cursor-colors cursor-colors))
+	  (otherwise
+	   (user-error "cursor-colors or my-evil-cursor-colors is invalid: %s; %s"
+				   cursor-colors
+				   my-evil-cursor-colors))))
+
+  (my-evil-toggle-cursor-colors 'light)
+
   (evil-set-undo-system 'undo-tree)
 
   (dolist (m '(dired-mode vterm-mode ghostel-mode tab-switcher-mode))
