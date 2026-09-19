@@ -47,12 +47,11 @@
 	(ibuffer-auto-mode 1))
   (add-hook 'ibuffer-mode-hook #'ibuffer-auto-mode-enable))
 (use-package midnight
-  :custom
-  (clean-buffer-list-delay-general 1)
-  (clean-buffer-list-kill-never-regexps (add-to-list 'clean-buffer-list-kill-never-regexps
-                                                     "\\`\\*.*-eshell\\*\\'"
-                                                     t))
   :config
+  (setopt clean-buffer-list-delay-general 1)
+  (setopt clean-buffer-list-kill-never-regexps (cons "\\`\\*.*-eshell\\*\\'"
+                                                     clean-buffer-list-kill-never-regexps
+                                                     ))
   (midnight-mode 1)
   (midnight-delay-set 'midnight-delay "01:42am"))
 
@@ -222,10 +221,9 @@
   :straight t
   :init
   (setq evil-want-keybinding nil)		; Remove keybindings defined in evil-keybindings.el
-  :custom
-  (evil-move-cursor-back nil)
-  (evil-disable-insert-state-bindings t)
   :config
+  (setopt evil-move-cursor-back nil)
+  (setopt evil-disable-insert-state-bindings t)
   (evil-mode 1)
   (defvar my-evil-cursor-colors 'light)
 
