@@ -55,9 +55,7 @@ if [[ -f "$HOME/.shtools" ]]; then
 fi
 
 SSH_AUTH_SOCK_FILE="$HOME/.ssh/ssh_auth_sock"
-if [ -n "$SSH_AUTH_SOCK" ]; then
-  echo -n "$SSH_AUTH_SOCK" > "$SSH_AUTH_SOCK_FILE"
-fi
+SSH_AUTH_SOCK_HISTFILE="$HOME/.ssh/ssh_auth_sock.history"
 
 get_ssh_auth_sock() {
   cat "$SSH_AUTH_SOCK_FILE"
@@ -66,6 +64,15 @@ get_ssh_auth_sock() {
 update_ssh_auth_sock() {
   export SSH_AUTH_SOCK=$(get_ssh_auth_sock)
 }
+
+# Write to SSH_AUTH_SOCK_FILE only if this is a valid SSH_CONNECTION
+# TODO: Check if SSH_AUTH_SOCK is a valid socket
+# TODO: Add precmd hooks to run update_ssh_auth_sock for a set of commands.
+if [[ -n "$SSH_CONNECTION" || -n "$SSH_TTY" ]] && [[ -n "$SSH_AUTH_SOCK" ]]; then
+  printf "$(date) - $(get_ssh_auth_sock)\n" >> "$SSH_AUTH_SOCK_HISTFILE"
+  echo -n "$SSH_AUTH_SOCK" > "$SSH_AUTH_SOCK_FILE"
+fi
+
 
 # LOCAL_ZSHLIB_DIR for sharing shell scripts
 export LOCAL_ZSHLIB_DIR="$HOME/.local/lib/zsh"
