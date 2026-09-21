@@ -199,6 +199,17 @@
   (dolist (pkg '(transient org))
 	(straight-use-package pkg)))
 
+;;;; Profiling
+(use-package profiler
+  :bind
+  ("<f7>" . my-profiler-capture)
+  :config
+  (defun my-profiler-capture ()
+    (interactive)
+    (if (not (profiler-running-p))
+        (profiler-start 'cpu+mem)
+      (profiler-stop)
+      (profiler-report))))
 ;;; Core Packages
 (use-package compat
   :straight t
