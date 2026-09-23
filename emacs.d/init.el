@@ -154,6 +154,17 @@
 								   (gnu/linux "/usr/bin/google-chrome")
 								   (darwin "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"))
 	  browse-url-browser-function 'browse-url-generic)
+(use-package ansi-osc
+  :functions ansi-osc-apply-on-region
+  :hook
+  (Man-cooked . my-ansi-osc-apply-on-buffer)
+  :config
+  (defun my-ansi-osc-apply-on-buffer ()
+    (interactive)
+    (dlet ((inhibit-read-only t)
+           (buffer-read-only nil))
+      (message "apply on buffer: %s" (current-buffer))
+      (ansi-osc-apply-on-region (point-min) (point-max)))))
 
 ;;;; project.el
 (use-package project
