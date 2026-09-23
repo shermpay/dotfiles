@@ -723,7 +723,42 @@ frame's environment."
   :bind
   ("C-c t" . #'ghostel)
   :config
-  (add-to-list 'project-switch-commands '(ghostel-project "Ghostel" "t") t))
+  (add-to-list 'project-switch-commands '(ghostel-project "Ghostel" "t") t)
+  (defun my-ghostel--open-link (url)
+    "Open URL, dispatching by scheme.
+file:// URIs open in Emacs; http(s) and other schemes use `browse-url'.
+fileref: URIs (from auto-detected file[:line[:col]] patterns) open
+the file at the given position in another window.  A fileref without
+a line suffix opens at the start of the file or directory."
+    (when (and url (stringp url))
+      (cond
+       ((string-match "\\`fileref:\\(.*?\\)\\(?::\\([0-9]+\\)\\(?::\\([0-9]+\\)\\)?\\)?\\'" url)
+        (let ((file (match-string 1 url))
+              (line (and (match-string 2 url)
+                         (string-to-number (match-string 2 url))))
+              (col (and (match-string 3 url)
+                        (string-to-number (match-string 3 url)))))
+          (when (file-exists-p file)
+            (find-file-other-window file)
+            (when line
+              (goto-char (point-min))
+              (forward-line (1- (max 1 line)))
+              (when col (move-to-column (max 0 (1- col))))))))
+       ((string-match "\\`file://\\(?:localhost\\)?\\(/[^\\#]*\\)\\(?:#L\\([0-9]+\\)\\)?\\(?:-L\\([0-9]+\\)\\)?" url)
+        (let ((file (url-unhex-string (match-string 1 url)))
+              (start-line (string-to-number (or (match-string 2 url) "0")))
+              (end-line (string-to-number (or (match-string 3 url) "0"))))
+          (find-file-other-window file)
+          (when (> end-line 0)
+            (goto-line end-line)
+            (push-mark)
+            (activate-mark))
+          (when (> start-line 0)
+            (goto-line start-line))))
+       ((string-match-p "\\`[a-z]+://" url)
+        (browse-url url)))))
+
+  (advice-add 'ghostel--open-link :override #'my-ghostel--open-link))
 
 
 ;;;; Toggle between the different case types (ie. CamelCase, underscore_case, kebab-case).
