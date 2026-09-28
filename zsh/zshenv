@@ -27,6 +27,7 @@ export VISUAL="emacsclient -r -a vim"
 export PAGER=less
 export LESS=R
 export CFLAGS="-Wall -pipe"
+export MAILDIR="$HOME/.mail"
 
 
 if [[ "$(uname -s)" = "Darwin" ]]; then
