@@ -41,3 +41,11 @@
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
+
+;;; Local configurations
+(defvar my-local-early-init-file
+  (concat user-emacs-directory "early-init.local.el")
+  "Local early-init.el file for per instance configuration.")
+
+(when (file-exists-p my-local-early-init-file)
+  (load my-local-early-init-file))
