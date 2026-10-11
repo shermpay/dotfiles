@@ -809,6 +809,8 @@ a line suffix opens at the start of the file or directory."
         (browse-url url)))))
 
   (advice-add 'ghostel--open-link :override #'my-ghostel--open-link))
+  (setopt ghostel-shell "/bin/zsh")
+  (add-to-list 'project-switch-commands '(ghostel-project "Ghostel" "t") t))
 
 
 ;;;; Toggle between the different case types (ie. CamelCase, underscore_case, kebab-case).
@@ -898,7 +900,7 @@ a line suffix opens at the start of the file or directory."
 (defun my-gdrive-or-emacs-dir ()
   (if (getenv "MY_DRIVE")
 	  (file-name-as-directory (getenv "MY_DRIVE"))
-	(do
+	(progn
 	 (message "Missing 'MY_DRIVE' environment variable!")
 	 user-emacs-directory)))
 ;;;; Variables
