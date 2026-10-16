@@ -27,6 +27,13 @@
   :config
   (editorconfig-mode))
 (setopt use-short-answers t)
+;;;; Minibuffer
+(use-package emacs
+  :config
+  (setq enable-recursive-minibuffers t))
+(use-package mb-depth
+  :config
+  (minibuffer-depth-indicate-mode))
 ;;;; kill-ring
 (setq save-interprogram-paste-before-kill t)
 ;;;; isearch
@@ -144,16 +151,18 @@
   (setq auto-save-file-name-transforms
 		`((".*" ,tmp t))))
 ;;;; OS
-(setq shell-file-path "/bin/zsh")
 (use-package dired
   :config
   (setq dired-dwim-target t)
   (setq dired-listing-switches "-alh")
   (put 'dired-find-alternate-file 'disabled nil))
-(setq browse-url-generic-program (cl-ecase system-type
-								   (gnu/linux "/usr/bin/google-chrome")
-								   (darwin "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"))
-	  browse-url-browser-function 'browse-url-generic)
+(use-package browse-url
+  :config
+  (setq browse-url-generic-program (cl-ecase system-type
+                                     (gnu/linux "/usr/bin/google-chrome")
+                                     (darwin "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"))
+        browse-url-browser-function 'browse-url-generic))
+
 (use-package ansi-osc
   :functions ansi-osc-apply-on-region
   :hook
@@ -179,6 +188,9 @@
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
 ;;;; Inputs
+(use-package which-key
+  :config
+  (which-key-mode))
 (use-package repeat
   :config
   (repeat-mode 1))
@@ -559,7 +571,6 @@
 (with-eval-after-load "flymake"
   (define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
   (define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error))
-(setq help-at-pt-timer 0.9)
 (setq help-at-pt-display-when-idle '(flymake-overlay))
 
 ;; Spell checkers
