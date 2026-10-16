@@ -47,7 +47,7 @@ def symlink(dest, src):
     print(f"symlinked: {dest} --> {src}")
 
 
-def symlink_all(dest, src, hide=False, skip_mkdir=False):
+def symlink_all(dest, src, hide=False, skip_mkdir=False, make_executable=False):
     print(f"installing directories: {dest} --> {src}")
     if dest.exists() and dest != HOME:
         print(f"WARNING: destination directory '{dest}' exists")
@@ -74,9 +74,16 @@ def symlink_all(dest, src, hide=False, skip_mkdir=False):
             dest_name = path.name
             if hide:
                 dest_name = "." + dest_name
-            symlink(pathlib.Path(dest, dest_name), pathlib.Path(src, path.name))
+            dest_path = dest / dest_name
+            src_path = src / path.name
+            symlink(dest_path, src_path)
+            if make_executable:
+                chmod_flag = 0o755
+                print("making executable via chmod", color.UNDERLINE(dest_path), color.BOLD(oct(chmod_flag)))
+                dest_path.chmod(chmod_flag)
+
         elif path.is_dir():
-            symlink_all(pathlib.Path(dest, path.name), pathlib.Path(src, path.name), skip_mkdir=skip_mkdir)
+            symlink_all(pathlib.Path(dest, path.name), pathlib.Path(src, path.name), hide=hide, skip_mkdir=skip_mkdir, make_executable=make_executable)
         else:
             print(f"ERROR: Unknown file type: {path}")
             sys.exit(2)
@@ -114,7 +121,7 @@ def setup_sh(args):
 @setup
 def setup_bin(args):
     config_src_dir = pathlib.Path(__file__).parent / "bin"
-    symlink_all(HOME / ".local/bin", config_src_dir, skip_mkdir=args.skip_mkdir)
+    symlink_all(HOME / ".local/bin", config_src_dir, skip_mkdir=args.skip_mkdir, make_executable=True)
 
 def check_env_vars():
     print(color.HEADER("[BEGIN]"), f"check_env_vars")
