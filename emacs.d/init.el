@@ -755,11 +755,10 @@ frame's environment."
 	:config
 	(corfu-terminal-mode)))
 
-
-
 ;;;; Terminal
 (use-package vterm
-  :straight t
+  :disabled t
+  :straight nil
   :config
   (setq vterm-buffer-name-string "vterm [%s]")
   (setq vterm-timer-delay 0.01)
