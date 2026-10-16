@@ -178,9 +178,9 @@
 ;;;; project.el
 (use-package project
   :custom
-  (project-mode-line t))
-(setq project-vc-extra-root-markers '("MODULE.bazel" "go.mod" ".dir-locals.el"))
-(setq project-compilation-buffer-name-function 'project-prefixed-buffer-name)
+  (project-mode-line t)
+  (project-vc-extra-root-markers '("MODULE.bazel" "go.mod" ".dir-locals.el" ".jj"))
+  (project-compilation-buffer-name-function 'project-prefixed-buffer-name))
 
 ;;;; tramp
 (use-package tramp
@@ -667,10 +667,38 @@
 								;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
 								(add-hook 'before-save-hook #'ocamlformat-before-save))))
 ;;; Additional Packages
+;;;; Markdown
+(use-package markdown-mode
+  :init
+  (unless (package-installed-p 'markdown-mode)
+	(straight-use-package 'markdown-mode))
+  :functions
+  my-markdown-follow-file-link
+  :config
+  (defun my-markdown-follow-file-link (url-str)
+	(when-let* ((url (url-generic-parse-url url-str))
+				(_ (string-equal (url-type url) "file"))
+				(filename (url-filename url)))
+	  (find-file-other-window filename)
+	  (when-let* ((target (url-target url))
+				  (_ (string-match "L\\([0-9]+\\)\\(?:-L\\([0-9]+\\)\\)" target)))
+		(let ((start (string-to-number (match-string 1 target)))
+			  (end (string-to-number (match-string 2 target))))
+		  (goto-char (point-min))
+		  (forward-line start)
+		  (when end
+			(push-mark)
+			(activate-mark)
+		  (forward-line (- end start)))
+		  ;; (list filename start end)
+		  ))))
+  (add-hook 'markdown-follow-link-functions #'my-markdown-follow-file-link))
+
+
 ;;;; IBuffer/Imenu/dired sidebar?
 (use-package imenu-list
   :straight t)
-;;;; Magit
+;;;; Version Control
 (use-package magit
   :straight t
   ;; Needed to load default value of magit-status-section-hook.
@@ -679,10 +707,22 @@
   :hook
   (magit-status-sections . magit-insert-user-header))
 
+;; (use-package majutsu
+;;  :straight (:host github :repo "0WD0/majutsu"))
 
+(use-package vc-jj
+  :straight t)
 
 ;;;; Within Terminal
-(unless (display-graphic-p)
+(when (or (daemonp) (not (display-graphic-p)))
+  (use-package term/xterm
+    :config
+    ;; Assumes all xterm based terminals have the necessary capabilities.
+    ;; In particular, we need this for ghostty, as it's not reporting a large enough version, thus
+	;; it's not able to have the correct background color.
+	;; See https://github.com/ghostty-org/ghostty/discussions/5179#discussioncomment-18510763
+    (setopt xterm-extra-capabilities '(reportBackground modifyOtherKeys getSelection setSelection)))
+
   (use-package evil-terminal-cursor-changer
 	:straight t
 	:custom
