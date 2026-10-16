@@ -123,13 +123,6 @@ cmd='{$(ls --color=always -t -w 80 | head -n 10 | xargs echo)}'
 prompt="\\nλ *> "
 export PS1="${debian_chroot:+($debian_chroot)}"$userps1$dirps1$cmd$prompt
 
-# Commonly used directories
-export PJ=~/Dropbox/Projects
-export SW=~/Software
-export DL=~/Downloads
-export DB=~/Dropbox
-export HW=~/Dropbox/uw
-
 # Env Variables
 export EDITOR="emacsclient -n -a vim"
 export SUDO_EDITOR=$EDITOR
