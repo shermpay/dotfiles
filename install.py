@@ -3,14 +3,16 @@
 
 """OS agnostic dotfiles installation script.
 
-Requires Python3.6 and above.
+Requires Python3.11 and above.
 """
 
 import sys
-if sys.version_info < (3, 6):
+if sys.version_info < (3, 11):
     print("Python version too low", sys.version_info)
     sys.exit(1)
 
+import argparse
+import enum
 import os
 import pathlib
 from shutil import which
@@ -18,7 +20,7 @@ from shutil import which
 HOME = pathlib.Path.home()
 
 
-class color:
+class color(enum.StrEnum):
     HEADER = '\033[95m'
     BLUE = '\033[94m'
     CYAN = '\033[96m'
@@ -29,6 +31,8 @@ class color:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+    def __call__(self, s: str) -> str:
+        return f"{self.value}{s}{color.ENDC}"
 
 def check_dir(path):
     if not path.is_dir():
@@ -43,12 +47,15 @@ def symlink(dest, src):
     print(f"symlinked: {dest} --> {src}")
 
 
-def symlink_all(dest, src, hide=False):
+def symlink_all(dest, src, hide=False, skip_mkdir=False):
     print(f"installing directories: {dest} --> {src}")
     if dest.exists() and dest != HOME:
         print(f"WARNING: destination directory '{dest}' exists")
         done = False
         while not done:
+            if skip_mkdir:
+                print(f"skip_mkdir={skip_mkdir}, skipping...")
+                break
             resp = input("(S)kip creation/(D)elete/(Q)uit? ")
             if resp == 'S':
                 break
@@ -69,39 +76,48 @@ def symlink_all(dest, src, hide=False):
                 dest_name = "." + dest_name
             symlink(pathlib.Path(dest, dest_name), pathlib.Path(src, path.name))
         elif path.is_dir():
-            symlink_all(pathlib.Path(dest, path.name), pathlib.Path(src, path.name))
+            symlink_all(pathlib.Path(dest, path.name), pathlib.Path(src, path.name), skip_mkdir=skip_mkdir)
         else:
             print(f"ERROR: Unknown file type: {path}")
             sys.exit(2)
 
+def setup(func):
+    name = func.__name__
+    def new_func(*args, **kwargs):
+        print(color.HEADER("[BEGIN]"), name)
+        func(*args, **kwargs)
+        print(color.CYAN("[END]"), name)
+        print()
+    return new_func
 
-def setup_emacs():
-    print(f"{color.HEADER}[BEGIN]{color.ENDC} setup_emacs")
+@setup
+def setup_emacs(args):
     emacs_path = which("emacs")
     if emacs_path:
-        print(f"{color.OK}[OK]{color.ENDC} Emacs installed at '{emacs_path}'.")
+        print(color.OK("[OK]"), f"Emacs installed at '{emacs_path}'.")
     else:
-        print(f"{color.WARN}[NOT_FOUND]{color.ENDC} Emacs not found!")
+        print(color.WARN("[NOT_FOUND]"), "Emacs not found!")
     EMACS_D = pathlib.Path(HOME, ".emacs.d")
     config_src_dir = pathlib.Path(pathlib.Path(__file__).parent, "emacs.d")
-    symlink_all(EMACS_D, config_src_dir)
-    print(f"{color.CYAN}[END]{color.ENDC} setup_emacs")
-    print()
+    symlink_all(EMACS_D, config_src_dir, skip_mkdir=args.skip_mkdir)
 
-def setup_sh():
-    print(f"{color.HEADER}[BEGIN]{color.ENDC} setup_sh")
+@setup
+def setup_sh(args):
     zsh_path = which("zsh")
     if zsh_path:
-        print(f"{color.OK}[OK]{color.ENDC} zsh installed at '{zsh_path}'.")
+        print(color.OK("[OK]"), f"zsh installed at '{zsh_path}'.")
     else:
-        print(f"{color.WARN}[NOT_FOUND]{color.ENDC} zsh not found!")
+        print(color.WARN("[NOT_FOUND]"), f"zsh not found!")
     config_src_dir = pathlib.Path(pathlib.Path(__file__).parent, "zsh")
-    symlink_all(HOME, config_src_dir, hide=True)
-    print(f"{color.CYAN}[END]{color.ENDC} setup_sh")
-    print()
+    symlink_all(HOME, config_src_dir, hide=True, skip_mkdir=args.skip_mkdir)
+
+@setup
+def setup_bin(args):
+    config_src_dir = pathlib.Path(__file__).parent / "bin"
+    symlink_all(HOME / ".local/bin", config_src_dir, skip_mkdir=args.skip_mkdir)
 
 def check_env_vars():
-    print(f"{color.HEADER}[BEGIN]{color.ENDC} check_env_vars")
+    print(color.HEADER("[BEGIN]"), f"check_env_vars")
     missing_vars = []
     MY_DRIVE = os.environ.get("MY_DRIVE")
     clr = color.CYAN
@@ -111,17 +127,24 @@ def check_env_vars():
         clr = color.WARN
         missing_vars.append("MY_DRIVE")
 
-    print(f"{clr}MY_DRIVE='{MY_DRIVE}'{color.ENDC}")
-    print(f"{color.WARN}WARNING: The following environment variables are required but not set!{color.ENDC}")
+    print(clr(f"MY_DRIVE='{MY_DRIVE}'"))
+    print(color.WARN("WARNING: The following environment variables are required but not set!"))
     for var in missing_vars:
         print(f"\t{var}")
-    print(f"{color.CYAN}[END]{color.ENDC} check_env_vars")
+    print(color.CYAN("[END]"), "check_env_vars")
     print()
 
 def main():
+    parser = argparse.ArgumentParser("install.py")
+    parser.add_argument("-s", "--skip-mkdir", action="store_true", dest="skip_mkdir", help="skip directory creation")
+    args = parser.parse_args(sys.argv[1:])
+
     check_env_vars()
-    setup_sh()
-    setup_emacs()
+    setup_sh(args)
+    setup_emacs(args)
+    setup_bin(args)
+
+    print(color.BOLD(f"{sys.argv[0]} completed successfully!"))
 
 if __name__ == "__main__":
     main()
