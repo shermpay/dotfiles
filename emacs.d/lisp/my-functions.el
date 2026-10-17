@@ -24,8 +24,6 @@
 
 ;;; Code:
 (require 'cl-lib)
-(require 's)
-(require 'dash)
 
 
 ;;; ========================================
@@ -50,7 +48,7 @@ Uses the `dot` tool."
   (cl-labels ((aux (list result)
 		(if (null list)
 		    result
-		  (aux (cl-rest (cdr list)) (cons (-take 2 list) result)))))
+		  (aux (cl-rest (cdr list)) (cons (take 2 list) result)))))
     (cl-reduce (lambda (x acc) (append x acc)) (aux list (list)))))
 
 (defun my-reverse-char-pairs (beg end)
