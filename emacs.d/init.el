@@ -105,7 +105,6 @@
   :config
   (column-number-mode)
   (tooltip-mode -1)
-  (which-function-mode)
   (setq-default mode-line-format
 				'("%e" mode-line-front-space
 				  (:propertize
@@ -121,12 +120,31 @@
   (keymap-set mode-line-major-mode-keymap "<header-line>"
 			  (keymap-lookup mode-line-major-mode-keymap "<mode-line>"))
   (keymap-set mode-line-minor-mode-keymap "<header-line>"
-			  (keymap-lookup mode-line-minor-mode-keymap "<mode-line>")))
+			  (keymap-lookup mode-line-minor-mode-keymap "<mode-line>"))
+  (which-function-mode)
+  (setopt which-func-display 'header))
 
 (use-package tab-bar
   :config
   (tab-bar-mode)
-  (tab-bar-history-mode))
+  (tab-bar-history-mode)
+  (setopt tab-bar-format
+		  '(tab-bar-format-history tab-bar-format-tabs tab-bar-separator
+								   tab-bar-format-add-tab
+								   tab-bar-format-align-right
+								   tab-bar-format-global)))
+
+(use-package time
+  :config
+  (display-time-mode))
+
+(use-package battery
+  :config
+  (display-battery-mode))
+
+(use-package tab-line
+  :config
+  (global-tab-line-mode))
 
 (use-package pixel-scroll
   :config
