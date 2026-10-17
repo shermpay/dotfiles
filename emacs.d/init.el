@@ -116,7 +116,7 @@
 				  (project-mode-line project-mode-line-format) (vc-mode vc-mode) " "
 				  mode-line-end-spaces))
   (setq-default header-line-format
-				'(" ⚿ " header-line-indent mode-line-modes mode-line-misc-info))
+				'("⚿ " header-line-indent mode-line-modes))
   (keymap-set mode-line-major-mode-keymap "<header-line>"
 			  (keymap-lookup mode-line-major-mode-keymap "<mode-line>"))
   (keymap-set mode-line-minor-mode-keymap "<header-line>"
@@ -824,7 +824,7 @@ a line suffix opens at the start of the file or directory."
           (when (> start-line 0)
             (goto-line start-line))))
        ((string-match-p "\\`[a-z]+://" url)
-        (browse-url url)))))
+        (browse-url url))))
 
   (advice-add 'ghostel--open-link :override #'my-ghostel--open-link))
   (setopt ghostel-shell "/bin/zsh")
