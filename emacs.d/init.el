@@ -620,7 +620,16 @@
 ;;;;; Emacs Lisp
 (use-package emacs
   :custom
-  (trusted-content (add-to-list 'trusted-content "~/.emacs.d/lisp/")))
+  (trusted-content (add-to-list 'trusted-content "~/.emacs.d/lisp/"))
+  :hook
+  (emacs-lisp-mode . flymake-mode)
+  :config
+  (defun my-log-function (orig-fun &rest args)
+	"Log the call to ORIG-FUN and ARGS to *Messages*.
+
+This is meant to be a :around advice to debug functions."
+	(message "log-function: (%s %s)" orig-fun args)
+	(apply orig-fun args)))
 ;;;;; Common Lisp
 (use-package slime
   :disabled
