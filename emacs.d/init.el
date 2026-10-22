@@ -4,12 +4,18 @@
 
 ;;; Requires
 (require 'cl-lib)
+(require 'use-package)					; For computing stats
+
 ;;; Load path
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
 ;;; User Info
 (setq user-full-name "Sherman Pay"
 	  user-mail-address "shermanpay1991@gmail.com")
+
+(use-package use-package
+  :custom
+  (use-package-compute-statistics t))
 
 ;;; Basic Configuration
 (setq debug-on-error t)
