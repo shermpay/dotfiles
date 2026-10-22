@@ -257,17 +257,9 @@
   :config
   (require 'compat-31))
 
-(use-package undo-tree
-  :straight t
-  :diminish (undo-tree-mode . "")
-  :config (global-undo-tree-mode 1)
-  (setq my/undo-tree-history-dir (concat user-emacs-directory "undo-tree-history"))
-  (make-directory my/undo-tree-history-dir t)
-  (setq undo-tree-history-directory-alist `(("." . ,my/undo-tree-history-dir)))
-  (defun my-evil-undo-system ()
-	(evil-set-undo-system 'undo-tree))
-  :hook
-  (evil-mode . my-evil-undo-system))
+(use-package undo-fu
+  :straight t)
+
 
 (use-package evil
   :straight t
@@ -303,7 +295,7 @@
 
   (my-evil-toggle-cursor-colors 'light)
 
-  (evil-set-undo-system 'undo-tree)
+  (evil-set-undo-system 'undo-fu)
 
   (dolist (m '(dired-mode vterm-mode ghostel-mode tab-switcher-mode))
 	(add-to-list 'evil-emacs-state-modes m)))
