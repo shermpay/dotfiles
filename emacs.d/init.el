@@ -18,87 +18,114 @@
   (use-package-compute-statistics t))
 
 ;;; Basic Configuration
-(setq debug-on-error t)
-(setopt enable-local-eval t)
-(global-subword-mode t)
-(show-paren-mode 1)
-(setq show-paren-style 'expression)
-(setq next-line-add-newlines nil)
+(use-package subword
+  :hook
+  (after-init . global-subword-mode))
+
+(use-package paren
+  :custom
+  (show-paren-style 'expression)
+  :hook
+  (after-init . show-paren-mode))
 
 (setq-default tab-width 4)
 (use-package simple
   :config
   (indent-tabs-mode -1))
+
 (use-package loaddefs
-  :config
-  (editorconfig-mode))
-(setopt use-short-answers t)
-;;;; Minibuffer
+  :hook
+  (after-init . editorconfig-mode))
+
 (use-package emacs
-  :config
-  (setq enable-recursive-minibuffers t))
+  :custom
+  (debug-on-error t)
+  (enable-local-eval t)
+  (use-short-answers t)
+  (confirm-kill-emacs #'y-or-n-p))
+
+;;;; Minibuffer
+(setq enable-recursive-minibuffers t)
 (use-package mb-depth
-  :config
-  (minibuffer-depth-indicate-mode))
+  :hook
+  (after-init . minibuffer-depth-indicate-mode))
+
 ;;;; kill-ring
-(setq save-interprogram-paste-before-kill t)
+(setq save-interprogram-paste-before-kill t
+	  kill-do-not-save-duplicates t)
 ;;;; isearch
 (use-package isearch
   :custom
   (isearch-lazy-count t))
-;;;; Buffers/Frames/
+;;;; Buffers/Frames/Windows
 (use-package uniquify
-  :config
+  :custom
   ;; /foo/bar/name => name|/foo/bar
-  (setq uniquify-buffer-name-style 'post-forward))
+  (uniquify-buffer-name-style 'post-forward))
+
 (use-package ibuffer
-  :config
-  (define-key global-map (kbd "C-x C-b") 'ibuffer)
-  (setq ibuffer-expert t)
-  (setq ibuffer-show-empty-filter-groups nil)
-  (defun ibuffer-auto-mode-enable ()
-	(ibuffer-auto-mode 1))
-  (add-hook 'ibuffer-mode-hook #'ibuffer-auto-mode-enable))
+  :bind
+  ("C-x C-b" . ibuffer)
+  :custom
+  (ibuffer-expert t)
+  (ibuffer-show-empty-filter-groups nil)
+  :hook
+  (ibuffer-mode . ibuffer-auto-mode))
+
 (use-package midnight
+  :custom
+  (clean-buffer-list-delay-general 1)
+  :hook
+  (after-init . midnight-mode)
   :config
-  (setopt clean-buffer-list-delay-general 1)
-  (setopt clean-buffer-list-kill-never-regexps (cons "\\`\\*.*-eshell\\*\\'"
-                                                     clean-buffer-list-kill-never-regexps
-                                                     ))
-  (midnight-mode 1)
+  (add-to-list 'clean-buffer-list-kill-never-regexps "\\`\\*.*-eshell\\*\\'")
   (midnight-delay-set 'midnight-delay "01:42am"))
 
-(setopt switch-to-buffer-obey-display-actions t)
-(setopt display-buffer-alist nil)
-(setopt display-buffer-alist
-		'(((derived-mode comint-mode compilation-mode eshell-mode vterm-mode ghostel-mode)
-		   (display-buffer-reuse-mode-window
-			display-buffer-in-direction)
-		   (inhibit-same-window . t)
-		   (window-height . 0.33)
-		   (mode comint-mode compilation-mode eshell-mode vterm-mode vterm-copy-mode ghostel-mode)
-		   (direction . bottom))
-		  ((derived-mode Info-mode help-mode helpful-mode)
-		   (display-buffer-reuse-window
-			;; display-buffer-in-side-window)
-			display-buffer-in-direction)
-		   (inhibit-same-window . t)
-		   (window-width . 0.33)
-		   (mode Info-mode help-mode helpful-mode)
-		   (side . right)
-		   (slot . 0))
-		  ))
+(use-package window
+  :bind
+  (("M-o" . 'other-window))
+
+  :custom
+  (switch-to-buffer-obey-display-actions t)
+  (display-buffer-alist
+   '(((derived-mode comint-mode compilation-mode eshell-mode vterm-mode ghostel-mode)
+	  (display-buffer-reuse-mode-window
+	   display-buffer-in-direction)
+	  (inhibit-same-window . t)
+	  (window-height . 0.33)
+	  (mode comint-mode compilation-mode eshell-mode vterm-mode vterm-copy-mode ghostel-mode)
+	  (direction . bottom))
+	 ((derived-mode Info-mode help-mode helpful-mode)
+	  (display-buffer-reuse-window
+	   ;; display-buffer-in-side-window)
+	   display-buffer-in-direction)
+	  (inhibit-same-window . t)
+	  (window-width . 0.33)
+	  (mode Info-mode help-mode helpful-mode)
+	  (side . right)
+	  (slot . 0))
+	 )))
+
 ;;;; Compilation
+(use-package compile
+  :bind
+  (("C-c r" .  recompile)))
+
 (use-package ansi-color
-  :config
-  (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
+  :after compile
+  :hook
+  (compilation-filter . ansi-color-compilation-filter))
 
 ;;;; UI
 (use-package display-line-numbers
   :custom
   (display-line-numbers-type t)		; t means absolute
   :hook
-  ((prog-mode . display-line-numbers--turn-on))
+  ((prog-mode . display-line-numbers--turn-on)))
+
+(use-package simple
+  :hook
+  (after-init . column-number-mode)
   :config
   ;; No need line number on mode-line
   (line-number-mode -1))
@@ -109,8 +136,6 @@
   (visible-bell t)
   (mode-line-compact 'long)
   :config
-  (column-number-mode)
-  (tooltip-mode -1)
   (setq-default mode-line-format
 				'("%e" mode-line-front-space
 				  (:propertize
@@ -126,54 +151,66 @@
   (keymap-set mode-line-major-mode-keymap "<header-line>"
 			  (keymap-lookup mode-line-major-mode-keymap "<mode-line>"))
   (keymap-set mode-line-minor-mode-keymap "<header-line>"
-			  (keymap-lookup mode-line-minor-mode-keymap "<mode-line>"))
-  (which-function-mode)
-  (setopt which-func-display 'header))
+			  (keymap-lookup mode-line-minor-mode-keymap "<mode-line>")))
+
+(use-package which-func
+  :custom
+  (which-func-display 'header)
+  :hook
+  (after-init . which-function-mode))
 
 (use-package tab-bar
-  :config
-  (tab-bar-mode)
-  (tab-bar-history-mode)
-  (setopt tab-bar-format
-		  '(tab-bar-format-history tab-bar-format-tabs tab-bar-separator
-								   tab-bar-format-add-tab
-								   tab-bar-format-align-right
-								   tab-bar-format-global)))
+  :hook
+  ((after-init . tab-bar-mode)
+   (after-init . tab-bar-history-mode))
+  :custom
+  (tab-bar-format
+   '(tab-bar-format-history tab-bar-format-tabs tab-bar-separator
+							tab-bar-format-add-tab
+							tab-bar-format-align-right
+							tab-bar-format-global)))
 
 (use-package time
-  :config
-  (display-time-mode))
+  :hook
+  (after-init . display-time-mode))
 
 (use-package battery
-  :config
-  (display-battery-mode))
+  :hook
+  (after-init . display-battery-mode))
 
 (use-package tab-line
-  :config
-  (global-tab-line-mode))
+  :hook
+  (after-init . global-tab-line-mode))
 
 (use-package pixel-scroll
-  :config
-  (pixel-scroll-mode)
+  :hook
+  (after-init . pixel-scroll-mode)
   ;; (pixel-scroll-precision-mode) ;; see bug#69972
   )
 
 ;;;; Emacs Server
-(with-eval-after-load "server"
-  (unless (server-running-p) (server-start)))
+(use-package server
+  :functions
+  server-running-p
+  :config
+  (unless (server-running-p)
+	(add-hook 'after-init-hook #'server-start)))
 
 ;;;; Sessions and Backups
 (use-package saveplace
-  :config
-  (save-place-mode))
+  :hook
+  (after-init . save-place-mode))
 (use-package savehist
+  :hook
+  (after-init . savehist-mode))
+
+(use-package emacs
   :config
-  (savehist-mode))
-(let ((tmp (concat user-emacs-directory "tmp")))
-  (setq backup-directory-alist
-		`((".*" . ,tmp)))
-  (setq auto-save-file-name-transforms
-		`((".*" ,tmp t))))
+  (let ((tmp (concat user-emacs-directory "tmp")))
+	(setq backup-directory-alist
+		  `((".*" . ,tmp)))
+	(setq auto-save-file-name-transforms
+		  `((".*" ,tmp t)))))
 ;;;; OS
 (use-package dired
   :config
@@ -213,13 +250,12 @@
 
 ;;;; Inputs
 (use-package which-key
-  :config
-  (which-key-mode))
+  :hook
+  (after-init . which-key-mode))
+
 (use-package repeat
-  :config
-  (repeat-mode 1))
-(define-key global-map (kbd "M-o") 'other-window)
-(define-key global-map (kbd "C-c r") #'recompile)
+  :hook
+  (after-init . repeat-mode))
 
 ;;;; Enable disabled commands
 (dolist (sym '(narrow-to-region
@@ -228,8 +264,11 @@
 			   downcase-region))
   (put sym 'disabled nil))
 
+
 ;;;; Package Management
 (use-package package
+  :functions
+  straight-use-package
   :custom
   (package-install-upgrade-built-in t)
   :config
@@ -241,7 +280,6 @@
 			   '("elpa" . "https://elpa.gnu.org/packages/") t)
   (when (< emacs-major-version 27)
 	(package-initialize))
-  (straight-pull-recipe-repositories)
   ;; Builtin overrides
   (dolist (pkg '(transient org))
 	(straight-use-package pkg)))
@@ -257,6 +295,7 @@
         (profiler-start 'cpu+mem)
       (profiler-stop)
       (profiler-report))))
+
 ;;; Core Packages
 (use-package compat
   :straight t
@@ -597,6 +636,7 @@
 
 ;;;; LSP
 (use-package eglot
+  :defer t
   :bind
   (("C-c C-e" . eglot-code-actions))
   :config
@@ -637,11 +677,13 @@ This is meant to be a :around advice to debug functions."
 (setq flycheck-emacs-lisp-load-path 'inherit)
 ;;;;; Clojure
 (use-package clojure-mode
+  :defer t
   :straight t
   :hook
   (clojure-mode . (lambda () (require 'display-fill-column-indicator) (display-fill-column-indicator--turn-on))))
 
 (use-package flycheck-clj-kondo
+  :defer t
   :straight t)
 
 (use-package flycheck-mode
@@ -655,6 +697,7 @@ This is meant to be a :around advice to debug functions."
 
 ;;;; Go
 (use-package go-mode
+  :defer t
   :straight t
   :mode ("\\.go\\'" . go-mode)
   :hook (before-save . gofmt-before-save)
@@ -669,16 +712,17 @@ This is meant to be a :around advice to debug functions."
 
 ;; (remove-hook 'go-mode-hook 'add-hook-gofmt-before-save)
 (use-package go-ts-mode
-  :config
-  (setq go-ts-mode-indent-offset 4))
+  :defer t
+  :custom
+  (go-ts-mode-indent-offset 4))
 
 ;;;; Rust
 (use-package rust-mode
+  :defer t
   :straight t
-  :init
-  (setopt rust-mode-treesitter-derive t)
-  :config
-  (setq rust-format-on-save t))
+  :custom
+  (rust-mode-treesitter-derive t)
+  (rust-format-on-save t))
 
 ;;;; OCaml
 (use-package tuareg
@@ -694,9 +738,8 @@ This is meant to be a :around advice to debug functions."
 ;;; Additional Packages
 ;;;; Markdown
 (use-package markdown-mode
-  :init
-  (unless (package-installed-p 'markdown-mode)
-	(straight-use-package 'markdown-mode))
+  :defer t
+  :straight t
   :functions
   my-markdown-follow-file-link
   :config
@@ -725,17 +768,17 @@ This is meant to be a :around advice to debug functions."
   :straight t)
 ;;;; Version Control
 (use-package magit
+  :defer t
   :straight t
-  ;; Needed to load default value of magit-status-section-hook.
-  ;; Since magit-status-section-hook does not have ###autoload
-  :demand t
-  :hook
-  (magit-status-sections . magit-insert-user-header))
+  :config
+  (magit-add-section-hook 'magit-status-sections-hook #'magit-insert-user-header))
+
 
 ;; (use-package majutsu
 ;;  :straight (:host github :repo "0WD0/majutsu"))
 
 (use-package vc-jj
+  :defer t
   :straight t)
 
 ;;;; Within Terminal
@@ -858,9 +901,6 @@ a line suffix opens at the start of the file or directory."
   :hook
   (prog-mode . highlight-indent-guides-mode))
 
-
-(require 'org)
-
 ;;;; Helpful
 (use-package helpful
   :straight t
@@ -889,13 +929,16 @@ a line suffix opens at the start of the file or directory."
 
 ;;;; Debuggers
 (use-package realgud
+  :defer t
   :straight t)
 
 (use-package realgud-lldb
+  :defer t
   :straight t)
 
 ;;;; notmuch (email)
 (use-package notmuch
+  :defer t
   :straight t
   :config
   (defun my-notmuch-open-in-gmail ()
