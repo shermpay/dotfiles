@@ -1,4 +1,4 @@
-;;; my-functions.el --- Core library functions for my usage  -*- lexical-binding: t; -*-
+;;; my.el --- Core library functions for my usage  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  Sherman Pay
 
@@ -19,11 +19,69 @@
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-
 ;; 
 
-;;; Code:
 (require 'cl-lib)
+
+;;; Code:
+
+
+;;; PROFILING
+
+(defvar my-completing-read-start-time 0)
+(defvar my-completing-read-profile-buffer)
+
+(defun my-completing-read-profile-setup ()
+  "."
+  (setq my-completing-read-profile-buffer (get-buffer-create "*completing-read-profile*"))
+  (advice-add 'completing-read-default :before #'my-completing-read-profile-before-advice)
+  (advice-add 'completing-read-default :after #'my-completing-read-profile-after-advice))
+
+(defun my-completing-read-profile-before-advice (prompt collection &rest _args)
+  "Before Advice for to profile COMPLETING-READ.
+
+See COMPLETING-READ for PROMPT and COLLECTION details."
+  (condition-case nil
+	  (progn
+		(setq my-completing-read-start-time (current-time))
+		(let ((collection-msg (cl-typecase collection
+								(list (format "list %s... <%d items total>" (take 5 collection) (length collection)))
+								(hash-table (format "hash-table %s... <%d items total>"
+													(let (lst)
+													  (maphash (lambda (k v) (push (cons k v) lst)) collection)
+													  lst)
+													(hash-table-count collection)))
+								(obarray (format "obarray %s" collection))
+								(function (format "function: %s" collection))
+								(t (format "unknown collection type: %s" (type-of collection))))))
+		  (with-current-buffer my-completing-read-profile-buffer
+			(insert
+			 (goto-char (point-max))
+			 (format "completing-read at %s" (format-time-string "%H:%M:%S:%3Nms" my-completing-read-start-time))
+			 ?\t "prompt: " prompt ?\n
+			 ?\t "collection: " collection-msg ?\n))))
+	(error nil)))
+
+
+(defun my-completing-read-profile-after-advice (_prompt _collection &rest _args)
+  "After Advice for to profile COMPLETING-READ.
+
+See COMPLETING-READ for PROMPT and COLLECTION details."
+  (unwind-protect
+      (let* ((end-time (current-time))
+             (end-time-str (format-time-string "%H:%M:%S:%3N" end-time))
+             (elapsed (format-time-string "%s" (time-subtract end-time my-completing-read-start-time))))
+        (with-current-buffer my-completing-read-profile-buffer
+          (goto-char (point-max))
+          (insert
+           ?\t (format "end-time=%s; elapsed=%ss" end-time-str elapsed) ?\n ?\n)))
+    (setq my-completing-read-start-time nil)))
+
+(when nil
+  (my-completing-read-profile-setup)
+  (progn
+	(advice-remove 'completing-read-default #'my-completing-read-profile-before-advice)
+	(advice-remove 'completing-read-default #'my-completing-read-profile-after-advice)))
 
 
 ;;; ========================================
@@ -37,11 +95,6 @@ Uses the `dot` tool."
   (let* ((file (buffer-file-name))
 		 (out-file (substring file 0 (- (length file) 4))))
     (shell-command (concat "dot -Tpng " file " -o " out-file ".png"))))
-
-(defun my-caesar-cipher (s n)
-  "Apply a caesar cipher to S using N as the offset."
-  (apply #'string
-         (mapcar (lambda (x) (+ (mod (+ n (- x ?a)) 26) ?a)) (downcase s))))
 
 (defun my-reverse-pairs (list)
   "Reverse pairs in LIST."
@@ -67,26 +120,6 @@ Uses the `dot` tool."
 Prepend the string with PREPEND and append to the string with APPEND."
   (cl-loop for x from (string-to-char start) to (string-to-char end)
 		collect (concat prepend (char-to-string x) append)))
-
-(defun my-gen-chars ()
-  "Generate characters from START to END."
-  (interactive)
-  (let ((start (read-from-minibuffer "Start character: "))
-	(end (read-from-minibuffer "End character: ")))
-    (my-generate-characters start end)))
-
-(defun my-insert-date (insert-date-format)
-  "Insert the current date.
-
-Prefix argument controls INSERT-DATE-FORMAT."
-  (interactive "P")
-  (let ((format (cond
-				 ((null insert-date-format) "%d.%m.%Y")
-				 ((equal insert-date-format '(4)) "%Y-%m-%d")
-				 ((equal insert-date-format '(16)) "%A, %d. %B %Y")))
-		(system-time-locale "de_DE"))
-    (insert (format-time-string format))))
-
 
 (defun my-apply-function-to-region (from to function)
   "Apply an elisp FUNCTION to region in FROM TO."
@@ -129,5 +162,5 @@ Prefix argument controls INSERT-DATE-FORMAT."
 	(add-to-list list-symbol value)))
 
 
-(provide 'my-functions)
-;;; my-functions.el ends here
+(provide 'my)
+;;; my.el ends here
