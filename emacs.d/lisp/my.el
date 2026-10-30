@@ -161,6 +161,35 @@ Prepend the string with PREPEND and append to the string with APPEND."
 
 	(add-to-list list-symbol value)))
 
+(defun my-duration-list->seconds (dur-list)
+  "Convert a DUR-LIST to an integer seconds.
+
+DUR-LIST is the an even length list of the form: (N UNIT...)"
+  (unless (cl-evenp (length dur-list))
+	(error "DUR-LIST is not even length: %s" dur-list))
+
+  (cl-flet ((to-seconds (n unit)
+			  (* n
+				 (cl-ecase unit
+				   ((seconds) 1)
+				   ((minutes) 60)
+				   ((hours) 3600)
+				   ((days) 86400)
+				   ((weeks) 604800)))))
+	(cl-loop
+	 for (n unit) on dur-list by #'cddr
+	 sum (to-seconds n unit))))
+
+(defmacro my-duration (&rest args)
+  "Convert ARGS to number of seconds.
+
+ARGS is a sequence of N UNIT pairs where N is an integer and UNIT is a symbol.
+
+For example:
+
+ (my-duration 1 seconds 2 minutes)"
+  `(my-duration-list->seconds ',args))
+
 
 (provide 'my)
 ;;; my.el ends here
