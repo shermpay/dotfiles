@@ -9,6 +9,72 @@
 ;;; Load path
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
+;;; Package Management
+;;;;; Bootstrap Elpaca
+(defvar elpaca-installer-version 0.12)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil :depth 1 :inherit ignore
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca-activate)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-sources-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (<= emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                  ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                  ,@(when-let* ((depth (plist-get order :depth)))
+                                                      (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                  ,(plist-get order :repo) ,repo))))
+                  ((zerop (call-process "git" nil buffer t "checkout"
+                                        (or (plist-get order :ref) "--"))))
+                  (emacs (concat invocation-directory invocation-name))
+                  ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                        "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                  ((require 'elpaca))
+                  ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
+
+(use-package package
+  :custom
+  (package-install-upgrade-built-in t)
+  :config
+  ;; (add-to-list 'package-archives
+  ;;   '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+  (add-to-list 'package-archives
+			   '("melpa" . "https://melpa.org/packages/") t)
+  (add-to-list 'package-archives
+			   '("elpa" . "https://elpa.gnu.org/packages/") t)
+  (when (< emacs-major-version 27)
+	(package-initialize)))
+
+(defun my-package-install (names)
+  (mapc (lambda (pkg) (eval `(elpaca ,pkg))) names)
+  (elpaca-wait))
+
+
+;;;;; Builtin overrides
+(my-package-install '(compat
+					  transient
+					  org
+					  project))
+
+
 ;;; User Info
 (setq user-full-name "Sherman Pay"
 	  user-mail-address "shermanpay1991@gmail.com")
@@ -265,24 +331,6 @@
   (put sym 'disabled nil))
 
 
-;;;; Package Management
-(use-package package
-  :functions
-  straight-use-package
-  :custom
-  (package-install-upgrade-built-in t)
-  :config
-  ;; (add-to-list 'package-archives
-  ;;   '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-  (add-to-list 'package-archives
-			   '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives
-			   '("elpa" . "https://elpa.gnu.org/packages/") t)
-  (when (< emacs-major-version 27)
-	(package-initialize))
-  ;; Builtin overrides
-  (dolist (pkg '(transient org))
-	(straight-use-package pkg)))
 
 ;;;; Profiling
 (use-package profiler
@@ -297,17 +345,24 @@
       (profiler-report))))
 
 ;;; Core Packages
+;;;; Install
+(my-package-install '(undo-fu
+					  evil
+					  exec-path-from-shell
+					  vertico
+					  orderless
+					  consult
+					  corfu
+					  avy
+					  ace-window))
 (use-package compat
-  :straight t
   :config
   (require 'compat-31))
 
-(use-package undo-fu
-  :straight t)
+(use-package undo-fu)
 
 
 (use-package evil
-  :straight t
   :init
   (setq evil-want-keybinding nil)		; Remove keybindings defined in evil-keybindings.el
   :config
@@ -346,7 +401,6 @@
 	(add-to-list 'evil-emacs-state-modes m)))
 
 (use-package exec-path-from-shell
-  :straight t
   :custom
   (exec-path-from-shell-arguments '("-l"))
   :config
@@ -356,7 +410,6 @@
   (exec-path-from-shell-initialize))
 
 (use-package vertico
-  :straight t
   :init
   (vertico-mode)
 
@@ -411,7 +464,6 @@
   (setq read-extended-command-predicate #'command-completion-default-include-p));; Enable vertico
 
 (use-package orderless
-  :straight t
   :init
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
@@ -421,7 +473,6 @@
 		completion-category-overrides '((file (styles partial-completion)))))
 
 (use-package consult
-  :straight t
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings in `mode-specific-map'
 		 ("C-c M-x" . consult-mode-command)
@@ -545,7 +596,6 @@
 
 ;; TODO: Migrate to completion-preview-mode
 (use-package corfu
-  :straight t
   ;; Optional customizations
   :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -604,7 +654,6 @@
 
 ;;;; Navigation
 (use-package avy
-  :straight t
   :bind
   (("C-c SPC" . avy-goto-char))
   (:map evil-motion-state-map
@@ -616,12 +665,19 @@
 		  avy-all-windows-alt t))
 
 (use-package ace-window
-  :straight t
   :config
   (global-set-key (kbd "M-o") 'ace-window)
   (setq aw-scope 'frame))
 
 ;;; Programming Modes
+(my-package-install '(clojure-mode
+					  flycheck-clj-kondo
+					  flycheck
+					  go-mode
+					  rust-mode
+					  tuareg
+					  markdown-mode
+					  ))
 ;;;; Checkers
 (with-eval-after-load "flymake"
   (define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
@@ -678,16 +734,13 @@ This is meant to be a :around advice to debug functions."
 ;;;;; Clojure
 (use-package clojure-mode
   :defer t
-  :straight t
   :hook
   (clojure-mode . (lambda () (require 'display-fill-column-indicator) (display-fill-column-indicator--turn-on))))
 
 (use-package flycheck-clj-kondo
-  :defer t
-  :straight t)
+  :defer t)
 
-(use-package flycheck-mode
-  :straight (flycheck-mode :type git :host github :repo "flycheck/flycheck")
+(use-package flycheck
   :hook clojure-mode)
 
 ;;;;; Lisp Shared
@@ -698,7 +751,6 @@ This is meant to be a :around advice to debug functions."
 ;;;; Go
 (use-package go-mode
   :defer t
-  :straight t
   :mode ("\\.go\\'" . go-mode)
   :hook (before-save . gofmt-before-save)
   ;; :hook (go-mode . add-hook-gofmt-before-save)
@@ -719,27 +771,17 @@ This is meant to be a :around advice to debug functions."
 ;;;; Rust
 (use-package rust-mode
   :defer t
-  :straight t
   :custom
   (rust-mode-treesitter-derive t)
   (rust-format-on-save t))
 
 ;;;; OCaml
 (use-package tuareg
-  :disabled
-  :ensure nil)
-(use-package ocamlformat
-  :disabled
-  :ensure nil
-  :config
-  (add-hook 'tuareg-mode-hook (lambda ()
-								;; (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
-								(add-hook 'before-save-hook #'ocamlformat-before-save))))
+  :disabled)
 ;;; Additional Packages
 ;;;; Markdown
 (use-package markdown-mode
   :defer t
-  :straight t
   :functions
   my-markdown-follow-file-link
   :config
@@ -764,22 +806,34 @@ This is meant to be a :around advice to debug functions."
 
 
 ;;;; IBuffer/Imenu/dired sidebar?
-(use-package imenu-list
-  :straight t)
+(my-package-install '(imenu-list
+					  magit
+					  (majutsu :host github :repo "0WD0/majutsu")
+					  vc-jj
+					  evil-terminal-cursor-changer
+					  clipetty
+					  corfu-terminal
+					  vterm
+					  ghostel
+					  helpful
+					  devdocs
+					  rg
+					  realgud
+					  realgud-lldb
+					  notmuch))
+
+(use-package imenu-list)
 ;;;; Version Control
 (use-package magit
   :defer t
-  :straight t
   :config
   (magit-add-section-hook 'magit-status-sections-hook #'magit-insert-user-header))
 
 
-;; (use-package majutsu
-;;  :straight (:host github :repo "0WD0/majutsu"))
+;; (use-package majutsu)
 
 (use-package vc-jj
-  :defer t
-  :straight t)
+  :defer t)
 
 ;;;; Within Terminal
 (when (or (daemonp) (not (display-graphic-p)))
@@ -792,14 +846,12 @@ This is meant to be a :around advice to debug functions."
     (setopt xterm-extra-capabilities '(reportBackground modifyOtherKeys getSelection setSelection)))
 
   (use-package evil-terminal-cursor-changer
-	:straight t
 	:custom
 	(etcc-use-color t)
 	:config
 	(etcc-on)
 	)
   (use-package clipetty
-	:straight t
 	:hook (after-init . global-clipetty-mode)
 	:config
 	;; The following is needed to support mosh
@@ -819,14 +871,12 @@ frame's environment."
 
   (use-package corfu-terminal
 	:if (< emacs-major-version 31)
-	:straight t
 	:config
 	(corfu-terminal-mode)))
 
 ;;;; Terminal
 (use-package vterm
   :disabled t
-  :straight nil
   :config
   (setq vterm-buffer-name-string "vterm [%s]")
   (setq vterm-timer-delay 0.01)
@@ -837,7 +887,6 @@ frame's environment."
   :hook (vterm-mode . (lambda () (goto-address-mode 1))))
 
 (use-package ghostel
-  :straight t
   :bind
   ("C-c t" . #'ghostel)
   :config
@@ -903,7 +952,6 @@ a line suffix opens at the start of the file or directory."
 
 ;;;; Helpful
 (use-package helpful
-  :straight t
   :custom
   (evil-emacs-state-modes (add-to-list 'evil-emacs-state-modes 'helpful-mode))
   :bind (("C-h f" . helpful-callable)
@@ -919,27 +967,22 @@ a line suffix opens at the start of the file or directory."
   )
 ;;;; Devdocs
 (use-package devdocs
-  :straight t
   :bind
   (("C-c M-d" . devdocs-lookup)))
 
 ;;;; Ripgrep
-(use-package rg
-  :straight t)
+(use-package rg)
 
 ;;;; Debuggers
 (use-package realgud
-  :defer t
-  :straight t)
+  :defer t)
 
 (use-package realgud-lldb
-  :defer t
-  :straight t)
+  :defer t)
 
 ;;;; notmuch (email)
 (use-package notmuch
   :defer t
-  :straight t
   :config
   (defun my-notmuch-open-in-gmail ()
 	"Open the current notmuch email in the Gmail web interface."
@@ -1055,8 +1098,11 @@ a line suffix opens at the start of the file or directory."
 
 
 ;;;; org-roam
+(my-package-install '(org-roam
+					  org-roam-ui
+					  websocket))
+
 (use-package org-roam
-  :straight t
   :after org
   :custom
   (org-roam-directory org-directory)
@@ -1106,7 +1152,6 @@ a line suffix opens at the start of the file or directory."
 
 (use-package org-roam-ui
   :after org-roam
-  :straight t
   :config
   (setq org-roam-ui-sync-theme t
 		org-roam-ui-follow t
