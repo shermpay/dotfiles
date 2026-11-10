@@ -927,6 +927,15 @@ a line suffix opens at the start of the file or directory."
 ;;;; notmuch (email)
 (use-package notmuch
   :defer t
+  :straight t
+  :custom
+  (notmuch-tagging-keys
+   `(("a" ,notmuch-archive-tags "Archive")
+	 ("u" ,notmuch-show-mark-read-tags "Mark read")
+	 ("A" ,(append notmuch-archive-tags notmuch-show-mark-read-tags) "Mark Read & Archive")
+	 ("f" ("+flagged") "Flag") ("s" ("+spam" "-inbox") "Mark as spam")
+	 ("d" ("+deleted" "-inbox") "Delete")))
+
   :config
   (defun my-notmuch-open-in-gmail ()
 	"Open the current notmuch email in the Gmail web interface."
@@ -943,6 +952,12 @@ a line suffix opens at the start of the file or directory."
   ;; Bind it to "B" (for Browser) inside notmuch-show-mode
   (with-eval-after-load 'notmuch
 	(define-key notmuch-show-mode-map (kbd "B") #'my-notmuch-open-in-gmail)))
+
+(use-package ol-notmuch
+  :straight t
+  :after (org notmuch)
+  :bind
+  ("C-c l" . org-store-link))
 
 ;;; Org Mode
 ;;;; The following are builtin configurations.
