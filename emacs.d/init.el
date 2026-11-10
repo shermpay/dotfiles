@@ -182,6 +182,7 @@ RECIPE can be a symbol for the package name or a list."
 				  mode-line-frame-identification mode-line-buffer-identification " "
 				  mode-line-position
 				  (project-mode-line project-mode-line-format) (vc-mode vc-mode) " "
+				  mode-line-misc-info
 				  mode-line-end-spaces))
   (setq-default header-line-format
 				'("⚿ " header-line-indent mode-line-modes))
@@ -201,11 +202,13 @@ RECIPE can be a symbol for the package name or a list."
   ((after-init . tab-bar-mode)
    (after-init . tab-bar-history-mode))
   :custom
-  (tab-bar-format
-   '(tab-bar-format-history tab-bar-format-tabs tab-bar-separator
-							tab-bar-format-add-tab
-							tab-bar-format-align-right
-							tab-bar-format-global)))
+  (tab-bar-format '(tab-bar-format-menu-bar
+					tab-bar-format-tabs
+					tab-bar-separator
+					tab-bar-format-add-tab
+					tab-bar-format-align-right
+					tab-bar-format-global
+					)))
 
 (use-package time
   :hook
