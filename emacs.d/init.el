@@ -271,10 +271,14 @@ RECIPE can be a symbol for the package name or a list."
   :config
   (defun my-ansi-osc-apply-on-buffer ()
     (interactive)
-    (dlet ((inhibit-read-only t)
-           (buffer-read-only nil))
+    (let ((inhibit-read-only t)
+          (buffer-read-only nil))
       (message "apply on buffer: %s" (current-buffer))
       (ansi-osc-apply-on-region (point-min) (point-max)))))
+
+(use-package executable
+  :hook
+  (after-save . executable-chmod))
 
 ;;;; project.el
 (use-package project
