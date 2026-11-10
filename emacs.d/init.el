@@ -278,7 +278,8 @@ RECIPE can be a symbol for the package name or a list."
 
 (use-package executable
   :hook
-  (after-save . executable-chmod))
+  (after-save . executable-make-buffer-file-executable-if-script-p))
+
 
 ;;;; project.el
 (use-package project
@@ -751,22 +752,24 @@ This is meant to be a :around advice to debug functions."
 
 
 ;;;; IBuffer/Imenu/dired sidebar?
+<<<<<<< HEAD
 (my-package-install-and-load imenu-list
-							 magit
-							 (majutsu :host github :repo "0WD0/majutsu")
-							 vc-jj
-							 clipetty
-							 corfu-terminal
-							 vterm
-							 ghostel
-							 helpful
-							 devdocs
-							 rg
-							 realgud
-							 realgud-lldb
-							 notmuch)
+                             magit
+                             (majutsu :host github :repo "0WD0/majutsu")
+                             vc-jj
+                             clipetty
+                             corfu-terminal
+                             vterm
+                             ghostel
+                             helpful
+                             devdocs
+                             rg
+                             realgud
+                             realgud-lldb
+                             notmuch)
 
 (use-package imenu-list)
+
 ;;;; Version Control
 (use-package magit
   :defer t
@@ -774,7 +777,12 @@ This is meant to be a :around advice to debug functions."
   (magit-add-section-hook 'magit-status-sections-hook #'magit-insert-user-header))
 
 
-;; (use-package majutsu)
+(use-package majutsu
+  :functions
+  my-ansi-osc-apply-on-buffer
+  :hook
+  ;; needed for OSC-8 strings.
+  (majutsu-refresh-buffer . my-ansi-osc-apply-on-buffer))
 
 (use-package vc-jj
   :defer t)
