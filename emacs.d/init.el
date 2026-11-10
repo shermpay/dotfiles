@@ -834,9 +834,10 @@ frame's environment."
 
 (use-package ghostel
   :bind
-  ("C-c t" . #'ghostel)
+  (("C-c t" . #'ghostel)
+   :map project-prefix-map
+   ("t" . ghostel-project))
   :config
-  (add-to-list 'project-switch-commands '(ghostel-project "Ghostel" "t") t)
   (defun my-ghostel--open-link (url)
     "Open URL, dispatching by scheme.
 file:// URIs open in Emacs; http(s) and other schemes use `browse-url'.
