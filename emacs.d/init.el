@@ -29,16 +29,21 @@
   (when (< emacs-major-version 27)
 	(package-initialize)))
 
-(defun my-package-install (names)
-  (mapc (lambda (pkg) (eval `(elpaca ,pkg))) names)
-  (elpaca-wait))
+(defmacro my-package-install-and-load (&rest recipes)
+  "Install and load packages specified by RECIPES.
+
+Blocks until all RECIPES have been installed.
+
+RECIPE can be a symbol for the package name or a list."
+  `(progn ,@(mapcar (lambda (pkg) `(elpaca ,pkg)) recipes)
+		  (elpaca-wait)))
 
 
 ;;;;; Builtin overrides
-(my-package-install '(compat
-					  transient
-					  org
-					  project))
+(my-package-install-and-load compat
+							 transient
+							 org
+							 project)
 
 
 ;;; User Info
@@ -312,15 +317,16 @@
 
 ;;; Core Packages
 ;;;; Install
-(my-package-install '(undo-fu
-					  evil
-					  exec-path-from-shell
-					  vertico
-					  orderless
-					  consult
-					  corfu
-					  avy
-					  ace-window))
+(my-package-install-and-load undo-fu
+							 ;; evil
+							 meow
+							 exec-path-from-shell
+							 vertico
+							 orderless
+							 consult
+							 corfu
+							 avy
+							 ace-window)
 (use-package compat
   :config
   (require 'compat-31))
@@ -636,14 +642,14 @@
   (setq aw-scope 'frame))
 
 ;;; Programming Modes
-(my-package-install '(clojure-mode
-					  flycheck-clj-kondo
-					  flycheck
-					  go-mode
-					  rust-mode
-					  tuareg
-					  markdown-mode
-					  ))
+(my-package-install-and-load clojure-mode
+							 flycheck-clj-kondo
+							 flycheck
+							 go-mode
+							 rust-mode
+							 tuareg
+							 markdown-mode
+							 )
 ;;;; Checkers
 (with-eval-after-load "flymake"
   (define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
@@ -772,21 +778,21 @@ This is meant to be a :around advice to debug functions."
 
 
 ;;;; IBuffer/Imenu/dired sidebar?
-(my-package-install '(imenu-list
-					  magit
-					  (majutsu :host github :repo "0WD0/majutsu")
-					  vc-jj
-					  evil-terminal-cursor-changer
-					  clipetty
-					  corfu-terminal
-					  vterm
-					  ghostel
-					  helpful
-					  devdocs
-					  rg
-					  realgud
-					  realgud-lldb
-					  notmuch))
+(my-package-install-and-load imenu-list
+							 magit
+							 (majutsu :host github :repo "0WD0/majutsu")
+							 vc-jj
+							 ;; evil-terminal-cursor-changer
+							 clipetty
+							 corfu-terminal
+							 vterm
+							 ghostel
+							 helpful
+							 devdocs
+							 rg
+							 realgud
+							 realgud-lldb
+							 notmuch)
 
 (use-package imenu-list)
 ;;;; Version Control
@@ -1064,9 +1070,9 @@ a line suffix opens at the start of the file or directory."
 
 
 ;;;; org-roam
-(my-package-install '(org-roam
-					  org-roam-ui
-					  websocket))
+(my-package-install-and-load org-roam
+							 org-roam-ui
+							 websocket)
 
 (use-package org-roam
   :after org
