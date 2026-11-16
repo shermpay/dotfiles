@@ -180,7 +180,7 @@ RECIPE can be a symbol for the package name or a list."
 					mode-line-remote mode-line-window-dedicated)
 				   display (min-width (6.0)))
 				  mode-line-frame-identification mode-line-buffer-identification " "
-				  mode-line-position evil-mode-line-tag
+				  mode-line-position
 				  (project-mode-line project-mode-line-format) (vc-mode vc-mode) " "
 				  mode-line-end-spaces))
   (setq-default header-line-format
@@ -318,7 +318,6 @@ RECIPE can be a symbol for the package name or a list."
 ;;; Core Packages
 ;;;; Install
 (my-package-install-and-load undo-fu
-							 ;; evil
 							 meow
 							 exec-path-from-shell
 							 vertico
@@ -334,43 +333,16 @@ RECIPE can be a symbol for the package name or a list."
 (use-package undo-fu)
 
 
-(use-package evil
-  :init
-  (setq evil-want-keybinding nil)		; Remove keybindings defined in evil-keybindings.el
-  :config
-  (setopt evil-move-cursor-back nil)
-  (setopt evil-disable-insert-state-bindings t)
-  (evil-mode 1)
-  (defvar my-evil-cursor-colors 'light)
 
-  (defun my-evil-toggle-cursor-colors (&optional cursor-colors args)
-	"Set evil cursor colors based on CURSOR-COLORS."
-	(interactive)
-	(unless cursor-colors
-	  (setq cursor-colors (cl-case my-evil-cursor-colors
-							((light) 'dark)
-							((dark) 'light)
-							)))
-	(cl-case cursor-colors
-	  ((dark) (setq evil-normal-state-cursor '("dim gray" box)
-					 evil-insert-state-cursor '("dim gray" (bar . 4))
-					 evil-emacs-state-cursor '("dark violet" bar)
-					 my-evil-cursor-colors cursor-colors))
-	  ((light) (setq evil-normal-state-cursor '("light salmon" box)
-					  evil-insert-state-cursor '("light salmon" (bar . 4))
-					  evil-emacs-state-cursor '("magenta" (bar . 4))
-					  my-evil-cursor-colors cursor-colors))
-	  (otherwise
-	   (user-error "cursor-colors or my-evil-cursor-colors is invalid: %s; %s"
-				   cursor-colors
-				   my-evil-cursor-colors))))
-
-  (my-evil-toggle-cursor-colors 'light)
-
-  (evil-set-undo-system 'undo-fu)
-
-  (dolist (m '(dired-mode vterm-mode ghostel-mode tab-switcher-mode))
-	(add-to-list 'evil-emacs-state-modes m)))
+(use-package meow
+  :custom
+  (meow-expand-hint-remove-delay 1.6)
+  (meow-use-clipboard select-enable-clipboard))
+(use-package meow-config
+  :bind
+  ("C-c `" . meow-normal-mode)
+  :hook
+  (after-init-hook . meow-config-init))
 
 (use-package exec-path-from-shell
   :custom
@@ -623,9 +595,7 @@ RECIPE can be a symbol for the package name or a list."
 ;;;; Navigation
 (use-package avy
   :bind
-  (("C-c SPC" . avy-goto-char))
-  (:map evil-motion-state-map
-		("SPC" . avy-goto-word-or-subword-1))
+  ("C-c SPC" . avy-goto-char)
 
   :config
   (avy-setup-default)
@@ -778,7 +748,6 @@ This is meant to be a :around advice to debug functions."
 							 magit
 							 (majutsu :host github :repo "0WD0/majutsu")
 							 vc-jj
-							 ;; evil-terminal-cursor-changer
 							 clipetty
 							 corfu-terminal
 							 vterm
@@ -813,12 +782,6 @@ This is meant to be a :around advice to debug functions."
 	;; See https://github.com/ghostty-org/ghostty/discussions/5179#discussioncomment-18510763
     (setopt xterm-extra-capabilities '(reportBackground modifyOtherKeys getSelection setSelection)))
 
-  (use-package evil-terminal-cursor-changer
-	:custom
-	(etcc-use-color t)
-	:config
-	(etcc-on)
-	)
   (use-package clipetty
 	:hook (after-init . global-clipetty-mode)
 	:config
@@ -920,8 +883,6 @@ a line suffix opens at the start of the file or directory."
 
 ;;;; Helpful
 (use-package helpful
-  :custom
-  (evil-emacs-state-modes (add-to-list 'evil-emacs-state-modes 'helpful-mode))
   :bind (("C-h f" . helpful-callable)
 		 ("C-h v" . helpful-variable)
 		 ("C-h k" . helpful-key)
